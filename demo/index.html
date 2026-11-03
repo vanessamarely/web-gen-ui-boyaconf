@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mercado campesino · Plaza de Tunja</title>
+    <meta name="description" content="Demo de la charla UI generativa sin fricción (BoyaConf 2026): un agente arma tu mercado de la semana con tools de WebMCP mientras la lista se genera en streaming." />
+    <link rel="icon" href="/favicon.svg" />
+    <!-- En <head>: sin salto al cargar (si se importa desde JS, en desarrollo el CSS llega tarde). -->
+    <link rel="stylesheet" href="/src/styles.css" />
+  </head>
+  <body>
+    <a class="skip" href="#lista">Saltar a la lista</a>
+
+    <!-- Barra de la charla (no es parte del producto) -->
+    <div class="charla-bar" role="region" aria-label="Controles de la demo de la charla">
+      <span class="charla-tag">BoyaConf 26 · demo</span>
+      <div class="modo" role="radiogroup" aria-label="Modo de la UI generativa">
+        <button type="button" role="radio" data-modo="ingenuo" aria-checked="false">Ingenuo</button>
+        <button type="button" role="radio" data-modo="fluido" aria-checked="true">Sin fricción</button>
+      </div>
+      <div id="hud"></div>
+      <button type="button" class="inspector-btn" data-inspector-toggle aria-expanded="false" aria-controls="inspector">Tools WebMCP</button>
+    </div>
+
+    <header class="site">
+      <a class="logo" href="/"><img src="/favicon.svg" alt="" width="36" height="36" /><span><b>Mercado campesino</b><small>Plaza de mercado · Tunja</small></span></a>
+      <form class="pedido" data-pedido>
+        <label class="sr" for="q">Pídele al agente</label>
+        <input id="q" name="q" autocomplete="off" placeholder="Ej.: mercado para 4 con 120 mil, para un cuchuco" />
+        <button type="submit">Pedir al agente</button>
+      </form>
+      <div class="sugerencias" data-sugerencias></div>
+    </header>
+
+    <div class="layout">
+      <main>
+        <div class="resumen" data-resumen aria-live="off"></div>
+        <div id="lista" class="lista" tabindex="-1"></div>
+      </main>
+      <aside class="panel" aria-label="Actividad del agente">
+        <div class="panel-head"><h2>Actividad del agente</h2><button type="button" class="cancelar" data-cancelar hidden>Cancelar</button></div>
+        <p class="respuesta" data-respuesta hidden></p>
+        <ol class="feed" data-feed></ol>
+        <h3 class="hist-h">Cambios del agente</h3>
+        <ol class="historial" data-historial></ol>
+        <p class="motor" data-motor></p>
+      </aside>
+    </div>
+
+    <aside id="inspector" class="inspector" hidden aria-label="Inspector de tools WebMCP"></aside>
+    <dialog class="confirmar" data-confirmar>
+      <form method="dialog">
+        <h2>Confirmar</h2>
+        <p data-confirmar-texto></p>
+        <div class="acciones"><button value="no">Cancelar</button><button value="si" class="primario">Sí, enviar</button></div>
+      </form>
+    </dialog>
+    <p class="sr" data-anuncio role="status" aria-live="polite"></p>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

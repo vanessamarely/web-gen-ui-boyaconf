@@ -1,0 +1,7 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    { "name": "boya-slides", "runtimeExecutable": "npm", "runtimeArgs": ["run", "dev", "-w", "slides"], "port": 5291 },
+    { "name": "boya-demo", "runtimeExecutable": "npm", "runtimeArgs": ["run", "dev", "-w", "demo"], "port": 5292 }
+  ]
+}
