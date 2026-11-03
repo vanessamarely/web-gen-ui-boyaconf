@@ -608,7 +608,7 @@ section[data-deck-active] .g-step.warn .ico { animation: pulse 1.6s ease-in-out 
 .guard-side { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; padding-right: 180px; }
 :root[data-ratio='4-3'] .guard { gap: 14px; } :root[data-ratio='4-3'] .g-step:not(:last-child)::after { right: -14px; }
 :root[data-ratio='4-3'] .g-step b { font-size: 15px; } :root[data-ratio='4-3'] .g-step small { font-size: 12.5px; }
-:root[data-ratio='4-3'] .guard-side { grid-template-columns: 1fr 1fr; padding-right: 0; } :root[data-ratio='4-3'] .guard-side .box:last-child { display: none; }
+:root[data-ratio='4-3'] .guard-side { grid-template-columns: 1fr 1fr; padding-right: 0; }
 
 /* ═════════════ DEMO CON VIDEO ═════════════ */
 .prompt-chip { display: flex; gap: 10px; align-items: center; margin: 0 0 16px; padding: 12px 16px; border-radius: var(--r-md); border: var(--lw) solid var(--line); background: var(--p-blue); font-size: 21px; font-weight: 500; }
@@ -1182,3 +1182,13 @@ section[data-deck-active] .gen-status .g2 { animation: gen-on 400ms both; animat
 :root[data-ratio='4-3'] .join-grid .box p { font-size: 15px; }
 :root[data-ratio='4-3'] .card-frame { padding-bottom: 110px; }
 :root[data-ratio='4-3'] .progreso-grid .side-notes { padding-right: 70px; }
+/* El estado "generando → listo" va en el pie, junto al número de slide (arriba choca con EN VIVO y el menú) */
+.gen-status { top: auto; bottom: 30px; right: 200px; font-size: 12px; line-height: 1; }
+:root[data-joinqr='off'] .gen-status { right: 120px; }
+:root[data-ratio='4-3'] .guard-side { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+:root[data-ratio='4-3'] .guard-side .box p { font-size: 15px; }
+/* Muro con pocos tejedores (antes del mosaico): recuadros más grandes */
+.tejedor-wall:not(.mosaic) { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
+.tejedor-wall:not(.mosaic) .tejedor-tile { padding: 12px 10px 14px; }
+.tejedor-wall:not(.mosaic) .tejedor-tile b { font-size: 16px; }
+.tejedor-wall:not(.mosaic) .tejedor-tile small { font-size: 13px; }

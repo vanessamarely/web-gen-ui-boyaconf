@@ -137,6 +137,7 @@ async function boot() {
     myVotes = v;
     if (view === 'live' && live?.kind === 'poll') updatePoll($('#screen'));
     renderScore();
+    renderHold();
   });
   renderMe();
   if (name) void rt.join(name).catch(() => undefined);
@@ -331,6 +332,22 @@ function bindNoteBox(root: ParentNode, id: string, { followLiveOnSave }: { follo
 /** Banner fijo: la presentadora avanzó mientras escribías (o ya guardaste y vas detrás). */
 function renderHold() {
   const el = $('[data-hold]');
+  // Pregunta abierta mientras la persona crea su tejedor o lee sus notas: avisar (no perderla ni su bono).
+  const qid = live?.kind === 'poll' ? live.qid : null;
+  if (view !== 'live' && qid && !myVotes[qid] && !live?.revealed?.[qid]) {
+    const sig = `poll:${qid}`;
+    if (el.dataset.for !== sig || el.hidden) {
+      el.dataset.for = sig;
+      el.innerHTML = `<p><span class="pulse" aria-hidden="true"></span><b>¡Pregunta abierta!</b> Responde rápido: suma más puntos. Lo que estabas haciendo queda guardado.</p>
+        <div class="row"><button class="btn primary" type="button" data-hold-poll>Responder ahora</button></div>`;
+      el.querySelector('[data-hold-poll]')?.addEventListener('click', () => {
+        el.hidden = true;
+        go('live');
+      });
+    }
+    el.hidden = false;
+    return;
+  }
   const behind = view === 'live' && Boolean(live?.id) && Boolean(shownId) && live!.id !== shownId;
   if (!behind) {
     if (!el.hidden) el.hidden = true;
@@ -677,6 +694,7 @@ function go(v: View) {
   view = v;
   closeMenu();
   render();
+  renderHold();
   scrollTo({ top: 0 });
 }
 

@@ -288,3 +288,10 @@ main { max-width: 520px; margin: 0 auto; min-height: 60dvh; }
 .brand img { width: 26px; height: 26px; }
 .brand .lt { color: #22c68d; } .brand .gt { color: #f43f5e; }
 :root[data-theme='light'] .brand img { content: url('/brand/boyaconf-isotipo-dark.svg'); }
+
+/* Tarjeta del podio (oro, plata, bronce): fondo claro → tinta oscura en TODO el texto, en cualquier tema */
+.podium-card.place-1, .podium-card.place-2, .podium-card.place-3 { color: #1d1220; }
+.podium-card.place-1 :is(h1, p, .kicker, .muted, .fine, b), .podium-card.place-2 :is(h1, p, .kicker, .muted, .fine, b), .podium-card.place-3 :is(h1, p, .kicker, .muted, .fine, b) { color: #1d1220; }
+.podium-card.winner .podium-list li { background: rgba(255, 255, 255, 0.75); color: #1d1220; }
+.podium-card.winner .podium-list li b { color: #1d1220; }
+.podium-card.winner .podium-list li[data-me] { background: #fff; box-shadow: inset 4px 0 0 #22c68d; }

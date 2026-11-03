@@ -129,7 +129,7 @@ export async function initLive(stage: DeckStage, sections: HTMLElement[]) {
     // La primera vez que se muestra una pregunta, se marca la hora de apertura (bono por rapidez).
     if (qid && !slide?.openedAt?.[qid]) void send(rt.openQuestion(qid));
     // "Llegar a tiempo": quien entró antes del capítulo 01 suma +100 (se marca una sola vez).
-    if (s.dataset.id === 'sec-mcp' && !slide?.earlyUntil) void send(rt.markEarlyEnd());
+    if (s.dataset.id === 'sec-agentica' && !slide?.earlyUntil) void send(rt.markEarlyEnd());
     if (c?.kind === 'podium') {
       publishPodium();
       renderPodium();

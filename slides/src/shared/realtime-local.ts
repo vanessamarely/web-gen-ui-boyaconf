@@ -44,28 +44,37 @@ export function createLocalRealtime(): Realtime {
   }
   const me = uid;
 
-  const emit = () => {
-    const db = read();
+  // La copia más reciente que conocemos. Entre pestañas, localStorage se sincroniza de forma
+  // ASÍNCRONA: el aviso del BroadcastChannel puede llegar antes que el dato. Por eso el aviso
+  // lleva la base completa y quien lo recibe la usa (no relee localStorage).
+  let latest: LocalDb | null = null;
+  const current = () => latest ?? read();
+  const emit = (db: LocalDb = current()) => {
     listeners.forEach((l) => l(db));
   };
   const write = (fn: (db: LocalDb) => void) => {
-    const db = read();
+    const db = current();
     fn(db);
+    latest = db;
     try {
       localStorage.setItem(KEY, JSON.stringify(db));
     } catch {
       /* cuota llena */
     }
-    channel.postMessage({ type: 'db' });
-    emit();
+    channel.postMessage({ type: 'db', db });
+    emit(db);
   };
   channel.onmessage = (e) => {
-    if (e.data?.type === 'db') emit();
+    if (e.data?.type === 'db') {
+      if (e.data.db) latest = { ...empty(), ...e.data.db, slide: { ...emptySlide(), ...e.data.db.slide } };
+      else latest = null; // aviso sin datos (p. ej. ensayos que escriben localStorage a mano): releer
+      emit();
+    }
     if (e.data?.type === 'reaction') reactionListeners.forEach((l) => l(e.data.r, e.data.uid));
   };
   const sub = (fn: (db: LocalDb) => void) => {
     listeners.add(fn);
-    queueMicrotask(() => fn(read()));
+    queueMicrotask(() => fn(current()));
     return () => {
       listeners.delete(fn);
     };
@@ -101,7 +110,7 @@ export function createLocalRealtime(): Realtime {
       return ok;
     },
     async takenNames(names) {
-      const db = read();
+      const db = current();
       return new Set(names.filter((n) => db.names[nameKey(n)] && db.names[nameKey(n)] !== me));
     },
     async join(name) {
@@ -152,14 +161,14 @@ export function createLocalRealtime(): Realtime {
       });
     },
     async resetSession() {
-      const db = read();
+      const db = current();
       const n = Object.keys(db.players).length + Object.keys(db.tejedores).length + Object.keys(db.questions).length + Object.keys(db.votes).length;
       write((d) => Object.assign(d, { ...empty(), answers: d.answers }));
       return n;
     },
 
     async loadAnswers() {
-      return isPresenter() ? read().answers : null;
+      return isPresenter() ? current().answers : null;
     },
     async saveAnswers(a) {
       write((db) => (db.answers = a));
