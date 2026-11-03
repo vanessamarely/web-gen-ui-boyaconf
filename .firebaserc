@@ -1,5 +1,16 @@
 {
   "projects": {},
-  "targets": {},
+  "targets": {
+    "genui-boyaconf": {
+      "hosting": {
+        "slides": [
+          "genui-boyaconf-slides"
+        ],
+        "demo": [
+          "genui-boyaconf-demo"
+        ]
+      }
+    }
+  },
   "etags": {}
 }
