@@ -45,8 +45,8 @@ function render(m: Extract<PresenterMsg, { type: 'state' }>) {
   lost.textContent = `${m.lostHere} perdidos aquí`;
   lost.classList.toggle('alert', m.lostHere > 0);
   const live = $('[data-stat="live"]');
-  live.textContent = m.live ? '● transmitiendo' : 'sin transmitir';
-  live.className = m.live ? 'on' : 'off';
+  live.textContent = !m.online ? 'sin señal' : m.live ? '● transmitiendo' : 'sin transmitir';
+  live.className = !m.online ? 'alert' : m.live ? 'on' : 'off';
   if (!changed) return;
   $('[data-pos]').textContent = `${index + 1} / ${total}`;
   $('[data-section]').textContent = c?.section ?? c?.label ?? '';

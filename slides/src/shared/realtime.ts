@@ -115,6 +115,8 @@ export interface Realtime {
   /** Marca (una vez, con hora del servidor) el fin del bono "llegar a tiempo". */
   markEarlyEnd(): Promise<void>;
   onSlide(cb: (s: SlideState) => void): Unsub;
+  /** Avisa si hay conexión real con el servidor (no basta con tener wifi o datos encendidos). */
+  onConnection(cb: (online: boolean) => void): Unsub;
 
   // Público
   /** Reserva el apodo para este uid. false si ya es de otra persona (el primero gana). */

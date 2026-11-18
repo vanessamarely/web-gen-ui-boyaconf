@@ -38,6 +38,21 @@ export async function createFirebaseRealtime(): Promise<Realtime> {
       const cur = (await getDoc(session)).data();
       if (!cur?.earlyUntil) await setDoc(session, { earlyUntil: serverTimestamp() }, { merge: true });
     },
+    onConnection(cb) {
+      let fromCache = false;
+      const emit = () => cb(navigator.onLine && !fromCache);
+      addEventListener('online', emit);
+      addEventListener('offline', emit);
+      const off = onSnapshot(session, { includeMetadataChanges: true }, (snap) => {
+        fromCache = snap.metadata.fromCache;
+        emit();
+      }, () => undefined);
+      return () => {
+        off();
+        removeEventListener('online', emit);
+        removeEventListener('offline', emit);
+      };
+    },
     onSlide(cb) {
       return onSnapshot(session, (snap) => {
         const data = (snap.data({ serverTimestamps: 'estimate' }) ?? {}) as Record<string, unknown>;

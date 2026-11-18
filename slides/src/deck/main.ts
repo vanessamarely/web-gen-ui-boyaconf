@@ -286,6 +286,21 @@ function playClips(slide: HTMLElement) {
     } else v.pause();
   });
 }
+// La presentadora descarga los videos al abrir: si la señal se cae, siguen funcionando.
+async function guardarVideos() {
+  for (const v of document.querySelectorAll<HTMLVideoElement>('video[data-src]')) {
+    try {
+      const copia = async (url: string) => URL.createObjectURL(await (await fetch(url)).blob());
+      if (v.getAttribute('poster')) v.poster = await copia(v.getAttribute('poster')!);
+      v.src = await copia(v.dataset.src!);
+      if (v.closest('[data-deck-active]')) v.play().catch(() => undefined);
+    } catch {
+      /* Sin copia: el video se pide al llegar a su slide. */
+    }
+  }
+}
+if (!publico) void guardarVideos();
+
 stage.addEventListener('slidechange', (e) => {
   const { index, slide } = (e as CustomEvent).detail as { index: number; slide: HTMLElement };
   current = index;

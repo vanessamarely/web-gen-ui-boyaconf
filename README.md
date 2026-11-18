@@ -84,6 +84,13 @@ Las respuestas del podio se cargan desde `slides/answers.json`, que no está en 
 npm test
 ```
 
+## Si el auditorio no tiene internet
+
+- **Asistentes:** usan sus propios datos móviles. Quien no tenga datos participa levantando la mano.
+- **Presentadora:** conecta solo su computador a los datos de su celular y abre la presentación publicada con `?presenter=1` antes de empezar. Los videos quedan guardados al abrirla.
+- **Si la señal se cae:** los slides siguen funcionando y los celulares se ponen al día cuando vuelva.
+- **Sin ninguna conexión:** corre `npm run dev:slides` y abre `http://localhost:5291/?local&presenter=1`. Los slides funcionan, pero los celulares no se sincronizan.
+
 ## Despliegue (Firebase Hosting + Firestore)
 
 Copia [`.env.example`](.env.example) a `slides/.env.local` con la configuración web del proyecto. Luego:

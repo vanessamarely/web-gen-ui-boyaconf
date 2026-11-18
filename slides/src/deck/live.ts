@@ -33,7 +33,7 @@ function icon(node: IconNode, size = 28, color?: string): SVGElement {
 
 /** Mensajes entre el deck y la consola de la presentadora (misma máquina, sin red). */
 export type PresenterMsg =
-  | { type: 'state'; index: number; total: number; id: string; players: number; tejedores: number; questions: number; votes: number; lostHere: number; live: boolean; mode: string }
+  | { type: 'state'; index: number; total: number; id: string; players: number; tejedores: number; questions: number; votes: number; lostHere: number; live: boolean; online: boolean; mode: string }
   | { type: 'goto'; index: number }
   | { type: 'next' }
   | { type: 'prev' }
@@ -69,6 +69,7 @@ export async function initLive(stage: DeckStage, sections: HTMLElement[]) {
   let answers: AnswerKey = {};
   let unsubQuestions: (() => void) | null = null;
   let qaError = '';
+  let online = true;
 
   const bc = new BroadcastChannel(`${NS}-presenter-${SESSION_ID}`);
   const badge = document.querySelector<HTMLElement>('.presenter-badge')!;
@@ -82,6 +83,8 @@ export async function initLive(stage: DeckStage, sections: HTMLElement[]) {
 
   const syncPresenterUi = () => {
     badge.hidden = !presenter;
+    badge.textContent = online ? 'EN VIVO' : 'SIN SEÑAL · los slides siguen';
+    badge.classList.toggle('offline', !online);
     warn.hidden = presenter || !presenterLink || rt.mode !== 'firebase';
     document.querySelectorAll<HTMLElement>('[data-presenter-only]').forEach((el) => (el.hidden = presenter || !presenterLink || rt.mode === 'local'));
     document.querySelectorAll<HTMLElement>('[data-presenter-ui]').forEach((el) => (el.hidden = !presenter));
@@ -113,13 +116,19 @@ export async function initLive(stage: DeckStage, sections: HTMLElement[]) {
   const send = (p: Promise<unknown>) =>
     p.catch((err) => {
       console.warn('[live] no se pudo publicar:', err);
-      if (rt.mode === 'firebase') {
+      // Un corte de señal no le quita el control a la presentadora: solo un permiso negado.
+      if (rt.mode === 'firebase' && (err as { code?: string }).code === 'permission-denied') {
         presenter = false;
         syncPresenterUi();
       }
     });
   let lastIndex = -1;
   const active = () => sections[Math.max(0, lastIndex)];
+  rt.onConnection((v) => {
+    online = v;
+    syncPresenterUi();
+    if (lastIndex >= 0) tellConsole();
+  });
   function publish(index: number) {
     lastIndex = index;
     const s = sections[index];
@@ -146,7 +155,7 @@ export async function initLive(stage: DeckStage, sections: HTMLElement[]) {
   // ── Consola de la presentadora (BroadcastChannel) ─────────────────────
   function tellConsole() {
     const id = sections[lastIndex]?.dataset.id ?? '';
-    const msg: PresenterMsg = { type: 'state', index: lastIndex, total: sections.length, id, players: players.length, tejedores: tejedores.filter((c) => !c.hidden).length, questions: questions.length, votes: votes.length, lostHere: feedback.filter((f) => f.lost.includes(id)).length, live: presenter, mode: rt.mode };
+    const msg: PresenterMsg = { type: 'state', index: lastIndex, total: sections.length, id, players: players.length, tejedores: tejedores.filter((c) => !c.hidden).length, questions: questions.length, votes: votes.length, lostHere: feedback.filter((f) => f.lost.includes(id)).length, live: presenter, online, mode: rt.mode };
     bc.postMessage(msg);
   }
   bc.onmessage = (e: MessageEvent<PresenterMsg>) => {

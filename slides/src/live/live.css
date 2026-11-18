@@ -62,6 +62,7 @@ svg { flex: none; }
 }
 
 .status { margin: 0 0 12px; font: 300 12.5px var(--mono); color: var(--ink-dim); min-height: 1.4em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.status.offline { width: fit-content; max-width: 100%; padding: 3px 10px; border-radius: 999px; background: #ffe08a; color: #2a211b; font-weight: 600; }
 main { max-width: 520px; margin: 0 auto; min-height: 60dvh; }
 
 .card-sheet, .poll { background: var(--surface); border: 2px solid var(--line); border-radius: 24px; padding: 20px; display: grid; gap: 14px; animation: rise 240ms ease-out both; }

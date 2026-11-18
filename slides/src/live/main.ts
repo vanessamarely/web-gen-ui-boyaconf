@@ -111,6 +111,37 @@ function markSeen(id: string) {
   }
 }
 
+// ── Estado de la conexión: la señal puede ir y venir durante la charla ──
+let netOnline = true;
+let statusText = 'Conectando…';
+function paintStatus() {
+  const el = $('[data-status]');
+  el.classList.toggle('offline', !netOnline);
+  el.textContent = netOnline ? statusText : 'Sin señal · reconectando…';
+}
+function setStatus(text: string) {
+  statusText = text;
+  paintStatus();
+}
+/** Recarga solo cuando la app se puede descargar: así nunca aparece la página de error del navegador. */
+function reloadWhenReachable() {
+  setTimeout(() => {
+    fetch(location.href, { method: 'HEAD', cache: 'no-store' })
+      .then((r) => (r.ok ? location.reload() : reloadWhenReachable()))
+      .catch(reloadWhenReachable);
+  }, 8000);
+}
+/** Sin señal, el envío queda en cola: se avisa a la persona en lugar de dejarla esperando. */
+async function sendWithHint<T>(task: Promise<T>, onSlow: () => void): Promise<T> {
+  const timer = setTimeout(onSlow, netOnline ? 5000 : 0);
+  try {
+    return await task;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+const QUEUED = 'Sin señal. Se enviará cuando vuelva: no cierres la app.';
+
 async function boot() {
   applyTheme(store.get<Theme>('theme', 'system'));
   createIcons({ icons: ICONS, attrs: { 'stroke-width': 1.75, 'aria-hidden': 'true' } });
@@ -120,9 +151,16 @@ async function boot() {
   rt = await getRealtime();
   const forcedLocal = new URLSearchParams(location.search).has('local');
   if (rt.mode === 'local' && !forcedLocal && import.meta.env.VITE_FIREBASE_API_KEY) {
-    $('[data-status]').innerHTML = 'Sin conexión en vivo con la pantalla. Reintentando… <button class="link" type="button" onclick="location.reload()">Reintentar</button>';
-    setTimeout(() => location.reload(), 20000);
-  } else $('[data-status]').textContent = rt.mode === 'local' ? 'Modo ensayo (local) · esperando el deck…' : 'Conectado · esperando el deck…';
+    netOnline = false;
+    paintStatus();
+    reloadWhenReachable();
+  } else {
+    setStatus(rt.mode === 'local' ? 'Modo ensayo (local) · esperando el deck…' : 'Conectado · esperando el deck…');
+    rt.onConnection((online) => {
+      netOnline = online;
+      paintStatus();
+    });
+  }
 
   rt.onSlide((s) => {
     const prev = live;
@@ -130,7 +168,7 @@ async function boot() {
     if (s.id) markSeen(s.id);
     // Antes del muro y del podio: asegura que el tejedor publicado siga en esta sesión.
     if (prev?.id !== s.id && (s.kind === 'wall' || s.kind === 'podium')) setTimeout(() => void syncTejedor(), Math.random() * 2500);
-    $('[data-status]').textContent = s.total ? `En vivo · ${s.label} · ${s.index + 1}/${s.total}` : 'Conectado · esperando a que empiece la charla…';
+    setStatus(s.total ? `En vivo · ${s.label} · ${s.index + 1}/${s.total}` : 'Conectado · esperando a que empiece la charla…');
     // Cambios dentro del mismo slide (revelar, podio publicado) actualizan por partes.
     const sameSlide = prev?.id === s.id;
     if (view === 'live') renderLive(!sameSlide);
@@ -175,7 +213,9 @@ function render() {
 async function freshOptions(): Promise<string[]> {
   const pool = new Set<string>();
   while (pool.size < 10) pool.add(randomName());
-  const taken = await rt.takenNames([...pool]).catch(() => new Set<string>());
+  // Con señal débil no se deja a la persona esperando: la reserva al entrar sigue evitando apodos repetidos.
+  const sinRespuesta = new Promise<Set<string>>((ok) => setTimeout(() => ok(new Set()), 4000));
+  const taken = await Promise.race([rt.takenNames([...pool]).catch(() => new Set<string>()), sinRespuesta]);
   const free = [...pool].filter((n) => !taken.has(n));
   return (free.length >= 3 ? free : [...pool]).slice(0, 3);
 }
@@ -208,7 +248,7 @@ function renderJoin(screen: HTMLElement, msg = '') {
       $('[data-join-msg]', screen).textContent = 'Reservando tu apodo…';
       try {
         // Reserva atómica: si alguien lo tomó un segundo antes, recibes el mismo con numeración.
-        name = await claimUniqueName(pick, (n) => rt.reserveName(n));
+        name = await sendWithHint(claimUniqueName(pick, (n) => rt.reserveName(n)), () => ($('[data-join-msg]', screen).textContent = 'La señal está débil. Seguimos intentando…'));
         store.set('name', name);
         if (!tejedor.name) tejedor.name = name.slice(0, 18);
         await rt.join(name);
@@ -423,7 +463,7 @@ function renderPoll(screen: HTMLElement, qid: QuestionId) {
       msg.textContent = 'Enviando…';
       navigator.vibrate?.(20);
       try {
-        await rt.vote(qid, b.dataset.opt!);
+        await sendWithHint(rt.vote(qid, b.dataset.opt!), () => (msg.textContent = QUEUED));
         if (!myVotes[qid]) myVotes = { ...myVotes, [qid]: b.dataset.opt! };
         updatePoll(screen);
       } catch (err) {
@@ -526,7 +566,7 @@ function setupFeedback() {
     document.querySelectorAll<HTMLElement>(`[data-rate="${key}"]`).forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
     const msg = $('[data-rate-msg]');
     try {
-      await rt.rate({ [key]: rating[key] });
+      await sendWithHint(rt.rate({ [key]: rating[key] }), () => (msg.textContent = QUEUED));
       msg.textContent = rating.clara && rating.util ? '¡Gracias por tu opinión!' : 'Falta una respuesta.';
     } catch (err) {
       console.error('[live] calificación', err);
@@ -863,7 +903,7 @@ function openAsk() {
     sendBtn.disabled = true;
     msg.textContent = 'Enviando…';
     try {
-      await rt.ask({ name: name ?? 'Anónimo', text: `[${topic}] ${text}`.slice(0, 280), slide: (live?.label ?? '').slice(0, 80) });
+      await sendWithHint(rt.ask({ name: name ?? 'Anónimo', text: `[${topic}] ${text}`.slice(0, 280), slide: (live?.label ?? '').slice(0, 80) }), () => (msg.textContent = QUEUED));
       void rt.react('ask').catch(() => undefined);
       lastAsk = Date.now();
       msg.textContent = '¡Enviada! Gracias.';

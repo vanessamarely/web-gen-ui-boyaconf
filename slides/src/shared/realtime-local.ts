@@ -97,6 +97,10 @@ export function createLocalRealtime(): Realtime {
       write((db) => (db.slide.earlyUntil ??= Date.now()));
     },
     onSlide: (cb) => sub((db) => cb(db.slide)),
+    onConnection: (cb) => {
+      cb(true);
+      return () => undefined;
+    },
 
     async reserveName(name) {
       const k = nameKey(name);
