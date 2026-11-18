@@ -1397,17 +1397,7 @@ deck-stage > section .footer { bottom: 32px; }
 .beneficios li { display: grid; align-content: start; gap: 14px; padding: 28px 24px; border-top: 4px solid var(--yellow); background: var(--glass); border-radius: 4px 4px 18px 18px; }
 .beneficios h3 { margin: 0; font: 800 31px/1.14 var(--display); color: var(--ink); }
 .beneficios p { margin: 0; font-size: 24px; line-height: 1.28; color: var(--ink-dim); }
-.reglas { display: grid; gap: 10px; align-content: start; }
-.reglas h3 { margin: 0; font: 800 28px/1.1 var(--display); color: var(--ink); }
-.reglas ul { list-style: none; margin: 0; padding: 0; display: grid; }
-.reglas li { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; padding: 7px 0; border-bottom: 1px solid var(--glass-line); font-size: 22px; line-height: 1.2; color: var(--ink); }
-.reglas li b { flex: none; font: 700 20px var(--mono); color: var(--yellow); }
-.reglas p { margin: 0; font-size: 21px; line-height: 1.25; color: var(--ink-dim); }
-.reglas .perdi b { color: var(--ink); }
-.reglas .sala { font: 500 17px var(--mono); }
-:root[data-theme='light'] .reglas li b { color: var(--ink); }
 :root[data-ratio='4-3'] .beneficios { grid-template-columns: 1fr; gap: 10px; } :root[data-ratio='4-3'] .beneficios li { padding: 14px 18px; gap: 4px; } :root[data-ratio='4-3'] .beneficios h3 { font-size: 24px; } :root[data-ratio='4-3'] .beneficios p { font-size: 19px; }
-:root[data-ratio='4-3'] .reglas { gap: 6px; } :root[data-ratio='4-3'] .reglas h3 { font-size: 21px; } :root[data-ratio='4-3'] .reglas li { font-size: 16px; padding: 4px 0; gap: 8px; } :root[data-ratio='4-3'] .reglas li b { font-size: 14px; } :root[data-ratio='4-3'] .reglas p { font-size: 16px; } :root[data-ratio='4-3'] .reglas .sala { font-size: 13px; }
 
 .qa-pulse { padding: 10px 14px; border-bottom: 1px solid var(--line); font-size: 15px; line-height: 1.35; }
 .qa-pulse p { margin: 0 0 4px; }
@@ -1447,7 +1437,6 @@ section[data-id='industria'] .archivos { gap: 9px; } section[data-id='industria'
 :root[data-ratio='4-3'] section[data-id='industria'] .archivos code { font-size: 19px; } :root[data-ratio='4-3'] section[data-id='industria'] .archivos span { font-size: 16px; }
 
 .beneficios a { align-self: end; font: 500 13px var(--mono); color: var(--green); overflow-wrap: anywhere; }
-.reglas li em { font-style: normal; font-weight: 800; color: var(--yellow); }
 :root[data-ratio='4-3'] .beneficios a { font-size: 12px; }
 
 /* Modo claro: colores sólidos y legibles */
@@ -1456,10 +1445,58 @@ section[data-id='industria'] .archivos { gap: 9px; } section[data-id='industria'
 :root:not([data-theme='dark']) .flujo li > b, :root:not([data-theme='dark']) .objetivo b, :root:not([data-theme='dark']) .prueba-pasos b, :root:not([data-theme='dark']) .paso-t b { background: #f3c94f; color: #1a0e1c; }
 :root:not([data-theme='dark']) .beneficios li { border-top-color: #8f1d5c; }
 :root:not([data-theme='dark']) .niveles .nuestro { border-top-color: var(--green); }
-:root:not([data-theme='dark']) .reglas li b, :root:not([data-theme='dark']) .reglas li em { color: #8f1d5c; }
 :root:not([data-theme='dark']) .card-frame > .porque b { color: #8f1d5c; }
 :root:not([data-theme='dark']) .flujo code { background: #1a0e1c; color: #7ee7bd; }
 :root:not([data-theme='dark']) .terminal { background: #1a0e1c; border-color: #1a0e1c; }
 :root:not([data-theme='dark']) .pill.web, :root:not([data-theme='dark']) .pill.web b, :root:not([data-theme='dark']) .code-chip { color: #fff; }
 :root:not([data-theme='dark']) .eyebrow { color: #0a6746; }
 :root:not([data-theme='dark']) .foot-evento .lt { color: #0a6746; } :root:not([data-theme='dark']) .foot-evento .gt { color: #b3173f; }
+
+/* Únete: solo el QR, grande y centrado. */
+.join-solo { display: grid; justify-items: center; gap: 12px; }
+.join-solo .qr-card { width: min(400px, 100%); }
+.join-solo .qr-card > div:first-child { width: 250px; }
+.join-solo .sala { margin: 0; font: 500 18px var(--mono); color: var(--ink-dim); }
+
+/* ═════════════ CELULAR EN VERTICAL: todo en una columna, sin cruces ═════════════ */
+@media (max-width: 640px) {
+  deck-stage > section .title, deck-stage > section.ronda-slide .title, deck-stage > section.codigo-slide .title, deck-stage > section.pasos-slide .title { font-size: clamp(24px, 7.8vw, 32px) !important; line-height: 1.12; overflow-wrap: break-word; }
+  deck-stage > section .cover-title, deck-stage > section .cover-title.sm { font-size: clamp(40px, 12.6vw, 52px) !important; line-height: 0.98; }
+  deck-stage > section.frase-slide .frase, deck-stage > section .frase { font-size: clamp(25px, 7.4vw, 30px) !important; line-height: 1.16; max-width: 100%; overflow-wrap: break-word; }
+  deck-stage > section .card-frame, deck-stage > section.pasos-slide .card-frame, deck-stage > section.ronda-slide .card-frame { padding: 58px 12px 84px !important; margin: 0 8px; box-sizing: border-box; }
+
+  deck-stage > section .comparar, deck-stage > section .metricas, deck-stage > section .app-ej, deck-stage > section .base-grid, deck-stage > section .ronda-videos, deck-stage > section .prueba-grid, deck-stage > section .codigo-grid { display: grid; grid-template-columns: minmax(0, 1fr) !important; gap: 12px; height: auto; max-height: none; }
+  deck-stage > section .comparar > *, deck-stage > section .metricas > *, deck-stage > section .app-ej > *, deck-stage > section .base-grid > *, deck-stage > section .ronda-videos > * { min-width: 0; width: 100%; max-width: 100%; height: auto; margin: 0; position: relative; inset: auto; transform: none; box-sizing: border-box; }
+  deck-stage > section .mini, deck-stage > section .mini-grid, deck-stage > section .mini-lista { min-width: 0; max-width: 100%; }
+  deck-stage > section .app-ej video { display: block; width: 100%; height: auto; }
+  deck-stage > section .app-pasos li, deck-stage > section .app-pasos span { min-width: 0; }
+
+  deck-stage > section .ronda-videos figure { display: grid; gap: 6px; }
+  deck-stage > section .ronda-videos figcaption { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; position: static; }
+  deck-stage > section .ronda-videos video { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; }
+
+  deck-stage > section .lazo { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; height: auto; }
+  deck-stage > section .lazo-f { display: none; }
+  deck-stage > section .lazo-p { display: grid; grid-template-columns: 46px minmax(0, 1fr); column-gap: 12px; align-items: center; justify-items: start; width: auto; min-width: 0; height: auto; min-height: 0; padding: 10px 12px; text-align: left; transform: none; }
+  deck-stage > section .lazo-p .ico { grid-row: 1 / span 2; position: static; }
+  deck-stage > section .lazo-p b, deck-stage > section .lazo-p small { position: static; grid-column: 2; }
+  deck-stage > section .lazo-rojo { text-align: left; }
+
+  deck-stage > section .t-fila { grid-template-columns: 24px minmax(0, 1fr) !important; row-gap: 2px; }
+  deck-stage > section .t-fila code { grid-column: 2; white-space: normal; overflow-wrap: anywhere; }
+  deck-stage > section .paso-t { display: grid; grid-template-columns: 36px minmax(0, 1fr); align-items: start; font-size: 19px; }
+  deck-stage > section .paso-t em { grid-column: 2; }
+
+  deck-stage > section .base-grid .qr-card { justify-self: center; width: min(240px, 100%); }
+  deck-stage > section.thanks .cover-frame { box-sizing: border-box; width: 100%; max-width: 100%; }
+  deck-stage > section .thanks-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; width: 100%; max-width: 100%; box-sizing: border-box; }
+  deck-stage > section .thanks-grid .qr-card { width: auto !important; min-width: 0; box-sizing: border-box; }
+  deck-stage > section .thanks-grid .qr-card { grid-template-columns: minmax(0, 1fr); padding: 10px 8px; }
+  deck-stage > section .thanks-grid .qr-card > div:first-child { width: 100%; max-width: 132px; min-width: 0; box-sizing: border-box; }
+  deck-stage > section .thanks-grid .qr-card strong { font-size: 15px; }
+  deck-stage > section .thanks-grid .qr-card span { font-size: 11px; }
+  deck-stage > section.thanks .cover-frame { padding-left: 16px; padding-right: 16px; align-items: stretch; }
+  deck-stage > section .archivos, deck-stage > section .archivos li { min-width: 0; max-width: 100%; box-sizing: border-box; }
+  deck-stage > section .archivos code { overflow-wrap: anywhere; font-size: 16px; }
+  deck-stage > section .code pre { font-size: 13px; }
+}
