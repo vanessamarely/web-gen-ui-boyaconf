@@ -257,7 +257,7 @@ function renderJoin(screen: HTMLElement, msg = '') {
       } catch (err) {
         console.error('[live] entrar', err);
         btn.disabled = false;
-        $('[data-join-msg]', screen).textContent = 'No se pudo entrar. Revisa tu conexión e inténtalo de nuevo.';
+        $('[data-join-msg]', screen).textContent = `No se pudo entrar. Inténtalo de nuevo. (${(err as { code?: string }).code ?? 'error'})`;
       }
     });
   };
@@ -911,7 +911,7 @@ function openAsk() {
     } catch (err) {
       console.error('[live] pregunta', err);
       sendBtn.disabled = false;
-      msg.textContent = 'No se pudo enviar. Revisa tu conexión e inténtalo de nuevo.';
+      msg.textContent = `No se pudo enviar. Inténtalo de nuevo. (${(err as { code?: string }).code ?? 'error'})`;
     }
   });
   dlg.showModal();

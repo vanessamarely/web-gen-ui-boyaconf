@@ -1,17 +1,30 @@
 import { GithubAuthProvider, getAuth, linkWithPopup, signInAnonymously, signInWithCredential } from 'firebase/auth';
-import { Timestamp, addDoc, arrayUnion, collection, deleteDoc, doc, getDoc, getDocs, getFirestore, limit, onSnapshot, orderBy, query, serverTimestamp, setDoc, updateDoc, writeBatch } from 'firebase/firestore';
+import { Timestamp, addDoc, arrayUnion, collection, deleteDoc, doc, getDoc, getDocs, initializeFirestore, limit, onSnapshot, orderBy, query, serverTimestamp, setDoc, updateDoc, writeBatch } from 'firebase/firestore';
 import { PRESENTER_GITHUB_ID, SESSION_ID } from './config';
 import { getFirebaseApp } from './firebase';
 import { nameKey } from './names';
 import { QUESTION_IDS, type AnswerKey } from './questions';
 import { emptySlide, type AudienceQuestion, type Feedback, type TejedorData, type Player, type Reaction, type Realtime, type SlideState, type VoteRecord, type Votes } from './realtime';
 
+/** Con señal inestable, una lectura puede fallar una vez: se reintenta antes de avisarle a la persona. */
+async function conReintentos<T>(tarea: () => Promise<T>, intentos = 3): Promise<T> {
+  for (let i = 1; ; i++) {
+    try {
+      return await tarea();
+    } catch (err) {
+      if (i >= intentos || (err as { code?: string }).code !== 'unavailable') throw err;
+      await new Promise((ok) => setTimeout(ok, 1200 * i));
+    }
+  }
+}
+
 const ms = (v: unknown) => (v instanceof Timestamp ? v.toMillis() : typeof v === 'number' ? v : undefined);
 
 export async function createFirebaseRealtime(): Promise<Realtime> {
   const app = await getFirebaseApp();
   const auth = getAuth(app);
-  const db = getFirestore(app);
+  // Conexión compatible con iPhone (Safari y Chrome usan el mismo motor) y con redes que cortan el streaming.
+  const db = initializeFirestore(app, { experimentalForceLongPolling: true });
 
   // Todo el público entra anónimo: sin formularios, sin datos personales.
   // Primero esperamos a que Firebase restaure la sesión: si ya es la presentadora (GitHub),
@@ -65,7 +78,7 @@ export async function createFirebaseRealtime(): Promise<Realtime> {
 
     async reserveName(name) {
       const ref = doc(sub('names'), nameKey(name));
-      const owner = async () => (await getDoc(ref)).data()?.uid as string | undefined;
+      const owner = async () => (await conReintentos(() => getDoc(ref))).data()?.uid as string | undefined;
       const current = await owner();
       if (current) return current === uid();
       try {
@@ -83,7 +96,7 @@ export async function createFirebaseRealtime(): Promise<Realtime> {
     async join(name) {
       // La hora de entrada se fija UNA vez (las reglas no dejan cambiarla): recargar no te quita el bono.
       const ref = doc(sub('players'), uid());
-      const prev = await getDoc(ref);
+      const prev = await conReintentos(() => getDoc(ref));
       if (prev.exists()) await updateDoc(ref, { name });
       else await setDoc(ref, { name, at: serverTimestamp() });
     },
