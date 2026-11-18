@@ -5,6 +5,8 @@ description: Make a web app's generative UI agent-ready and frictionless. Use wh
 
 # Frictionless generative UI for the agentic web
 
+> Start from the ready-to-copy harness in [`base/`](../../base): `AGENTS.md` (instructions), `harness/presupuestos.json` (budgets) and `harness/check.mjs` (Playwright browser tests). Work is done when the tests pass, not when the code compiles.
+
 The agentic web has three layers: an agent **reads** your site (semantic, accessible HTML), **uses** it through tools you define (WebMCP), and **generates** an interface for the person (generative UI). The generated UI is the only part people see: if it jumps, freezes or forgets what they did, the whole agentic experience feels broken. Make it frictionless for the person (fast, fluid, accessible) and for the agent (clear tools, one consistent state, errors it can recover from).
 
 ## Workflow

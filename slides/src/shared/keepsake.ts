@@ -41,9 +41,9 @@ export function keepsakeMarkdown({ nickname, notes, tejedor }: KeepsakeInput): s
     const mine = notes[s.id]?.text.trim();
     if (mine) out.push('', `> **Mi nota:** ${mine.replace(/\n/g, '\n> ')}`);
   }
-  out.push('', '## 10 puntadas para una UI generativa sin fricción');
+  out.push('', '## 5 reglas del harness web');
   CHECKLIST.forEach(([h, p], i) => out.push(`${i + 1}. **${h}:** ${p}`));
-  out.push('', '---', `- Web de Vanessa: https://vanessamarely.dev`, `- Repo: ${REPO_URL}`, `- Guía para tu agente de código (pídele a Claude Code, Gemini CLI o Cursor que revise tu UI generativa con ella): ${SKILL_URL}`, `- Slides: ${SLIDES_URL}`, `- Demo: ${DEMO_URL}`, '');
+  out.push('', '---', `- Web de Vanessa: https://vanessamarely.dev`, `- Repo: ${REPO_URL}`, `- Guía para tu agente de código (pídele a tu agente que revise tu UI generativa con ella): ${SKILL_URL}`, `- Slides: ${SLIDES_URL}`, `- Demo: ${DEMO_URL}`, '');
   return out.join('\n');
 }
 
@@ -136,7 +136,7 @@ export function keepsakeHTML({ nickname, notes, tejedor }: KeepsakeInput): strin
   ${body}
   <section class="card">
     <p class="eyebrow">// Para llevar</p>
-    <h2 style="margin:0 0 10px">10 puntadas para una <span class="hl">UI generativa sin fricción</span></h2>
+    <h2 style="margin:0 0 10px">5 reglas del <span class="hl">harness web</span></h2>
     <ol class="rules">${CHECKLIST.map(([h, p]) => `<li><b>${esc(h)}:</b> ${esc(p)}</li>`).join('')}</ol>
   </section>
   <section class="card">

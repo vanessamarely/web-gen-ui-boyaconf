@@ -1,0 +1,16 @@
+{
+  "name": "base-harness-web",
+  "private": true,
+  "type": "module",
+  "description": "Base para construir UI generativa con IA: guías para el agente y sensores que miden la experiencia en un navegador real.",
+  "scripts": {
+    "dev": "vite --port 5293 --strictPort",
+    "build": "vite build",
+    "preview": "vite preview --port 5293 --strictPort",
+    "harness": "node harness/check.mjs"
+  },
+  "devDependencies": {
+    "playwright-core": "^1.64.1",
+    "vite": "^8.3.2"
+  }
+}

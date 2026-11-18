@@ -166,7 +166,7 @@ export async function keepsakePDF({ nickname, notes, tejedor }: KeepsakeInput): 
 
   // Checklist y enlaces
   w.ensure(80);
-  w.text('10 puntadas para una UI generativa sin fricción', { font: f.b, size: 14 });
+  w.text('5 reglas del harness web', { font: f.b, size: 14 });
   w.space(2);
   CHECKLIST.forEach(([h, p], i) => w.text(`${i + 1}. ${h}: ${p}`, { size: 10, x: M + 6, width: W - 2 * M - 6 }));
   w.space(10);

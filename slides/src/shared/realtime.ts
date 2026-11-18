@@ -83,6 +83,17 @@ export interface AudienceQuestion {
   at: number;
 }
 
+/** Satisfacción: solo la presentadora la lee; no da puntos ni se proyecta. */
+export interface Feedback {
+  uid: string;
+  /** Slides en los que esta persona tocó "Me perdí" */
+  lost: string[];
+  /** 1 a 5: ¿qué tan clara fue la charla? */
+  clara?: number;
+  /** 1 a 5: ¿qué tan útil es para tu trabajo? */
+  util?: number;
+}
+
 export type Votes = Partial<Record<QuestionId, string>>;
 export interface VoteRecord {
   uid: string;
@@ -117,6 +128,9 @@ export interface Realtime {
   /** Duda para la presentadora (texto libre: NO se proyecta). */
   ask(q: { name: string; text: string; slide: string }): Promise<void>;
   publishTejedor(d: Omit<TejedorData, 'id' | 'createdAt' | 'hidden'>): Promise<void>;
+  /** "Me perdí" en este slide. */
+  markLost(slideId: string): Promise<void>;
+  rate(r: { clara?: number; util?: number }): Promise<void>;
 
   // Solo el deck agrega
   onPlayers(cb: (players: Player[]) => void): Unsub;
@@ -127,6 +141,8 @@ export interface Realtime {
   /** Solo presentadora (las reglas no dejan leerlas a nadie más). */
   onQuestions(cb: (qs: AudienceQuestion[]) => void, onError?: (msg: string) => void): Unsub;
   removeQuestion(id: string): Promise<void>;
+  /** Solo presentadora. */
+  onFeedback(cb: (all: Feedback[]) => void, onError?: (msg: string) => void): Unsub;
   setTejedorHidden(id: string, hidden: boolean): Promise<void>;
   /** Solo presentadora: borra asistentes, apodos, votos, reacciones, preguntas y tejedores de ESTA sesión. */
   resetSession(): Promise<number>;

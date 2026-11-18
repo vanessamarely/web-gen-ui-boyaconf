@@ -1,41 +1,25 @@
 // Controlador del deck: pie de página, tema, contraste, proporción de pantalla, menú,
 // decoraciones (tejedores, checklist, código) y la conexión en vivo con el público y la consola.
 import {
-  Accessibility,
-  Activity,
   Bot,
-  Calculator,
   Camera,
   CirclePlay,
-  Cpu,
-  Database,
-  Download,
-  Eye,
   GitBranch,
-  GitMerge,
   Globe,
-  Hand,
-  Highlighter,
-  Loader,
-  Megaphone,
-  MessageSquareText,
-  NotebookPen,
-  Pause,
+  BookOpen,
+  Check,
+  Eye,
+  Gauge,
   RefreshCw,
-  Rows3,
-  Sparkles,
-  Square,
   Trophy,
-  Undo2,
-  User,
   Users,
-  Volume2,
-  Wrench,
+  ArrowRight,
   ArrowUpRight,
   createIcons,
 } from 'lucide';
-import { CHECKLIST, CODE_CONTRACT, CODE_PATCHES, CODE_PLAN, CODE_RECONCILE, CODE_STATE, CODE_WEBMCP, SLIDE_BY_ID } from '../shared/content';
-import { DEMO_URL, NS, PUBLIC_DEMO_URL, REPO_URL, prettyUrl, publicLiveUrl, withSessionParams } from '../shared/config';
+import { CHECKLIST, SLIDE_BY_ID } from '../shared/content';
+import { CODIGO_PRUEBA, RONDAS, SALIDA_FINAL, SALIDA_INICIAL, type FilaSalida } from '../shared/rondas';
+import { DEMO_URL, NS, PUBLIC_DEMO_URL, REPO_URL, isPublicView, prettyUrl, publicLiveUrl, withSessionParams } from '../shared/config';
 import { tejedorSVG, type TejedorOptions } from '../shared/tejedor';
 import { QUESTIONS, type QuestionId } from '../shared/questions';
 import { esc } from '../shared/esc';
@@ -50,6 +34,18 @@ type DeckStage = HTMLElement & { goTo(i: number): void; next(): void; prev(): vo
 
 
 const stage = document.querySelector('deck-stage') as DeckStage;
+// En los slides publicados solo queda el contenido: nada de QR para unirse, preguntas, muro ni podio.
+const publico = isPublicView();
+const SOLO_EN_VIVO = new Set(['unete', 'vecino', 'q1', 'q2', 'q3', 'muro', 'podio']);
+if (publico) {
+  document.documentElement.dataset.publico = '';
+  // Sin miniaturas ni botón de reinicio: son herramientas de quien presenta.
+  postMessage({ type: '__deck_rail_visible', on: false }, location.origin);
+  stage.shadowRoot?.querySelector<HTMLElement>('.reset')?.style.setProperty('display', 'none');
+  stage.querySelectorAll<HTMLElement>(':scope > section').forEach((s) => SOLO_EN_VIVO.has(s.dataset.id ?? '') && s.remove());
+}
+// Los controles flotantes del deck van por encima del pie: nunca tapan las redes.
+stage.shadowRoot?.append(Object.assign(document.createElement('style'), { textContent: '.overlay { bottom: 64px !important; }' }));
 const sections = [...stage.querySelectorAll<HTMLElement>(':scope > section')];
 const total = sections.length;
 const pad = (n: number) => String(n).padStart(2, '0');
@@ -68,10 +64,9 @@ sections.forEach((s) => {
 
 // ── Pie de página con contador ───────────────────────────────────────
 sections.forEach((s, i) => {
-  if (i === 0 || s.classList.contains('section-slide') || s.classList.contains('cover')) return;
   s.insertAdjacentHTML(
     'beforeend',
-    `<div class="footer"><span class="handles">Instagram <b>@vanessamarelycode</b> · GitHub <b>vanessamarely</b> · <b>vanessamarely.dev</b></span><span>${pad(i + 1)} / ${total}</span></div>`,
+    `<div class="footer"><span class="handles"><b class="foot-web">vanessamarely.dev</b><span>Instagram <b>@vanessamarelycode</b></span><span>GitHub <b>vanessamarely</b></span></span><span class="foot-num">${pad(i + 1)} / ${total}</span></div>`,
   );
 });
 
@@ -80,9 +75,9 @@ mountSkin(sections);
 // ── QR pequeño para unirse en cada slide (para quien llega tarde) ─────
 // Esquina inferior izquierda, con aire alrededor. No va donde ya hay un QR grande.
 // Tecla J: mostrar / ocultar (se recuerda en este navegador).
-const NO_JOIN_QR = new Set(['portada', 'unete', 'demo', 'gracias']);
+const NO_JOIN_QR = new Set(['portada', 'bio', 'unete', 'gracias']);
 sections.forEach((s) => {
-  if (NO_JOIN_QR.has(s.dataset.id ?? '')) return;
+  if (publico || NO_JOIN_QR.has(s.dataset.id ?? '')) return;
   s.insertAdjacentHTML('beforeend', '<div class="join-notch" aria-hidden="true"><div class="join-qr" data-qr="live"></div><span>Únete</span></div>');
 });
 try {
@@ -97,13 +92,35 @@ const toggleJoinQr = () => {
   save('joinqr', off ? '0' : '1');
 };
 
-// ── Código: una sola fuente (content.ts) para el deck, el celular y la memoria ──
-const CODE: Record<string, string> = { webmcp: CODE_WEBMCP, contract: CODE_CONTRACT, plan: CODE_PLAN, patches: CODE_PATCHES, reconcile: CODE_RECONCILE, state: CODE_STATE };
-document.querySelectorAll<HTMLElement>('[data-code]').forEach((el) => {
-  const src = CODE[el.dataset.code!];
-  const pre = el.querySelector('pre')!;
-  pre.innerHTML = highlight(src, 'js');
+// ── Rondas: salen de la corrida real del agente (una sola fuente para deck, celular y memoria) ──
+document.querySelectorAll<HTMLElement>('[data-ronda]').forEach((sec) => {
+  const d = RONDAS.find((x) => x.id === sec.dataset.ronda);
+  if (!d) return;
+  sec.querySelector('.card-frame')!.innerHTML = `
+    <p class="eyebrow">Corrección ${d.n} de ${RONDAS.length} · ${esc(d.prueba)}</p>
+    <h2 class="title">${esc(d.problema)}</h2>
+    <p class="pasaba">${esc(d.pasaba)}</p>
+    <div class="ronda-videos">
+      <figure class="rojo"><figcaption><span>Antes</span><b>${esc(d.antes)}</b></figcaption><video muted loop playsinline preload="none" data-src="/clips/r-${d.id}-antes.webm" poster="/clips/r-${d.id}-antes.jpg" aria-label="${esc(d.problema)}: versión con el error"></video></figure>
+      <figure class="verde"><figcaption><span>Después</span><b>${esc(d.despues)}</b></figcaption><video muted loop playsinline preload="none" data-src="/clips/r-${d.id}-despues.webm" poster="/clips/r-${d.id}-despues.jpg" aria-label="${esc(d.problema)}: versión corregida"></video></figure>
+    </div>
+    <p class="medida"><b>${esc(d.mide)}</b> · ${esc(d.limite)}</p>`;
 });
+document.querySelectorAll<HTMLElement>('[data-codigo]').forEach((sec) => {
+  const d = RONDAS.find((x) => x.id === sec.dataset.codigo);
+  if (!d) return;
+  const panel = (tipo: string, cls: string, c: { archivo: string; texto: string }) =>
+    `<div class="code sm ${cls}"><div class="bar"><span>${tipo}</span><span>${esc(c.archivo)}</span></div><pre>${highlight(c.texto, 'js')}</pre></div>`;
+  sec.querySelector('.card-frame')!.innerHTML = `
+    <p class="eyebrow">Corrección ${d.n} de ${RONDAS.length} · el código real</p>
+    <h2 class="title">${esc(d.correccion)}</h2>
+    <div class="codigo-grid">${panel('Código con el error', 'mal', d.codigoAntes)}${panel('Código corregido', 'bien', d.codigoDespues)}</div>
+    <p class="porque"><b>Por qué funciona:</b> ${esc(d.porque)}</p>${d.extra ? `<p class="extra">${d.extra}</p>` : ''}`;
+});
+document.querySelectorAll<HTMLElement>('[data-objetivo]').forEach((el) => (el.innerHTML = RONDAS.map((d) => `<li><b>${d.n}</b><span>${esc(d.problema)}</span></li>`).join('')));
+document.querySelectorAll<HTMLElement>('[data-prueba]').forEach((el) => (el.innerHTML = highlight(CODIGO_PRUEBA, 'js')));
+const salida = (filas: FilaSalida[]) => filas.map((f) => `<div class="t-fila ${f.ok ? 'ok' : 'mal'}"><b>${f.ok ? '✓' : '✗'}</b><span>${esc(f.nombre)}</span><code>${esc(f.valor)}</code></div>`).join('') + `<p class="t-total">${filas.filter((f) => f.ok).length} de ${filas.length} pruebas pasaron</p>`;
+document.querySelectorAll<HTMLElement>('[data-salida]').forEach((el) => (el.innerHTML = salida(el.dataset.salida === 'final' ? SALIDA_FINAL : SALIDA_INICIAL)));
 
 // ── Preguntas: texto en el deck (las respuestas NO están en el bundle) ──
 document.querySelectorAll<HTMLElement>('[data-q-text]').forEach((el) => (el.textContent = QUESTIONS[el.dataset.qText as QuestionId].text));
@@ -174,11 +191,18 @@ const menu = document.querySelector<HTMLElement>('.deck-menu-panel')!;
 let current = Math.max(0, sections.findIndex((s) => s.hasAttribute('data-deck-active')));
 
 const ratioLabel = (m: RatioMode) => (m === 'auto' ? ['Auto', 'según la ventana'] : m === 'event' ? ['Extendida', '1680×672 · bandas'] : [RATIOS[m].label, RATIOS[m].hint]);
-menu.innerHTML = `
+menu.innerHTML = publico ? `
+  <div class="group">Enlaces</div>
+  <a href="${REPO_URL}" target="_blank" rel="noreferrer">Repositorio <i data-lucide="arrow-up-right"></i></a>
+  <div class="group">Vista</div>
+  <button type="button" data-act="theme">Modo claro / oscuro</button>
+  <button type="button" data-act="fs">Pantalla completa</button>
+  <div class="group">Ir a</div>
+  <div class="slides-list"></div>` : `
   <div class="group">Enlaces</div>
   <a href="${withSessionParams('/presenter/')}" target="_blank" rel="noreferrer">Consola de la presentadora <kbd>P</kbd></a>
   <a href="${publicLiveUrl()}" target="_blank" rel="noreferrer">App de asistentes <i data-lucide="arrow-up-right"></i></a>
-  <a href="${DEMO_URL}" target="_blank" rel="noreferrer">Demo: Mercado campesino <i data-lucide="arrow-up-right"></i></a>
+  <a href="${DEMO_URL}" target="_blank" rel="noreferrer">Demo <i data-lucide="arrow-up-right"></i></a>
   <a href="${REPO_URL}" target="_blank" rel="noreferrer">Repositorio <i data-lucide="arrow-up-right"></i></a>
   <div class="group">Proporción de pantalla <kbd><span data-ratio-state></span> · A</kbd></div>
   <div class="ratio-row">${MODES.map((m) => {
@@ -275,7 +299,7 @@ setTimeout(() => {
 renderMenuList();
 
 createIcons({
-  icons: { Accessibility, Activity, Bot, Calculator, Camera, CirclePlay, Cpu, Database, Download, Eye, GitBranch, GitMerge, Globe, Hand, Highlighter, Loader, Megaphone, MessageSquareText, NotebookPen, Pause, RefreshCw, Rows3, Sparkles, Square, Trophy, Undo2, User, Users, Volume2, Wrench, ArrowUpRight },
+  icons: { Bot, Camera, CirclePlay, GitBranch, Globe, BookOpen, Check, Eye, Gauge, RefreshCw, Trophy, Users, ArrowRight, ArrowUpRight },
   attrs: { 'stroke-width': 1.75, 'aria-hidden': 'true' },
 });
 dispatchEvent(new Event('tweakchange'));
@@ -287,12 +311,13 @@ addEventListener('keydown', (e) => {
   const k = e.key.toLowerCase();
   if (k === 'escape' && !menu.hidden) closeMenu();
   if (k === 'l') setTheme(!isDark());
-  if (k === 'h') toggleContrast();
   if (k === 'f') toggleFullscreen();
+  if (k === 'm') (menu.hidden ? openMenu : closeMenu)();
+  if (publico) return;
+  if (k === 'h') toggleContrast();
   if (k === 's') toggleRail();
   if (k === 'a') ratio.cycle();
   if (k === 'e') ratio.toggleEvent();
-  if (k === 'm') (menu.hidden ? openMenu : closeMenu)();
   if (k === 'j') toggleJoinQr();
   if (k === 'p') open(withSessionParams('/presenter/'), `${NS}-presenter`);
 });

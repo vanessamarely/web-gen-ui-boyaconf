@@ -12,6 +12,8 @@ describe('preguntas solo sobre la charla', () => {
     '¿moveBefore funciona en Safari?',
     '¿Cómo evito el CLS cuando la UI se genera en streaming?',
     '¿Qué es exactamente la web agéntica?',
+    'No entendí esa parte',
+    '¿Me explicas otra vez lo último?',
   ])('acepta: %s', (q) => expect(isOnTopic(q)).toBe(true));
 
   it.each(['¿Qué comiste hoy?', '¿Dónde compraste tu blusa?', 'hola', '¿Cuál es tu equipo de fútbol?', 'qué puta charla de MCP'])('rechaza: %s', (q) =>

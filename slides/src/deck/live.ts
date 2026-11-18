@@ -10,10 +10,10 @@
 import QRCode from 'qrcode';
 import { Brain, Check, Circle, Diamond, Flame, Heart, MessageCircleQuestion, Square, Triangle, createElement, type IconNode } from 'lucide';
 import { SLIDE_BY_ID } from '../shared/content';
-import { NS, PUBLIC_DEMO_URL, PUBLIC_SLIDES_URL, REPO_URL, SESSION_ID, prettyUrl, publicLiveUrl } from '../shared/config';
+import { NS, PUBLIC_DEMO_URL, PUBLIC_SLIDES_URL, REPO_URL, SESSION_ID, prettyUrl, publicLiveUrl, isPublicView } from '../shared/config';
 import { HILOS, tejedorSilhouette, tejedorSVG, type TejedorOptions } from '../shared/tejedor';
 import { QUESTIONS, QUESTION_IDS, parseAnswerKey, type AnswerKey, type QuestionId } from '../shared/questions';
-import { REACTIONS, correctCount, getRealtime, podiumKey, scoreFor, tally, uniqueCodes, winnerCode, type AudienceQuestion, type TejedorData, type Player, type Reaction, type SlideState, type VoteRecord } from '../shared/realtime';
+import { REACTIONS, correctCount, getRealtime, podiumKey, scoreFor, tally, uniqueCodes, winnerCode, type AudienceQuestion, type Feedback, type TejedorData, type Player, type Reaction, type SlideState, type VoteRecord } from '../shared/realtime';
 import { esc } from '../shared/esc';
 import { createBursts } from './reaction-bursts';
 
@@ -33,7 +33,7 @@ function icon(node: IconNode, size = 28, color?: string): SVGElement {
 
 /** Mensajes entre el deck y la consola de la presentadora (misma máquina, sin red). */
 export type PresenterMsg =
-  | { type: 'state'; index: number; total: number; id: string; players: number; tejedores: number; questions: number; votes: number; live: boolean; mode: string }
+  | { type: 'state'; index: number; total: number; id: string; players: number; tejedores: number; questions: number; votes: number; lostHere: number; live: boolean; mode: string }
   | { type: 'goto'; index: number }
   | { type: 'next' }
   | { type: 'prev' }
@@ -55,6 +55,7 @@ export async function initLive(stage: DeckStage, sections: HTMLElement[]) {
   document.querySelectorAll('[data-live-url]').forEach((el) => (el.textContent = prettyUrl(liveUrl)));
   buildPolls();
   dispatchEvent(new Event('tweakchange'));
+  if (isPublicView()) return; // Slides publicados: sin conexión en vivo.
 
   const rt = await getRealtime();
   const presenterLink = new URLSearchParams(location.search).has('presenter');
@@ -63,6 +64,7 @@ export async function initLive(stage: DeckStage, sections: HTMLElement[]) {
   let votes: VoteRecord[] = [];
   let tejedores: TejedorData[] = [];
   let questions: AudienceQuestion[] = [];
+  let feedback: Feedback[] = [];
   let slide: SlideState | null = null;
   let answers: AnswerKey = {};
   let unsubQuestions: (() => void) | null = null;
@@ -129,7 +131,7 @@ export async function initLive(stage: DeckStage, sections: HTMLElement[]) {
     // La primera vez que se muestra una pregunta, se marca la hora de apertura (bono por rapidez).
     if (qid && !slide?.openedAt?.[qid]) void send(rt.openQuestion(qid));
     // "Llegar a tiempo": quien entró antes del capítulo 01 suma +100 (se marca una sola vez).
-    if (s.dataset.id === 'sec-agentica' && !slide?.earlyUntil) void send(rt.markEarlyEnd());
+    if (s.dataset.id === 'paradigma' && !slide?.earlyUntil) void send(rt.markEarlyEnd());
     if (c?.kind === 'podium') {
       publishPodium();
       renderPodium();
@@ -144,7 +146,7 @@ export async function initLive(stage: DeckStage, sections: HTMLElement[]) {
   // ── Consola de la presentadora (BroadcastChannel) ─────────────────────
   function tellConsole() {
     const id = sections[lastIndex]?.dataset.id ?? '';
-    const msg: PresenterMsg = { type: 'state', index: lastIndex, total: sections.length, id, players: players.length, tejedores: tejedores.filter((c) => !c.hidden).length, questions: questions.length, votes: votes.length, live: presenter, mode: rt.mode };
+    const msg: PresenterMsg = { type: 'state', index: lastIndex, total: sections.length, id, players: players.length, tejedores: tejedores.filter((c) => !c.hidden).length, questions: questions.length, votes: votes.length, lostHere: feedback.filter((f) => f.lost.includes(id)).length, live: presenter, mode: rt.mode };
     bc.postMessage(msg);
   }
   bc.onmessage = (e: MessageEvent<PresenterMsg>) => {
@@ -496,17 +498,34 @@ export async function initLive(stage: DeckStage, sections: HTMLElement[]) {
   panel.hidden = true;
   panel.setAttribute('aria-label', 'Preguntas del público');
   panel.innerHTML = `<header><h2>Preguntas del público <small data-q-total></small></h2><button class="qa-download" type="button" data-q-md>.md</button><button class="qa-close" type="button" aria-label="Cerrar">✕</button></header>
-    <ol class="qa-list"></ol><p class="qa-empty">Aún no hay preguntas.</p>`;
+    <div class="qa-pulse" data-pulse></div><ol class="qa-list"></ol><p class="qa-empty">Aún no hay preguntas.</p>`;
   document.body.append(panel);
   panel.querySelector('.qa-close')!.addEventListener('click', () => (panel.hidden = true));
   panel.querySelector('[data-q-md]')!.addEventListener('click', () => {
-    const md = `# Preguntas del público · ${SESSION_ID}\n\n${questions.map((q) => `- **${q.name}** (${q.slide}): ${q.text}`).join('\n')}\n`;
+    const pulse = pulseSummary();
+    const md = `# Preguntas del público · ${SESSION_ID}\n\n${questions.map((q) => `- **${q.name}** (${q.slide}): ${q.text}`).join('\n')}\n\n# Satisfacción\n\n- Claridad: ${pulse.clara}\n- Utilidad: ${pulse.util}\n\n## Me perdí\n\n${pulse.lost.map((l) => `- ${l.label}: ${l.n}`).join('\n') || '- Nadie'}\n`;
     const a = document.createElement('a');
     a.href = URL.createObjectURL(new Blob([md], { type: 'text/markdown' }));
     a.download = `preguntas-${SESSION_ID}.md`;
     a.click();
   });
+  /** Promedios finales y slides donde más gente tocó "Me perdí". */
+  function pulseSummary() {
+    const avg = (key: 'clara' | 'util') => {
+      const all = feedback.map((f) => f[key]).filter((n): n is number => typeof n === 'number');
+      return all.length ? `${(all.reduce((a, b) => a + b, 0) / all.length).toFixed(1).replace('.', ',')} de 5 (${all.length})` : 'sin respuestas';
+    };
+    const counts = new Map<string, number>();
+    feedback.forEach((f) => f.lost.forEach((id) => counts.set(id, (counts.get(id) ?? 0) + 1)));
+    const lost = [...counts].sort((a, b) => b[1] - a[1]).map(([id, n]) => ({ label: SLIDE_BY_ID.get(id)?.label ?? id, n }));
+    return { clara: avg('clara'), util: avg('util'), lost };
+  }
+  function renderPulse() {
+    const p = pulseSummary();
+    panel.querySelector('[data-pulse]')!.innerHTML = `<p><b>Claridad:</b> ${p.clara} · <b>Utilidad:</b> ${p.util}</p><p><b>Me perdí:</b> ${p.lost.slice(0, 5).map((l) => `${esc(l.label)} (${l.n})`).join(' · ') || 'nadie por ahora'}</p>`;
+  }
   function renderQuestions() {
+    renderPulse();
     const list = panel.querySelector('.qa-list')!;
     list.innerHTML = questions.map((q) => `<li><p>${esc(q.text)}</p><small>${esc(q.name)} · ${esc(q.slide)}</small><button type="button" data-del="${esc(q.id)}">Respondida · quitar</button></li>`).join('');
     list.querySelectorAll<HTMLButtonElement>('[data-del]').forEach((b) => b.addEventListener('click', () => void rt.removeQuestion(b.dataset.del!)));
@@ -518,6 +537,11 @@ export async function initLive(stage: DeckStage, sections: HTMLElement[]) {
   }
   function listenQuestions() {
     if (!presenter || unsubQuestions) return;
+    rt.onFeedback((all) => {
+      feedback = all;
+      renderPulse();
+      tellConsole();
+    });
     unsubQuestions = rt.onQuestions(
       (qs) => {
         questions = qs;

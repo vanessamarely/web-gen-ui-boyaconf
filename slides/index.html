@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>UI generativa sin fricción — BoyaConf 2026</title>
-    <meta name="description" content="UI generativa sin fricción: qué es la web agéntica (lee, usa, genera), WebMCP y cómo tejer una UI generativa rápida, fluida y accesible. BoyaConf 2026." />
+    <title>UI generativa sin fricción · Harness web — BoyaConf 2026</title>
+    <meta name="description" content="UI generativa sin fricción: cómo construir con IA interfaces rápidas, fluidas y accesibles, y comprobarlas con un harness web. BoyaConf 2026." />
     <link rel="icon" href="/brand/boyaconf-isotipo.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -23,46 +23,19 @@
   </head>
   <body>
     <deck-stage width="1280" height="720">
-      <!-- ═════════════ PORTADA ═════════════ -->
       <section data-id="portada" data-label="Portada" class="cover">
-        <div class="cerros" aria-hidden="true"><i></i><i></i><i></i></div>
         <div class="cover-landmark" data-landmark="cover" aria-hidden="true"></div>
         <div class="frame cover-frame">
           <p class="event-logo"><img src="/brand/boyaconf-isotipo.svg" alt="" width="46" height="46" /><span><span class="lt">‹</span>BoyaConf<span class="gt">›</span> 2026</span></p>
-          <p class="eyebrow">web agéntica · UI generativa · WebMCP</p>
           <h1 class="cover-title"><span>UI generativa</span><span><span class="hl">sin fricción</span></span></h1>
-          <p class="cover-sub">Tejer interfaces rápidas, fluidas y accesibles para personas y agentes</p>
           <div class="speaker">
             <img src="/brand/vanessa.png" alt="" />
             <div><strong>Vanessa Aristizabal</strong><span>GDE Web &amp; Angular · GitHub Star</span></div>
           </div>
         </div>
         <div class="cover-tejedores" data-tejedores="3" aria-hidden="true"></div>
-        <div class="ruana-band bottom" aria-hidden="true"></div>
       </section>
 
-      <section data-id="unete" data-label="Únete">
-        <div class="frame card-frame">
-          <p class="eyebrow">Esta charla también es una app</p>
-          <h2 class="title">Escanea, juega por el podio y <span class="hl">crea tu tejedor</span></h2>
-          <div class="join-grid">
-            <div class="qr-card">
-              <div data-qr="live"></div>
-              <strong>Únete a la charla</strong>
-              <span data-live-url>…</span>
-            </div>
-            <div class="stack">
-              <div class="counters">
-                <div class="box blue"><div class="counter-big"><span data-count="players">0</span></div><small class="mono">en la sala</small></div>
-                <div class="box yellow"><div class="counter-big"><span data-count="tejedores">0</span></div><small class="mono">tejedores</small></div>
-              </div>
-              <div class="box red"><h3 class="ic"><i data-lucide="trophy"></i> 3 preguntas, 1 podio</h3><p>Acierta rápido. Bonos: entrar ahora, publicar tu tejedor, preguntar y reaccionar.</p></div>
-              <div class="box green"><h3 class="ic"><i data-lucide="notebook-pen"></i> Notas sin perder el hilo</h3><p>Si escribes, tu celular <b>no cambia de slide</b> hasta que guardes.</p></div>
-              <div class="box"><h3 class="ic"><i data-lucide="download"></i> Tu memoria al final</h3><p>PDF o HTML con cada slide, tus notas y tu tejedor.</p></div>
-            </div>
-          </div>
-        </div>
-      </section>
       <section data-id="bio" data-label="Quién soy">
         <div class="frame card-frame">
           <p class="eyebrow">Quién soy</p>
@@ -77,421 +50,363 @@
                 <li>GitHub Star · Creadora de contenido</li>
               </ul>
               <div class="socials">
+                <span class="pill web"><i data-lucide="globe"></i> <b>vanessamarely.dev</b></span>
                 <span class="pill"><i data-lucide="camera"></i> <b>@vanessamarelycode</b></span>
                 <span class="pill"><i data-lucide="circle-play"></i> <b>vanessamarely</b></span>
                 <span class="pill"><i data-lucide="git-branch"></i> <b>vanessamarely</b></span>
-                <span class="pill"><i data-lucide="globe"></i> <b>vanessamarely.dev</b></span>
               </div>
             </div>
           </div>
         </div>
       </section>
-      <section data-id="sec-agentica" data-label="01 ¿Web agéntica?" class="section-slide">
-        <div class="frame">
-          <p class="sec-num">01</p>
-          <h2 class="sec-title">¿Qué es la <span class="hl">web agéntica</span>?</h2>
-          <p class="lead">Sin humo: qué cambia cuando un agente usa la web contigo.</p>
-        </div>
-        <div class="section-art sec-blue">
-          <div class="landmark" data-landmark="telar"></div>
-          <div class="camino" aria-hidden="true"></div>
-          <div class="runner">
-            <p class="bubble">La web agéntica se teje en tres capas: leer, usar y generar.</p>
-            <div class="runner-art" data-runner="0" aria-hidden="true"></div>
-          </div>
-        </div>
-        <div class="surcos" aria-hidden="true"><i></i><i></i><i></i></div>
-      </section>
-      <section data-id="tres-capas" data-label="Lee · usa · genera">
+
+      <section data-id="unete" data-label="Únete">
         <div class="frame card-frame">
-          <p class="eyebrow">La web agéntica en una frase</p>
-          <h2 class="title">El agente <span class="hl">lee, usa y genera</span>; tú decides</h2>
-          <div class="capas reveal">
-            <div class="capa blue" style="--i: 0"><span class="n">1</span><span class="ico"><i data-lucide="eye"></i></span><h3>Lee</h3><p>Entiende tu sitio</p><span class="tech">HTML semántico · accesibilidad</span></div>
-            <div class="capa-arrow" style="--i: 1"></div>
-            <div class="capa green" style="--i: 2"><span class="n">2</span><span class="ico"><i data-lucide="wrench"></i></span><h3>Usa</h3><p>Actúa con tools que tú defines</p><span class="tech">WebMCP · JSON Schema</span></div>
-            <div class="capa-arrow" style="--i: 3"></div>
-            <div class="capa yellow" style="--i: 4"><span class="n">3</span><span class="ico"><i data-lucide="sparkles"></i></span><h3>Genera</h3><p>Arma la interfaz a tu medida</p><span class="tech">UI generativa</span></div>
-          </div>
-          <div class="persona-bar reveal"><span style="--i: 5"><i data-lucide="user"></i> <b>La persona decide en las tres:</b> ve lo que pasa · confirma lo importante · puede deshacer</span></div>
-          <p class="example reveal"><span style="--i: 6"><b>“Mercado para 4 con 120 mil”</b> → lee el catálogo · usa <code>agregar_producto</code> · genera la lista por puestos</span></p>
-        </div>
-      </section>
-      <section data-id="novedades" data-label="Lo nuevo">
-        <div class="frame card-frame">
-          <p class="eyebrow">Qué hay de nuevo (y qué es experimental)</p>
-          <h2 class="title">Lo nuevo en la <span class="hl">web agéntica</span></h2>
-          <div class="cases news reveal">
-            <div class="case green" style="--i: 0"><span class="ico"><i data-lucide="wrench"></i></span><h3>WebMCP</h3><p>Tu página registra <b>tools</b> con nombre, descripción y JSON Schema. Imperativa (<code>registerTool</code>) o declarativa (<code>&lt;form toolname&gt;</code>).</p><span class="pill yellow">Origin Trial · W3C CG</span></div>
-            <div class="case blue" style="--i: 1"><span class="ico"><i data-lucide="cpu"></i></span><h3>IA en el navegador</h3><p><b>Prompt API</b> con Gemini Nano y salida estructurada (<code>responseConstraint</code>): sin servidor, datos en el equipo.</p><span class="pill green">Chrome estable · equipos compatibles</span></div>
-            <div class="case yellow" style="--i: 2"><span class="ico"><i data-lucide="bot"></i></span><h3>Agentes del navegador</h3><p>Agentes y extensiones que usan las tools de tu página con la <b>sesión y los permisos</b> de la persona.</p><span class="pill blue">En evolución</span></div>
+          <p class="eyebrow">Saca tu celular</p>
+          <h2 class="title">Escanea y <span class="hl">crea tu tejedor</span></h2>
+          <div class="join-grid">
+            <div class="qr-card"><div data-qr="live"></div><strong>Únete a la charla</strong><span data-live-url>…</span></div>
+            <div class="reglas">
+              <h3>Suma puntos para el podio</h3>
+              <ul>
+                <li><span>Entra antes de empezar</span><b>+100</b></li>
+                <li><span>Publica tu tejedor en el muro</span><b>+100</b></li>
+                <li><span>Reacciona: se ve en esta pantalla</span><b>hasta +100</b></li>
+                <li><span>En la app, toca <em>Pregunta</em> y escríbela</span><b>+100</b></li>
+                <li><span>Acierta las 3 preguntas, rápido</span><b>hasta +1.000 c/u</b></li>
+              </ul>
+              <p class="perdi"><b>¿No entendiste algo?</b> En la app, toca <b>Me perdí</b>.</p>
+              <p class="sala"><span data-count="players">0</span> en la sala · <span data-count="tejedores">0</span> tejedores</p>
+            </div>
           </div>
         </div>
       </section>
-      <section data-id="webmcp" data-label="Una tool en tu página">
+
+      <section data-id="paradigma" data-label="Cómo está cambiando la web">
         <div class="frame card-frame">
-          <p class="eyebrow">WebMCP · API imperativa</p>
-          <h2 class="title">Una <span class="hl">tool</span> en tu página</h2>
-          <div class="code-grid">
-            <div class="code sm" data-code="webmcp" data-focus='[["1","document.modelContext: las tools viven en la página abierta"],["2-3","Nombre con verbo exacto y descripción clara"],["4-11","JSON Schema: lo que el agente debe mandar"],["12-15","execute llama la MISMA lógica que el botón"]]'><div class="bar"><span>demo/src/agente/tools.ts</span><span>WebMCP</span></div><pre></pre></div>
-            <div class="stack side-notes"><div class="box green"><h3>Sin servidor aparte</h3><p>Vive en la pestaña, con la sesión de la persona.</p></div><div class="box blue"><h3>Contrato, no clics</h3><p>Si cambias el diseño, la tool sigue igual.</p></div></div>
+          <p class="eyebrow">Cómo está cambiando la web</p>
+          <h2 class="title">De pantallas fijas a <span class="hl">pantallas que se arman para ti</span></h2>
+          <div class="comparar reveal">
+            <article class="comp" style="--i: 0">
+              <h3>Antes</h3>
+              <div class="mini" aria-hidden="true">
+                <p class="mini-bar">Catálogo de productos</p>
+                <div class="mini-grid"><i>Frutas</i><i>Verduras</i><i>Granos</i><i>Lácteos</i></div>
+              </div>
+              <p>Un equipo diseña cada pantalla.<br /><b>Tú buscas lo que necesitas.</b></p>
+            </article>
+            <article class="comp gen" style="--i: 1">
+              <h3>Ahora: UI generativa</h3>
+              <div class="mini" aria-hidden="true">
+                <p class="mini-pide">“Mercado para 4 personas”</p>
+                <ul class="mini-lista"><li>Papa pastusa <b>2 kg</b></li><li>Cebolla larga <b>1 atado</b></li><li>Huevos <b>1 docena</b></li></ul>
+              </div>
+              <p>Pides lo que necesitas.<br /><b>La IA arma la pantalla para ese pedido.</b></p>
+            </article>
           </div>
         </div>
       </section>
-      <section data-id="cara" data-label="La cara de la web agéntica">
+
+      <section data-id="ya-existe" data-label="Esto ya existe">
         <div class="frame card-frame">
-          <p class="eyebrow">Donde la web agéntica se ve (o se siente rota)</p>
-          <h2 class="title">La UI generativa es <span class="hl">la cara</span> de la web agéntica</h2>
-          <div class="guard chain6 reveal">
-            <div class="g-step" style="--i: 0"><span class="ico"><i data-lucide="message-square-text"></i></span><b>Intención</b><small>“mercado para 4”</small></div>
-            <div class="g-step" style="--i: 1"><span class="ico"><i data-lucide="bot"></i></span><b>Agente</b><small>decide qué hacer</small></div>
-            <div class="g-step" style="--i: 2"><span class="ico"><i data-lucide="wrench"></i></span><b>Tools</b><small>WebMCP</small></div>
-            <div class="g-step" style="--i: 3"><span class="ico"><i data-lucide="database"></i></span><b>Estado</b><small>uno solo</small></div>
-            <div class="g-step ok" style="--i: 4"><span class="ico"><i data-lucide="sparkles"></i></span><b>UI generada</b><small>lo único que se ve</small></div>
-            <div class="g-step" style="--i: 5"><span class="ico"><i data-lucide="user"></i></span><b>Persona</b><small>marca, edita, confía</small></div>
-          </div>
-          <div class="sin-friccion reveal">
-            <div class="box blue" style="--i: 6"><h3 class="ic"><i data-lucide="user"></i> Sin fricción para la persona</h3><p>Rápida (responde) · fluida (no salta ni se traba) · accesible.</p></div>
-            <div class="box green" style="--i: 7"><h3 class="ic"><i data-lucide="bot"></i> Sin fricción para el agente</h3><p>Tools claras · un solo estado · errores que le dicen cómo corregirse.</p></div>
+          <p class="eyebrow">No es ciencia ficción</p>
+          <h2 class="title">La UI generativa <span class="hl">ya está en productos reales</span></h2>
+          <ul class="beneficios reveal">
+            <li style="--i: 0"><h3>Instacart en ChatGPT</h3><p>Planeas comidas, armas la lista del mercado y pagas sin salir del chat.</p><a href="https://openai.com/index/instacart-partnership" target="_blank" rel="noreferrer">openai.com/index/instacart-partnership</a></li>
+            <li style="--i: 1"><h3>Modo IA de Google</h3><p>Crea herramientas interactivas para responder tu pregunta.</p><a href="https://research.google/blog/generative-ui-a-rich-custom-visual-interactive-user-experience-for-any-prompt/" target="_blank" rel="noreferrer">research.google/blog/generative-ui</a></li>
+            <li style="--i: 2"><h3>Vista dinámica de Gemini</h3><p>Diseña una experiencia interactiva para cada pedido.</p><a href="https://research.google/blog/generative-ui-a-rich-custom-visual-interactive-user-experience-for-any-prompt/" target="_blank" rel="noreferrer">research.google/blog/generative-ui</a></li>
+          </ul>
+        </div>
+      </section>
+
+      <section data-id="como-funciona" data-label="Cómo funciona">
+        <div class="frame card-frame">
+          <p class="eyebrow">Qué pasa dentro de la web</p>
+          <h2 class="title">Cómo funciona la <span class="hl">UI generativa</span></h2>
+          <ol class="flujo reveal">
+            <li style="--i: 0"><b>1</b><h3>Pides</h3><p>“Arma mi mercado”</p></li>
+            <li style="--i: 1"><b>2</b><h3>La web consulta a la IA</h3><p>Le envía tu pedido a un modelo</p></li>
+            <li style="--i: 2"><b>3</b><h3>La IA responde con datos</h3><code>{ "nombre": "Papa criolla", "cantidad": 2 }</code></li>
+            <li style="--i: 3"><b>4</b><h3>La web dibuja la pantalla</h3><p>Convierte los datos en una lista</p></li>
+          </ol>
+        </div>
+      </section>
+
+      <section data-id="control" data-label="Cuánto control tiene la IA">
+        <div class="frame card-frame">
+          <p class="eyebrow">La decisión de cada equipo</p>
+          <h2 class="title">¿Cuánto control <span class="hl">le damos a la IA?</span></h2>
+          <ol class="beneficios niveles reveal">
+            <li style="--i: 0" class="nuestro"><small>Nuestro ejemplo</small><h3>Componentes fijos</h3><p>La IA elige datos. El equipo ya creó los componentes.</p></li>
+            <li style="--i: 1"><small>Intermedio</small><h3>Interfaz declarativa</h3><p>La IA describe la pantalla. La web la dibuja con sus reglas.</p></li>
+            <li style="--i: 2"><small>Abierto</small><h3>Interfaz libre</h3><p>La IA escribe la interfaz. La web solo la muestra.</p></li>
+          </ol>
+          <p class="escala"><span>Más control del equipo</span><i aria-hidden="true"></i><span>Más libertad para la IA</span></p>
+        </div>
+      </section>
+
+      <section data-id="demo-app" data-label="El ejemplo de hoy">
+        <div class="frame card-frame">
+          <p class="eyebrow">El ejemplo de hoy</p>
+          <h2 class="title">Una web para <span class="hl">armar el mercado de la semana</span></h2>
+          <div class="app-ej">
+            <video muted loop playsinline preload="none" data-src="/clips/generando.webm" poster="/clips/app.png" aria-label="La lista de productos aparece en la pantalla a medida que llega la respuesta"></video>
+            <ol class="app-pasos">
+              <li><b>1</b><span>Presionas <strong>Armar mi mercado</strong></span></li>
+              <li><b>2</b><span>La lista aparece mientras llega la respuesta</span></li>
+              <li><b>3</b><span>Marcas lo que ya compraste y le dejas <strong>notas al vendedor</strong></span></li>
+            </ol>
           </div>
         </div>
       </section>
-      <section data-id="q1" data-label="Pregunta 1 · Web agéntica" data-q="q1" class="poll-slide">
+
+      <section data-id="demo-roto" data-label="El problema" class="pasos-slide">
         <div class="frame card-frame">
-          <p class="eyebrow">Pregunta 1 de 3 · Web agéntica · responde en tu celular</p>
+          <p class="eyebrow">El problema</p>
+          <h2 class="title">Pedí un cambio y <span class="hl">se borró lo que yo había hecho</span></h2>
+          <div class="pasos">
+            <p class="paso-t"><b>1</b> Marqué la papa criolla y le dejé una nota al vendedor</p>
+            <img src="/clips/antes-1.png" alt="Papa criolla marcada con la nota bien grandes" width="1800" height="120" />
+            <p class="paso-t pide"><b>2</b> Le pedí a la IA: <em>“Sube el presupuesto”</em></p>
+            <p class="paso-t mal"><b>3</b> La lista cambió, pero mi marca y mi nota desaparecieron</p>
+            <img class="mal" src="/clips/antes-2.png" alt="La lista cambió, pero mi marca y mi nota desaparecieron" width="1800" height="120" />
+          </div>
+        </div>
+      </section>
+
+      <section data-id="por-que" data-label="Por qué pasó" class="frase-slide">
+        <div class="frame card-frame">
+          <p class="eyebrow">¿Por qué pasa esto en la UI generativa?</p>
+          <p class="frase">Cada respuesta de la IA <span class="hl">vuelve a crear la lista</span> y reemplaza lo que ya estaba.<small>Puede pasar en cualquier web, pero aquí es más fácil: la pantalla cambia con cada respuesta.</small></p>
+        </div>
+      </section>
+
+      <section data-id="objetivo" data-label="El objetivo de hoy">
+        <div class="frame card-frame">
+          <p class="eyebrow">El objetivo de esta charla</p>
+          <h2 class="title">Encontrar y corregir <span class="hl">5 errores de esta web</span></h2>
+          <ol class="objetivo" data-objetivo></ol>
+          <p class="porque">Vamos a entender cada error y a corregirlo, <b>uno por uno</b>.</p>
+        </div>
+      </section>
+
+      <section data-id="prueba" data-label="Cómo se prueba">
+        <div class="frame card-frame">
+          <p class="eyebrow">¿Cómo se hace una prueba automática?</p>
+          <h2 class="title">Un programa <span class="hl">usa la web como una persona</span></h2>
+          <div class="prueba-grid">
+            <ol class="prueba-pasos reveal">
+              <li style="--i: 0"><b>1</b>Abre la web en Chrome</li>
+              <li style="--i: 1"><b>2</b>Marca un producto y escribe una nota</li>
+              <li style="--i: 2"><b>3</b>Pide el cambio a la lista</li>
+              <li style="--i: 3"><b>4</b>Revisa si la nota sigue ahí</li>
+            </ol>
+            <div class="code sm"><div class="bar"><span>Prueba real con Playwright</span><span>harness/check.mjs</span></div><pre data-prueba></pre></div>
+          </div>
+          <p class="porque">Se ejecuta en el computador con <code>npm run harness</code>.</p>
+        </div>
+      </section>
+
+      <section data-id="para-que" data-label="Para qué nos sirve">
+        <div class="frame card-frame">
+          <p class="eyebrow">Si desarrollas para la web</p>
+          <h2 class="title">¿Para qué <span class="hl">nos sirven estas pruebas?</span></h2>
+          <ol class="beneficios reveal">
+            <li style="--i: 0"><h3>Encuentras el error antes que tus usuarios</h3><p>Falla en tu computador, no en producción.</p></li>
+            <li style="--i: 1"><h3>Cambias código con confianza</h3><p>Cada cambio, tuyo o de la IA, se comprueba otra vez.</p></li>
+            <li style="--i: 2"><h3>La IA sabe qué debe corregir</h3><p>Lee qué prueba falló y lo intenta de nuevo.</p></li>
+          </ol>
+        </div>
+      </section>
+
+      <section data-id="metricas" data-label="Core Web Vitals">
+        <div class="frame card-frame">
+          <p class="eyebrow">Cómo se mide la experiencia</p>
+          <h2 class="title"><span class="hl">Core Web Vitals</span>: tres métricas</h2>
+          <div class="metricas reveal">
+            <div class="metrica" style="--i: 0"><b>LCP</b><p>¿Cuánto tarda en aparecer lo principal?</p><span>Bueno: 2,5 s o menos</span></div>
+            <div class="metrica" style="--i: 1"><b>INP</b><p>¿Cuánto tarda en responder cuando la usas?</p><span>Bueno: 200 ms o menos</span></div>
+            <div class="metrica" style="--i: 2"><b>CLS</b><p>¿Cuánto se mueve el contenido en pantalla?</p><span>Bueno: 0,1 o menos</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section data-id="medir" data-label="Cómo se mide">
+        <div class="frame card-frame">
+          <p class="eyebrow">Si la respuesta de la IA cambia</p>
+          <h2 class="title">¿Cómo medimos <span class="hl">el rendimiento?</span></h2>
+          <ol class="beneficios reveal">
+            <li style="--i: 0"><h3>La IA cambia los datos</h3><p>El código de la interfaz sigue siendo el mismo.</p></li>
+            <li style="--i: 1"><h3>Probamos con una respuesta grabada</h3><p>Siempre es igual, así podemos comparar cada corrección.</p></li>
+            <li style="--i: 2"><h3>Medimos con usuarios reales</h3><p>En producción seguimos LCP, INP y CLS.</p></li>
+          </ol>
+        </div>
+      </section>
+
+      <section data-id="inicio" data-label="Punto de partida">
+        <div class="frame card-frame">
+          <p class="eyebrow">Resultado de las pruebas en la primera versión</p>
+          <h2 class="title">La web <span class="hl">no pasó ninguna</span> de las 5 pruebas</h2>
+          <div class="terminal" data-salida="inicial"></div>
+          <p class="porque">Cada prueba fallida es un error. <b>Ahora los corregimos uno por uno.</b></p>
+        </div>
+      </section>
+
+      <section data-id="agente" data-label="Qué es un agente de IA" class="frase-slide">
+        <div class="frame card-frame">
+          <p class="eyebrow">Qué es un agente de IA</p>
+          <p class="frase">Una IA que <span class="hl">escribe y cambia código</span> por ti.<small>Por ejemplo: Claude Code, Codex o Cursor.</small></p>
+        </div>
+      </section>
+
+      <section data-id="harness" data-label="Qué es un harness" class="frase-slide">
+        <div class="frame card-frame">
+          <p class="eyebrow">Qué es un harness</p>
+          <p class="frase">Un harness <span class="hl">le da instrucciones al agente y comprueba el resultado</span> con pruebas automáticas.</p>
+        </div>
+      </section>
+
+      <section data-id="harness-pasos" data-label="Cómo funciona">
+        <div class="frame card-frame">
+          <p class="eyebrow">Cómo funciona un harness</p>
+          <h2 class="title">Cuatro <span class="hl">pasos</span></h2>
+          <div class="lazo reveal">
+            <div class="lazo-p" style="--i: 0"><span class="ico"><i data-lucide="book-open"></i></span><b>1. Instrucciones</b><small>El agente las lee</small></div>
+            <div class="lazo-f" style="--i: 1"></div>
+            <div class="lazo-p" style="--i: 2"><span class="ico"><i data-lucide="bot"></i></span><b>2. Código</b><small>El agente lo cambia</small></div>
+            <div class="lazo-f" style="--i: 3"></div>
+            <div class="lazo-p" style="--i: 4"><span class="ico"><i data-lucide="gauge"></i></span><b>3. Pruebas</b><small>Usan la web</small></div>
+            <div class="lazo-f" style="--i: 5"></div>
+            <div class="lazo-p ok" style="--i: 6"><span class="ico"><i data-lucide="check"></i></span><b>4. Entrega</b><small>Si todas pasan</small></div>
+          </div>
+          <p class="lazo-rojo reveal"><span style="--i: 7"><i data-lucide="refresh-cw"></i> Si una prueba falla, el agente corrige y vuelve a intentar.</span></p>
+        </div>
+      </section>
+
+      <section data-id="q1" data-label="Pregunta 1" data-q="q1" class="poll-slide">
+        <div class="frame card-frame">
+          <p class="eyebrow">Pregunta 1 de 3 · responde en tu celular</p>
           <h2 class="title poll-q" data-q-text="q1"></h2>
           <div class="poll" data-poll="q1"></div>
           <div class="poll-foot"><span class="pill"><i data-lucide="users"></i> <b data-total>0</b> respuestas</span><p class="explain" data-explain hidden></p><button class="btn-reveal" type="button" data-reveal hidden>Revelar <kbd>V</kbd></button></div>
         </div>
       </section>
-      <section data-id="sec-urdimbre" data-label="02 Renderizado" class="section-slide">
-        <div class="frame">
-          <p class="sec-num">02</p>
-          <h2 class="sec-title">Renderizado: <span class="hl">la urdimbre</span></h2>
-          <p class="lead">Tu UI pone la estructura y el espacio; el modelo solo trae datos.</p>
-        </div>
-        <div class="section-art sec-green">
-          <div class="landmark" data-landmark="puente"></div>
-          <div class="camino" aria-hidden="true"></div>
-          <div class="runner">
-            <p class="bubble">Como el puente: primero la estructura, luego lo que pasa por encima.</p>
-            <div class="runner-art" data-runner="1" aria-hidden="true"></div>
-          </div>
-        </div>
-        <div class="surcos" aria-hidden="true"><i></i><i></i><i></i></div>
-      </section>
-      <section data-id="contrato" data-label="Datos, no HTML">
+
+      <section data-id="r-renderizado" data-label="Corrección: resultado" class="ronda-slide" data-ronda="renderizado"><div class="frame card-frame"></div></section>
+
+      <section data-id="c-renderizado" data-label="Corrección: código" class="codigo-slide" data-codigo="renderizado"><div class="frame card-frame"></div></section>
+
+      <section data-id="r-streaming" data-label="Corrección: resultado" class="ronda-slide" data-ronda="streaming"><div class="frame card-frame"></div></section>
+
+      <section data-id="c-streaming" data-label="Corrección: código" class="codigo-slide" data-codigo="streaming"><div class="frame card-frame"></div></section>
+
+      <section data-id="r-dom" data-label="Corrección: resultado" class="ronda-slide" data-ronda="dom"><div class="frame card-frame"></div></section>
+
+      <section data-id="c-dom" data-label="Corrección: código" class="codigo-slide" data-codigo="dom"><div class="frame card-frame"></div></section>
+
+      <section data-id="vecino" data-label="Explícale a tu vecino" class="frase-slide">
         <div class="frame card-frame">
-          <p class="eyebrow">Catálogo de componentes + JSON Schema</p>
-          <h2 class="title">Datos, no HTML: <span class="hl">catálogo + schema</span></h2>
-          <div class="code-grid">
-            <div class="code sm" data-code="contract" data-focus='[["2-4","Un schema, no HTML libre"],["5","Primero el plan: qué secciones vienen"],["6-10","Componentes de un catálogo cerrado (enum)"],["11","Lo que no se ve aún, al final"],["15","responseConstraint: el modelo cumple el schema"]]'><div class="bar"><span>demo/src/genui/schema.ts</span><span>Prompt API</span></div><pre></pre></div>
-            <div class="stack side-notes"><div class="box green"><h3>Seguro y accesible</h3><p>Nada de HTML arbitrario: tus componentes, tu accesibilidad.</p></div><div class="box yellow"><h3>El orden importa</h3><p>Lo primero del schema es lo primero que aparece.</p></div></div>
-          </div>
+          <p class="eyebrow">20 segundos con quien tengas al lado</p>
+          <p class="frase">De estos 3 errores, <span class="hl">¿cuál has visto en una web?</span><small>Contenido que salta · web congelada · lista que se borra</small></p>
         </div>
       </section>
-      <section data-id="plan" data-label="Primero el plan">
+
+      <section data-id="q2" data-label="Pregunta 2" data-q="q2" class="poll-slide">
         <div class="frame card-frame">
-          <p class="eyebrow">Montar la urdimbre antes de tejer</p>
-          <h2 class="title">Primero <span class="hl">el plan</span>, luego el contenido</h2>
-          <div class="plan-grid">
-            <div class="plan-timeline reveal">
-              <div class="pt-row" style="--i: 0"><span class="pt-t">0 ms</span><div class="pt-bar"><i class="ph"></i><i class="ph"></i><i class="ph"></i></div><span class="pt-l">Pedido enviado</span></div>
-              <div class="pt-row" style="--i: 1"><span class="pt-t">~300 ms</span><div class="pt-bar"><i class="sk"></i><i class="sk"></i><i class="sk"></i></div><span class="pt-l"><b>Plan:</b> 3 secciones reservadas</span></div>
-              <div class="pt-row" style="--i: 2"><span class="pt-t">1 s</span><div class="pt-bar"><i class="fill"></i><i class="sk"></i><i class="sk"></i></div><span class="pt-l">Frutas llena su espacio</span></div>
-              <div class="pt-row" style="--i: 3"><span class="pt-t">3 s</span><div class="pt-bar"><i class="fill"></i><i class="fill"></i><i class="fill"></i></div><span class="pt-l">Todo listo · <b>CLS ≈ 0</b></span></div>
-            </div>
-            <div class="code sm" data-code="plan" data-focus='[["1-6","El plan: pocos tokens, llega casi de inmediato"],["8-10","Cada sección se reserva con su altura final"]]'><div class="bar"><span>demo/src/genui/plan.ts</span><span>plan</span></div><pre></pre></div>
-          </div>
-        </div>
-      </section>
-      <section data-id="sec-trama" data-label="03 Streaming" class="section-slide">
-        <div class="frame">
-          <p class="sec-num">03</p>
-          <h2 class="sec-title">Streaming: <span class="hl">la trama</span></h2>
-          <p class="lead">Mostrar valor desde el primer token sin trabar el hilo principal.</p>
-        </div>
-        <div class="section-art sec-yellow">
-          <div class="landmark" data-landmark="tota"></div>
-          <div class="camino" aria-hidden="true"></div>
-          <div class="runner">
-            <p class="bubble">Como el agua del lago: llega poco a poco y nunca se detiene.</p>
-            <div class="runner-art" data-runner="2" aria-hidden="true"></div>
-          </div>
-        </div>
-        <div class="surcos" aria-hidden="true"><i></i><i></i><i></i></div>
-      </section>
-      <section data-id="parches" data-label="Stream de cambios">
-        <div class="frame card-frame">
-          <p class="eyebrow">Streaming de UI generativa</p>
-          <h2 class="title">Envía <span class="hl">cambios</span>, no el documento entero</h2>
-          <div class="code-grid">
-            <div class="code sm" data-code="patches" data-focus='[["1-4","Cambios pequeños identificados por id"],["6-9","Cada cambio se aplica una vez y se pinta una vez por frame"]]'><div class="bar"><span>demo/src/genui/stream.ts</span><span>stream</span></div><pre></pre></div>
-            <div class="stack side-notes"><div class="box red"><h3>✗ Documento entero</h3><p>Reenviar y releer todo el JSON en cada token: el trabajo crece al cuadrado.</p></div><div class="box green"><h3>✓ Cambios por id</h3><p>Agregar, reemplazar, terminar: O(1) por cambio, 1 render por frame.</p></div></div>
-          </div>
-        </div>
-      </section>
-      <section data-id="progreso" data-label="El agente a la vista">
-        <div class="frame card-frame">
-          <p class="eyebrow">Que el agente no sea un fantasma</p>
-          <h2 class="title">El agente <span class="hl">trabaja a la vista</span></h2>
-          <div class="progreso-grid">
-            <div class="feed reveal" aria-label="Recreación del panel de actividad del agente">
-              <p class="feed-h"><i data-lucide="bot"></i> Actividad del agente</p>
-              <div class="feed-row done" style="--i: 0"><code>armar_mercado</code><span>plan: 4 puestos</span><b>✓</b></div>
-              <div class="feed-row done" style="--i: 1"><code>agregar_producto</code><span>papa pastusa · 3 kg</span><b>✓</b></div>
-              <div class="feed-row run" style="--i: 2"><code>agregar_producto</code><span>Buscando en el puesto de frutas…</span><b class="spin">◌</b></div>
-              <div class="feed-row wait" style="--i: 3"><code>ajustar_presupuesto</code><span>en cola</span><b>…</b></div>
-              <button type="button" class="feed-cancel" tabindex="-1">Cancelar</button>
-            </div>
-            <div class="stack side-notes reveal">
-              <div class="box blue" style="--i: 4"><h3 class="ic"><i data-lucide="activity"></i> Cada tool es un evento</h3><p>Qué hace, con qué y cómo terminó.</p></div>
-              <div class="box yellow" style="--i: 5"><h3 class="ic"><i data-lucide="loader"></i> aria-busy por sección</h3><p>Solo la sección que cambia; el resto sigue usable.</p></div>
-              <div class="box red" style="--i: 6"><h3 class="ic"><i data-lucide="square"></i> Cancelar</h3><p>AbortSignal en cada tool: la persona tiene el control.</p></div>
-            </div>
-          </div>
-        </div>
-      </section>
-      <section data-id="sec-destejer" data-label="04 Reutilizar el DOM" class="section-slide">
-        <div class="frame">
-          <p class="sec-num">04</p>
-          <h2 class="sec-title">Reutilizar el DOM: <span class="hl">no destejer</span></h2>
-          <p class="lead">Actualiza y mueve lo que ya existe en vez de recrearlo.</p>
-        </div>
-        <div class="section-art sec-red">
-          <div class="landmark" data-landmark="leyva"></div>
-          <div class="camino" aria-hidden="true"></div>
-          <div class="runner">
-            <p class="bubble">En Villa de Leyva no tumbamos la casa para pintar la puerta.</p>
-            <div class="runner-art" data-runner="3" aria-hidden="true"></div>
-          </div>
-        </div>
-        <div class="surcos" aria-hidden="true"><i></i><i></i><i></i></div>
-      </section>
-      <section data-id="reconciliar" data-label="Refinar sin regenerar">
-        <div class="frame card-frame">
-          <p class="eyebrow">“Súbele el presupuesto” no es una página nueva</p>
-          <h2 class="title">Refinar <span class="hl">sin regenerar</span></h2>
-          <div class="code-grid">
-            <div class="code sm" data-code="reconcile" data-focus='[["1-3","Reutiliza el nodo por id; crea solo lo nuevo"],["4","Parcha solo el texto que cambió"],["7-8","moveBefore(): mueve sin perder foco ni estado (Chrome 133+)"],["9","Respaldo: insertBefore"]]'><div class="bar"><span>demo/src/genui/reconciliar.ts</span><span>DOM</span></div><pre></pre></div>
-            <div class="stack side-notes"><div class="box green"><h3>Ids estables</h3><p>Pide al modelo conservarlos, o asígnalos por producto.</p></div><div class="box blue"><h3>moveBefore()</h3><p>Conserva foco, scroll, animaciones y lo que se escribe.</p></div></div>
-          </div>
-        </div>
-      </section>
-      <section data-id="foco" data-label="Tú no pierdes nada">
-        <div class="frame card-frame">
-          <p class="eyebrow">Mientras escribes una nota, el agente reorganiza la lista</p>
-          <h2 class="title">El agente cambia algo y <span class="hl">tú no pierdes nada</span></h2>
-          <div class="vs-lanes">
-            <div class="lane bad reveal">
-              <h3><i data-lucide="refresh-cw"></i> Ingenuo · innerHTML</h3>
-              <ol class="steps-mini">
-                <li style="--i: 0">Toda la lista se vuelve a crear <em>(miles de nodos)</em></li>
-                <li style="--i: 1">Se pierde la nota que escribías y el foco</li>
-                <li style="--i: 2">Lo marcado vuelve a desmarcarse</li>
-                <li style="--i: 3">La lista salta y el lector de pantalla relee todo</li>
-              </ol>
-            </div>
-            <div class="lane-vs">vs</div>
-            <div class="lane good reveal">
-              <h3><i data-lucide="git-merge"></i> Sin fricción · por id</h3>
-              <ol class="steps-mini">
-                <li style="--i: 4">Solo cambian las filas afectadas</li>
-                <li style="--i: 5">Tu nota y tu foco siguen ahí</li>
-                <li style="--i: 6">Lo marcado se respeta</li>
-                <li style="--i: 7">Se anuncia en corto qué cambió</li>
-              </ol>
-            </div>
-          </div>
-        </div>
-      </section>
-      <section data-id="q2" data-label="Pregunta 2 · Reutilizar el DOM" data-q="q2" class="poll-slide">
-        <div class="frame card-frame">
-          <p class="eyebrow">Pregunta 2 de 3 · Reutilizar el DOM · responde en tu celular</p>
+          <p class="eyebrow">Pregunta 2 de 3 · responde en tu celular</p>
           <h2 class="title poll-q" data-q-text="q2"></h2>
           <div class="poll" data-poll="q2"></div>
           <div class="poll-foot"><span class="pill"><i data-lucide="users"></i> <b data-total>0</b> respuestas</span><p class="explain" data-explain hidden></p><button class="btn-reveal" type="button" data-reveal hidden>Revelar <kbd>V</kbd></button></div>
         </div>
       </section>
-      <section data-id="sec-patron" data-label="05 Estado" class="section-slide">
-        <div class="frame">
-          <p class="sec-num">05</p>
-          <h2 class="sec-title">Estado: <span class="hl">el patrón</span></h2>
-          <p class="lead">El estado vive fuera del render y lo comparten la persona y el agente.</p>
-        </div>
-        <div class="section-art sec-blue">
-          <div class="landmark" data-landmark="paramo"></div>
-          <div class="camino" aria-hidden="true"></div>
-          <div class="runner">
-            <p class="bubble">El páramo guarda el agua para todos: así el estado, para persona y agente.</p>
-            <div class="runner-art" data-runner="4" aria-hidden="true"></div>
-          </div>
-        </div>
-        <div class="surcos" aria-hidden="true"><i></i><i></i><i></i></div>
-      </section>
-      <section data-id="un-estado" data-label="Un solo estado">
+
+      <section data-id="r-accesibilidad" data-label="Corrección: resultado" class="ronda-slide" data-ronda="accesibilidad"><div class="frame card-frame"></div></section>
+
+      <section data-id="c-accesibilidad" data-label="Corrección: código" class="codigo-slide" data-codigo="accesibilidad"><div class="frame card-frame"></div></section>
+
+      <section data-id="r-estado" data-label="Corrección: resultado" class="ronda-slide" data-ronda="estado"><div class="frame card-frame"></div></section>
+
+      <section data-id="c-estado" data-label="Corrección: código" class="codigo-slide" data-codigo="estado"><div class="frame card-frame"></div></section>
+
+      <section data-id="verde" data-label="Todo pasó">
         <div class="frame card-frame">
-          <p class="eyebrow">Una sola verdad para dos actores</p>
-          <h2 class="title">Un solo estado para <span class="hl">la persona y el agente</span></h2>
-          <div class="dual reveal">
-            <div class="web-frame" style="--i: 2"><span class="k1">Tu página</span></div>
-            <div class="actor" style="--i: 0"><span class="ico"><i data-lucide="user"></i></span><div><b>Persona</b><small>marca, edita, escribe</small></div></div>
-            <div class="flowline" style="--i: 1"><span>clic</span></div>
-            <div class="door ui" style="--i: 3"><b>Botón</b><small>mercado.marcar(id)</small></div>
-            <div class="actor agent" style="--i: 4"><span class="ico"><i data-lucide="bot"></i></span><div><b>Agente</b><small>recibe la intención</small></div></div>
-            <div class="flowline fast" style="--i: 5"><span>tool</span></div>
-            <div class="door tools" style="--i: 6"><b>Tool WebMCP</b><small>marcar_comprado</small></div>
-            <div class="logic" style="--i: 7"><i data-lucide="database"></i> Un store · con versión · suscripción por fila</div>
-          </div>
-          <div class="three-verbs reveal">
-            <span class="pill blue" style="--i: 8"><i data-lucide="git-merge"></i> Misma lógica</span>
-            <span class="pill green" style="--i: 9"><i data-lucide="rows-3"></i> Repinta una fila, no la página</span>
-            <span class="pill yellow" style="--i: 10"><i data-lucide="calculator"></i> Lo derivado, en código</span>
+          <p class="eyebrow">Corregimos los 5 errores, uno por uno</p>
+          <h2 class="title">La web <span class="hl">pasó las 5 pruebas</span></h2>
+          <div class="terminal" data-salida="final"></div>
+        </div>
+      </section>
+
+      <section data-id="demo-sano" data-label="La web corregida" class="pasos-slide">
+        <div class="frame card-frame">
+          <p class="eyebrow">La web corregida: repito los mismos pasos</p>
+          <h2 class="title">Ahora <span class="hl">mi marca y mi nota siguen ahí</span></h2>
+          <div class="pasos">
+            <p class="paso-t"><b>1</b> Marqué la papa criolla y le dejé una nota al vendedor</p>
+            <img src="/clips/despues-1.png" alt="Papa criolla marcada con la nota bien grandes" width="1800" height="120" />
+            <p class="paso-t pide"><b>2</b> Le pedí a la IA: <em>“Sube el presupuesto”</em></p>
+            <p class="paso-t bien"><b>3</b> La lista cambió y no perdí nada</p>
+            <img class="bien" src="/clips/despues-2.png" alt="La lista cambió y no perdí nada" width="1800" height="120" />
           </div>
         </div>
       </section>
-      <section data-id="conflictos" data-label="Lo de la persona gana">
+
+      <section data-id="frase" data-label="La idea" class="frase-slide">
         <div class="frame card-frame">
-          <p class="eyebrow">Cuando los dos tocan lo mismo</p>
-          <h2 class="title"><span class="hl">Lo de la persona</span> gana</h2>
-          <div class="prims estado3 reveal">
-            <div class="box yellow" style="--i: 0"><h3 class="ic"><i data-lucide="sparkles"></i> Generado</h3><p>Sugerencias del agente: se pueden reemplazar.</p></div>
-            <div class="box green" style="--i: 1"><h3 class="ic"><i data-lucide="user"></i> De la persona</h3><p>Marcado, notas, cantidades editadas: nunca se pisan.</p></div>
-            <div class="box blue" style="--i: 2"><h3 class="ic"><i data-lucide="calculator"></i> Derivado</h3><p>Total, lo que falta, el menú: lo calcula el código.</p></div>
-          </div>
-          <div class="version-row reveal">
-            <span class="pill" style="--i: 3"><i data-lucide="bot"></i> <code>marcar_comprado({ id, version: 7 })</code></span>
-            <span class="arrow-txt" style="--i: 4">→</span>
-            <span class="pill red" style="--i: 5">Versión actual: 8 · “La lista cambió, vuelve a leerla”</span>
-          </div>
-          <p class="example reveal"><span style="--i: 6">La persona puso <b>3 kg</b> de papa; el agente propone 2 kg → se queda en <b>3 kg</b> y la tool se lo dice al agente.</span></p>
+          <p class="eyebrow">Lo que aprendimos</p>
+          <p class="frase">La IA construye la página. <span class="hl">Las pruebas dicen si quedó bien.</span></p>
         </div>
       </section>
-      <section data-id="accesible" data-label="Accesible y reversible">
+
+      <section data-id="industria" data-label="Esto ya se usa">
         <div class="frame card-frame">
-          <p class="eyebrow">Confianza = parte de “sin fricción”</p>
-          <h2 class="title">El agente <span class="hl">avisa</span> y todo se puede deshacer</h2>
-          <div class="guard reveal">
-            <div class="g-step" style="--i: 0"><span class="ico"><i data-lucide="bot"></i></span><b>El agente actúa</b><small>agrega 3 productos</small></div>
-            <div class="g-step" style="--i: 1"><span class="ico"><i data-lucide="loader"></i></span><b>aria-busy</b><small>solo en esa sección</small></div>
-            <div class="g-step" style="--i: 2"><span class="ico"><i data-lucide="megaphone"></i></span><b>aria-live</b><small>“Agregué 3 productos”</small></div>
-            <div class="g-step warn" style="--i: 3"><span class="ico"><i data-lucide="highlighter"></i></span><b>Resalta</b><small>sin mover el foco</small></div>
-            <div class="g-step ok" style="--i: 4"><span class="ico"><i data-lucide="undo-2"></i></span><b>Deshacer</b><small>historial de cambios</small></div>
-          </div>
-          <div class="guard-side reveal">
-            <div class="box red" style="--i: 5"><h3 class="ic"><i data-lucide="hand"></i> Lo irreversible</h3><p>Pagar o enviar: confirmación en pantalla.</p></div>
-            <div class="box blue" style="--i: 6"><h3 class="ic"><i data-lucide="pause"></i> Movimiento</h3><p>Respeta <code>prefers-reduced-motion</code>.</p></div>
-            <div class="box green" style="--i: 7"><h3 class="ic"><i data-lucide="volume-2"></i> Anuncios cortos</h3><p>Espaciados, nunca uno por token.</p></div>
-          </div>
+          <p class="eyebrow">No es teoría</p>
+          <h2 class="title">Esto ya se usa <span class="hl">en la industria</span></h2>
+          <ul class="archivos reveal">
+            <li style="--i: 0"><code>AGENTS.md</code><span>Instrucciones para agentes de IA</span></li>
+            <li style="--i: 1"><code>Playwright</code><span>Pruebas automáticas en un navegador real</span></li>
+            <li style="--i: 2"><code>Modern Web Guidance</code><span>Guías de Chrome, Edge y Firefox para agentes de código</span></li>
+            <li style="--i: 3"><code>Web Codegen Scorer</code><span>Evalúa código generado con IA, en cualquier framework</span></li>
+          </ul>
         </div>
       </section>
-      <section data-id="demo" data-label="Demo · Mercado campesino">
+
+      <section data-id="agentica" data-label="La web agéntica">
         <div class="frame card-frame">
-          <p class="eyebrow">Demo · Mercado campesino · productos y precios ficticios</p>
-          <h2 class="title">Un agente arma tu <span class="hl">mercado de la semana</span></h2>
-          <div class="demo-grid">
-            <div>
-              <p class="prompt-chip"><i data-lucide="message-square-text"></i> “Mercado para 4 personas con 120 mil, que alcance para un cuchuco”</p>
-              <ol class="demo-steps reveal">
-                <li style="--i: 0"><span class="dn blue">1</span><b>El agente arma</b> · plan, streaming y tools</li>
-                <li style="--i: 1"><span class="dn red">2</span><b>Ingenuo</b> · cada acción re-pinta todo</li>
-                <li style="--i: 2"><span class="dn green">3</span><b>Sin fricción</b> · refinar sin perder nada</li>
-                <li style="--i: 3"><span class="dn yellow">4</span><b>Tools</b> · inspector y versión vieja</li>
-              </ol>
-            </div>
-            <div class="qr-card">
-              <div data-qr="demo"></div>
-              <strong>Repítela en tu laptop</strong>
-              <span data-demo-url>…</span>
-            </div>
-          </div>
-          <p class="small muted engine-note"><i data-lucide="cpu"></i> Gemini Nano (Prompt API) cuando está disponible · si no, un agente simulado que usa las mismas tools</p>
+          <p class="eyebrow">Hacia dónde vamos</p>
+          <h2 class="title">La <span class="hl">web agéntica</span></h2>
+          <p class="idea">Los agentes de IA no solo construirán páginas:<br /><b>también las usarán por nosotros.</b></p>
+          <p class="idea-nota"><b>WebMCP</b> es una propuesta experimental para que una página le diga a un agente qué puede hacer en ella.</p>
         </div>
       </section>
-      <section data-id="demo-arma" data-label="Demo 1 · El agente arma el mercado" class="clip-slide">
+
+      <section data-id="base" data-label="Tu base">
         <div class="frame card-frame">
-          <p class="eyebrow">Demo 1 de 4 · el agente arma el mercado</p>
-          <h2 class="title">Primero el plan, luego <span class="hl">los cambios en vivo</span></h2>
-          <div class="clip-grid">
-            <figure class="clip"><video muted loop playsinline preload="none" data-src="/clips/arma.webm" poster="/clips/arma.png"></video></figure>
-            <div class="clip-side reveal">
-              <div class="stats" style="--i: 0"><div class="stat good"><b data-metric="tools">1</b><span>tool: armar_mercado</span></div><div class="stat good"><b data-metric="cls">0,004</b><span>CLS mientras se genera</span></div></div>
-              <ul class="clip-points" style="--i: 1"><li>Los 4 puestos aparecen <b>reservados</b> antes del contenido</li><li>Cada tool del agente se ve en la actividad</li><li>La persona marca mientras el agente trabaja</li></ul>
-            </div>
+          <p class="eyebrow">El código de esta charla</p>
+          <h2 class="title">Prueba este <span class="hl">ejemplo</span></h2>
+          <div class="base-grid">
+            <ol class="archivos reveal">
+              <li style="--i: 0"><code>AGENTS.md</code><span>Las instrucciones para tu agente</span></li>
+              <li style="--i: 1"><code>presupuestos.json</code><span>Los límites de rendimiento</span></li>
+              <li style="--i: 2"><code>check.mjs</code><span>Las pruebas en el navegador</span></li>
+            </ol>
+            <div class="qr-card sm"><div data-qr="repo"></div><strong>Repositorio</strong><span>carpeta base/</span></div>
           </div>
         </div>
       </section>
-      <section data-id="demo-ingenuo" data-label="Demo 2 · Ingenuo" class="clip-slide">
+
+      <section data-id="q3" data-label="Pregunta 3" data-q="q3" class="poll-slide">
         <div class="frame card-frame">
-          <p class="eyebrow">Demo 2 de 4 · versión ingenua</p>
-          <h2 class="title">Ingenuo: <span class="hl">cada acción re-pinta todo</span></h2>
-          <div class="clip-grid">
-            <figure class="clip"><video muted loop playsinline preload="none" data-src="/clips/ingenuo.webm" poster="/clips/ingenuo.png"></video></figure>
-            <div class="clip-side reveal">
-              <div class="stats" style="--i: 0"><div class="stat bad"><b data-metric="nodes">71.765</b><span>nodos creados</span></div><div class="stat bad"><b data-metric="lost">2</b><span>focos perdidos · nota y marca borradas</span></div></div>
-              <ul class="clip-points" style="--i: 1"><li>Mientras escribes, el agente “sube el presupuesto”</li><li>innerHTML en cada pedazo: <b>381</b> renders</li><li>Las teclas que siguen caen en la página</li></ul>
-            </div>
-          </div>
-        </div>
-      </section>
-      <section data-id="demo-fluido" data-label="Demo 3 · Sin fricción" class="clip-slide">
-        <div class="frame card-frame">
-          <p class="eyebrow">Demo 3 de 4 · versión sin fricción</p>
-          <h2 class="title">Sin fricción: <span class="hl">refinar sin perder nada</span></h2>
-          <div class="clip-grid">
-            <figure class="clip"><video muted loop playsinline preload="none" data-src="/clips/fluido.webm" poster="/clips/fluido.png"></video></figure>
-            <div class="clip-side reveal">
-              <div class="stats" style="--i: 0"><div class="stat good"><b data-metric="nodes">147</b><span>nodos creados</span></div><div class="stat good"><b data-metric="lost">0</b><span>focos perdidos · nota y marca intactas</span></div></div>
-              <ul class="clip-points" style="--i: 1"><li>Mismo pedido: <b>13 cambios</b> por id, no 28</li><li>Lo comprado baja con <code>moveBefore()</code> y el foco sigue en tu nota</li><li>381 → <b>26</b> renders</li></ul>
-            </div>
-          </div>
-        </div>
-      </section>
-      <section data-id="demo-devtools" data-label="Demo 4 · Las tools por dentro" class="clip-slide">
-        <div class="frame card-frame">
-          <p class="eyebrow">Demo 4 de 4 · inspector de tools (como Application → WebMCP en DevTools)</p>
-          <h2 class="title">Las tools <span class="hl">por dentro</span></h2>
-          <div class="clip-grid">
-            <figure class="clip"><video muted loop playsinline preload="none" data-src="/clips/devtools.webm" poster="/clips/devtools.png"></video></figure>
-            <div class="clip-side reveal">
-              <div class="stats" style="--i: 0"><div class="stat good"><b data-metric="ntools">8</b><span>tools registradas</span></div><div class="stat warn"><b data-metric="retry">↺</b><span>versión vieja → se corrige</span></div></div>
-              <ul class="clip-points" style="--i: 1"><li>La persona marca algo: la tool trae una <b>versión vieja</b></li><li>“Vuelve a leer” → <code>ver_mercado</code> → reintento</li><li><b>Run tool</b> sin agente, como en DevTools</li></ul>
-            </div>
-          </div>
-        </div>
-      </section>
-      <section data-id="medir" data-label="¿Cómo sé que no hay fricción?">
-        <div class="frame card-frame">
-          <p class="eyebrow">Un solo slide de medición: dos públicos</p>
-          <h2 class="title">¿Cómo sé que <span class="hl">no hay fricción</span>?</h2>
-          <div class="medir-grid reveal">
-            <div class="lane good" style="--i: 0"><h3><i data-lucide="user"></i> Para la persona</h3>
-              <div class="kpi"><b>INP ≤ 200 ms</b><span>¿me hizo caso?</span></div>
-              <div class="kpi"><b>CLS ≤ 0,1</b><span>¿se quedó quieto?</span></div>
-              <div class="kpi"><b>LoAF</b><span>frames largos mientras genera</span></div></div>
-            <div class="lane" style="--i: 1"><h3><i data-lucide="bot"></i> Para el agente</h3>
-              <div class="kpi"><b>Llamadas</b><span>por intención</span></div>
-              <div class="kpi"><b>Tokens</b><span>leídos por tarea</span></div>
-              <div class="kpi"><b>Errores</b><span>y cuántos se corrigen solos</span></div></div>
-            <div class="lane yellow-lane" style="--i: 2"><h3><i data-lucide="accessibility"></i> Para todos</h3>
-              <div class="kpi"><b>Lector de pantalla</b><span>mientras el agente trabaja</span></div>
-              <div class="kpi"><b>Teclado</b><span>el foco nunca salta</span></div>
-              <div class="kpi"><b>Deshacer</b><span>cada cambio del agente</span></div></div>
-          </div>
-        </div>
-      </section>
-      <section data-id="q3" data-label="Pregunta 3 · Estado" data-q="q3" class="poll-slide">
-        <div class="frame card-frame">
-          <p class="eyebrow">Pregunta 3 de 3 · Estado · responde en tu celular</p>
+          <p class="eyebrow">Pregunta 3 de 3 · responde en tu celular</p>
           <h2 class="title poll-q" data-q-text="q3"></h2>
           <div class="poll" data-poll="q3"></div>
           <div class="poll-foot"><span class="pill"><i data-lucide="users"></i> <b data-total>0</b> respuestas</span><p class="explain" data-explain hidden></p><button class="btn-reveal" type="button" data-reveal hidden>Revelar <kbd>V</kbd></button></div>
         </div>
       </section>
+
       <section data-id="muro" data-label="Muro de tejedores">
         <div class="frame card-frame wall-frame">
-          <p class="eyebrow"><span data-count="tejedores">0</span> tejedores en el telar</p>
-          <h2 class="title">El telar <span class="hl">de la sala</span></h2>
+          <p class="eyebrow"><span data-count="tejedores">0</span> tejedores en la sala</p>
+          <h2 class="title">Los <span class="hl">tejedores</span> de hoy</h2>
           <div class="hilo-top" data-hilo-top></div>
           <div class="wall-stage">
             <aside class="spotlight" data-spotlight hidden></aside>
@@ -499,34 +414,33 @@
           </div>
         </div>
       </section>
-      <section data-id="checklist" data-label="Para llevar">
+
+      <section data-id="cierre" data-label="Para llevar" class="frase-slide">
         <div class="frame card-frame">
-          <p class="eyebrow">Para llevar · también en tu memoria y en la guía del repo</p>
-          <h2 class="title">10 puntadas <span class="hl">sin fricción</span></h2>
-          <ol class="checklist" data-checklist></ol>
+          <p class="eyebrow">Para llevar</p>
+          <p class="frase">La IA construye la página. <span class="hl">Las pruebas dicen si quedó bien.</span></p>
         </div>
       </section>
+
       <section data-id="podio" data-label="Podio">
         <div class="frame card-frame">
-          <p class="eyebrow">Aciertos + rapidez · bonos: a tiempo +100 · tejedor +100 · pregunta +100 · reacciones hasta +100</p>
+          <p class="eyebrow">Aciertos + rapidez + bonos</p>
           <h2 class="title">El <span class="hl">podio</span></h2>
           <div class="podium" data-podium></div>
           <div class="podium-rest" data-rest></div>
         </div>
       </section>
+
       <section data-id="gracias" data-label="Gracias" class="cover thanks">
-        <div class="cerros" aria-hidden="true"><i></i><i></i><i></i></div>
         <div class="cover-landmark" data-landmark="cover" aria-hidden="true"></div>
         <div class="frame cover-frame">
-          <p class="eyebrow">Sumercé = el trato más cariñoso de Boyacá</p>
           <h1 class="cover-title sm"><span>¡Gracias,</span><span><span class="hl">sumercé!</span></span></h1>
           <div class="thanks-grid">
-            <div class="qr-card sm"><div data-qr="repo"></div><strong>Repositorio</strong><span>código, demo y recursos</span></div>
+            <div class="qr-card sm"><div data-qr="repo"></div><strong>Repositorio</strong><span>instrucciones y pruebas</span></div>
             <div class="qr-card sm"><div data-qr="slides"></div><strong>Slides</strong><span data-slides-url>…</span></div>
           </div>
         </div>
         <div class="cover-tejedores" data-tejedores="3" aria-hidden="true"></div>
-        <div class="ruana-band bottom" aria-hidden="true"></div>
       </section>
     </deck-stage>
 

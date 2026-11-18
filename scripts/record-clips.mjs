@@ -1,128 +1,85 @@
-// Graba los clips de la demo Mercado campesino para los slides (y como plan B sin red).
-// Usa Playwright con el Google Chrome instalado (no descarga navegadores).
-//   npm run dev:demo                         (en otra terminal)
-//   node scripts/record-clips.mjs            → todos
-//   node scripts/record-clips.mjs arma       → solo uno: arma | ingenuo | fluido | devtools
-// Salida: slides/public/clips/<nombre>.webm + <nombre>.png (póster = último cuadro)
-// e imprime las métricas medidas en cada clip (para los números de los slides).
-import { chromium } from 'playwright-core';
+// Capturas de apertura con la app real del experimento: antes y después del harness.
+//   node scripts/record-clips.mjs
+// Salida: slides/public/clips/{antes,despues}-{1,2}.png (solo las filas que importan, en grande).
+import { spawn } from 'node:child_process';
 import { mkdirSync, renameSync, rmSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { chromium } from 'playwright-core';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const OUT = join(ROOT, 'slides/public/clips');
-const TMP = join(ROOT, '.clips-tmp');
-const DEMO = process.env.DEMO_URL ?? 'http://localhost:5292';
-const SIZE = { width: 1100, height: 660 };
 mkdirSync(OUT, { recursive: true });
 
-const idle = (p) => p.waitForFunction(() => !document.querySelector('[data-cancelar]:not([hidden])'), null, { timeout: 60000 });
-const metrics = (p) => p.evaluate(() => ({ ...window.mercadoDemo.metrics }));
+const VERSIONES = [
+  { nombre: 'antes', dir: 'base', port: 5294, color: '#e5294f' },
+  { nombre: 'despues', dir: 'docs/corrida-agente/despues', port: 5295, color: '#12a673' },
+];
 
-async function pedir(p, texto) {
-  await p.fill('#q', '');
-  await p.type('#q', texto, { delay: 22 });
-  await p.waitForTimeout(300);
-  await p.click('[data-pedido] button');
+/** Recorta solo las dos filas de la historia y resalta la nota. */
+async function captura(page, archivo, color) {
+  await page.evaluate(() => scrollTo(0, 0));
+  await page.addStyleTag({ content: `[data-id="papa-criolla"] input[type="text"] { outline: 3px solid ${color} !important; outline-offset: 1px; font-weight: 700; font-size: 18px; } [data-id="papa-criolla"] input[type="checkbox"] { outline: 3px solid ${color}; outline-offset: 2px; }` });
+  await page.waitForTimeout(200);
+  const a = await page.locator('[data-id="papa-criolla"]').boundingBox();
+  await page.screenshot({ path: join(OUT, archivo), clip: { x: a.x, y: a.y, width: a.width, height: a.height } });
 }
 
-/** Lista ya armada (rápido) para empezar las escenas 2–4 desde el mismo punto. */
-async function preparar(p) {
-  await p.evaluate(async () => {
-    await window.mercadoDemo.pedir('Mercado para 4 con 120 mil, para un cuchuco');
-  });
-  await idle(p);
-  await p.evaluate(() => {
-    window.scrollTo(0, 0);
-    window.mercadoDemo.resetMetrics();
-  });
-  await p.waitForTimeout(500);
-}
-
-/** La persona marca la papa y escribe una nota mientras el agente refina la lista. */
-async function refinarMientrasEscribo(p) {
-  await p.check('[data-id="papa-pastusa"] .chk');
-  await p.waitForTimeout(900);
-  await p.click('[data-id="cubio"] .nota');
-  await p.keyboard.type('bien grandes', { delay: 60 });
-  await p.evaluate(() => {
-    window.mercadoDemo.pedir('Súbele el presupuesto a 160 mil');
-  });
-  await p.waitForTimeout(700);
-  await p.keyboard.type(', por favor', { delay: 70 });
-  await idle(p);
-  await p.waitForTimeout(1500);
-  return p.evaluate(() => {
-    const m = window.mercadoDemo.mercado;
-    return { papaComprada: m.items.get('papa-pastusa')?.comprado ?? false, nota: m.items.get('cubio')?.nota ?? '', foco: document.activeElement?.classList.contains('nota') ?? false };
-  });
-}
-
-const SCENES = {
-  // 1 · El agente arma el mercado: plan → puestos reservados → cambios en streaming → tools a la vista.
-  async arma(p) {
-    await p.goto(`${DEMO}/?modo=fluido`, { waitUntil: 'load' });
-    await p.waitForTimeout(800);
-    await p.evaluate(() => window.mercadoDemo.resetMetrics());
-    await pedir(p, 'Mercado para 4 con 120 mil, para un cuchuco');
-    await idle(p);
-    await p.waitForTimeout(2000);
-    return metrics(p);
-  },
-  // 2 · Ingenuo: mientras marcas y escribes, el agente sube el presupuesto y todo se re-pinta.
-  async ingenuo(p) {
-    await p.goto(`${DEMO}/?modo=ingenuo`, { waitUntil: 'load' });
-    await preparar(p);
-    const r = await refinarMientrasEscribo(p);
-    return { ...(await metrics(p)), ...r };
-  },
-  // 3 · Sin fricción: el mismo pedido; tu nota, tu foco y lo marcado siguen ahí.
-  async fluido(p) {
-    await p.goto(`${DEMO}/?modo=fluido`, { waitUntil: 'load' });
-    await preparar(p);
-    const r = await refinarMientrasEscribo(p);
-    return { ...(await metrics(p)), ...r };
-  },
-  // 4 · Las tools por dentro: inspector, versión vieja → "vuelve a leer" → reintento correcto.
-  async devtools(p) {
-    await p.goto(`${DEMO}/?modo=fluido`, { waitUntil: 'load' });
-    await preparar(p);
-    await p.click('[data-inspector-toggle]');
-    await p.waitForTimeout(1200);
-    await p.click('[data-t="marcar_comprado"]');
-    await p.waitForTimeout(900);
-    // La persona marca algo mientras tanto: la versión que tenía la tool queda vieja.
-    await p.check('[data-id="cubio"] .chk');
-    await p.waitForTimeout(900);
-    await p.click('[data-run]');
-    await p.waitForTimeout(1800);
-    await p.click('[data-t="ver_mercado"]');
-    await p.waitForTimeout(600);
-    await p.click('[data-run]');
-    await p.waitForTimeout(1600);
-    await p.click('[data-t="marcar_comprado"]'); // el ejemplo ya trae la versión vigente
-    await p.waitForTimeout(800);
-    await p.click('[data-run]');
-    await p.waitForTimeout(2200);
-    const tools = await p.evaluate(async () => (await document.modelContext.getTools()).length);
-    return { ...(await metrics(p)), toolsRegistradas: tools, salida: await p.textContent('[data-out]') };
-  },
-};
-
-const only = process.argv[2];
-const browser = await chromium.launch({ channel: 'chrome', headless: true });
-for (const [name, scene] of Object.entries(SCENES)) {
-  if (only && only !== name) continue;
+const TMP = join(ROOT, '.clips-tmp');
+/** Video corto: la lista se arma en pantalla a medida que llega la respuesta. */
+async function grabarGeneracion(browser, url) {
   rmSync(TMP, { recursive: true, force: true });
-  const ctx = await browser.newContext({ viewport: SIZE, deviceScaleFactor: 1, colorScheme: 'light', recordVideo: { dir: TMP, size: SIZE } });
-  const p = await ctx.newPage();
-  const result = await scene(p);
-  await p.screenshot({ path: join(OUT, `${name}.png`) });
-  const video = p.video();
+  const size = { width: 1000, height: 620 };
+  const ctx = await browser.newContext({ viewport: size, recordVideo: { dir: TMP, size } });
+  const page = await ctx.newPage();
+  await page.goto(url, { waitUntil: 'load' });
+  const rotulo = (t) => page.evaluate((texto) => {
+    let el = document.querySelector('#rotulo-clip');
+    if (!el) { el = document.createElement('div'); el.id = 'rotulo-clip'; el.style.cssText = 'position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:99;padding:12px 24px;border-radius:999px;background:#1a0e1c;color:#fff;font:700 26px system-ui;white-space:nowrap'; document.body.append(el); }
+    el.textContent = texto;
+  }, t);
+  await rotulo('Presiono “Armar mi mercado”');
+  await page.waitForTimeout(1500);
+  await rotulo('La respuesta llega por partes…');
+  await page.click('[data-testid="generar"]');
+  await page.waitForFunction(() => /Compra temprano/.test(document.querySelector('#consejo')?.textContent ?? ''), null, { timeout: 60000 });
+  await rotulo('La lista quedó armada');
+  await page.waitForTimeout(2500);
+  const video = page.video();
   await ctx.close();
-  renameSync(await video.path(), join(OUT, `${name}.webm`));
-  console.log(name, JSON.stringify(result));
+  renameSync(await video.path(), join(OUT, 'generando.webm'));
+  rmSync(TMP, { recursive: true, force: true });
+}
+
+const browser = await chromium.launch({ channel: 'chrome', headless: true });
+for (const v of VERSIONES) {
+  const srv = spawn(join(ROOT, 'base/node_modules/.bin/vite'), [join(ROOT, v.dir), '--port', String(v.port), '--strictPort'], { stdio: 'ignore', detached: true });
+  const url = `http://localhost:${v.port}`;
+  for (let i = 0; i < 80 && !(await fetch(url).then(() => true).catch(() => false)); i++) await new Promise((r) => setTimeout(r, 200));
+  if (v.nombre === 'despues') await grabarGeneracion(browser, url);
+  const ctx = await browser.newContext({ viewport: { width: 1000, height: 760 }, deviceScaleFactor: 2 });
+  const page = await ctx.newPage();
+  await page.goto(url, { waitUntil: 'load' });
+  await page.click('[data-testid="generar"]');
+  await page.waitForFunction(() => /Compra temprano/.test(document.querySelector('#consejo')?.textContent ?? ''), null, { timeout: 60000 });
+  await page.waitForTimeout(500);
+  await page.locator('[data-id="papa-criolla"] input[type="checkbox"]').check();
+  await page.locator('[data-id="papa-criolla"] input[type="text"]').click();
+  await page.keyboard.type('bien grandes', { delay: 30 });
+  if (v.nombre === 'despues') {
+    await page.locator('[data-id="papa-pastusa"]').evaluate((el) => scrollTo(0, el.getBoundingClientRect().top + scrollY - 72));
+    await page.waitForTimeout(200);
+    await page.screenshot({ path: join(OUT, 'app.png') });
+  }
+  await captura(page, `${v.nombre}-1.png`, '#2f6fdb');
+  await page.locator('[data-id="papa-criolla"] input[type="text"]').focus();
+  await page.evaluate(() => document.querySelector('[data-testid="refinar"]').click());
+  await page.waitForFunction(() => document.querySelectorAll('[data-testid="lista"] [data-id]').length >= 43 && /Compra temprano/.test(document.querySelector('#consejo')?.textContent ?? ''), null, { timeout: 60000 });
+  await page.waitForTimeout(500);
+  const r = await page.evaluate(() => ({ nota: document.querySelector('[data-id="papa-criolla"] input[type="text"]').value, marca: document.querySelector('[data-id="papa-criolla"] input[type="checkbox"]').checked }));
+  await captura(page, `${v.nombre}-2.png`, v.color);
+  await ctx.close();
+  process.kill(-srv.pid);
+  console.log(v.nombre, JSON.stringify(r));
 }
 await browser.close();
-rmSync(TMP, { recursive: true, force: true });

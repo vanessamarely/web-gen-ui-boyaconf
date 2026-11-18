@@ -7,6 +7,7 @@ rules_version = '2';
 //   sessions/{sid}/players/{uid}    ← apodo (generado, no texto libre)
 //   sessions/{sid}/votes/{uid}      ← { q1, q1At, … } — qNAt = hora del servidor (puntaje justo y no editable)
 //   sessions/{sid}/reactions/{uid}  ← última reacción enviada (limitada a 1 cada ~0,8 s)
+//   sessions/{sid}/feedback/{uid}   ← "Me perdí" y calificación final: SOLO la presentadora las lee
 //   sessions/{sid}/tejedores/{uid}   ← tejedor publicado en el muro (solo opciones, sin imagen)
 //   sessions/{sid}/questions/{id}   ← dudas del público: SOLO la presentadora las lee (nada de texto libre en el proyector)
 //
@@ -106,6 +107,15 @@ service cloud.firestore {
           && request.resource.data.text.size() > 0 && request.resource.data.text.size() <= 280
           && request.resource.data.name is string && request.resource.data.name.size() <= 40
           && request.resource.data.slide is string && request.resource.data.slide.size() <= 80;
+      }
+
+      match /feedback/{uid} {
+        allow read, delete: if isPresenter();
+        allow create, update: if isOwner(uid) && onlyKeys(['lost', 'clara', 'util', 'at'])
+          && request.resource.data.at == request.time
+          && (!('lost' in request.resource.data) || (request.resource.data.lost is list && request.resource.data.lost.size() <= 60))
+          && (!('clara' in request.resource.data) || (smallInt(request.resource.data.clara, 5) && request.resource.data.clara >= 1))
+          && (!('util' in request.resource.data) || (smallInt(request.resource.data.util, 5) && request.resource.data.util >= 1));
       }
 
       match /tejedores/{uid} {

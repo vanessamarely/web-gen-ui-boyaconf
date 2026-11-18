@@ -1,7 +1,7 @@
 import { NS } from './config';
 import { nameKey } from './names';
 import type { AnswerKey, QuestionId } from './questions';
-import { emptySlide, type AudienceQuestion, type TejedorData, type Player, type Reaction, type Realtime, type SlideState, type VoteRecord, type Votes } from './realtime';
+import { emptySlide, type AudienceQuestion, type Feedback, type TejedorData, type Player, type Reaction, type Realtime, type SlideState, type VoteRecord, type Votes } from './realtime';
 
 interface LocalDb {
   slide: SlideState;
@@ -13,11 +13,12 @@ interface LocalDb {
   votes: Record<string, VoteRecord>;
   tejedores: Record<string, TejedorData>;
   questions: Record<string, AudienceQuestion>;
+  feedback: Record<string, Feedback>;
   answers: AnswerKey | null;
 }
 
 const KEY = `${NS}.local.db`;
-const empty = (): LocalDb => ({ slide: emptySlide(), players: {}, joinedAt: {}, names: {}, votes: {}, tejedores: {}, questions: {}, answers: null });
+const empty = (): LocalDb => ({ slide: emptySlide(), players: {}, joinedAt: {}, names: {}, votes: {}, tejedores: {}, questions: {}, feedback: {}, answers: null });
 
 function read(): LocalDb {
   try {
@@ -138,6 +139,15 @@ export function createLocalRealtime(): Realtime {
       const id = crypto.randomUUID().slice(0, 8);
       write((db) => (db.questions[id] = { ...q, id, uid: me, at: Date.now() }));
     },
+    async markLost(slideId) {
+      write((db) => {
+        const f = (db.feedback[me] ??= { uid: me, lost: [] });
+        if (!f.lost.includes(slideId)) f.lost.push(slideId);
+      });
+    },
+    async rate(r) {
+      write((db) => Object.assign((db.feedback[me] ??= { uid: me, lost: [] }), r));
+    },
     async publishTejedor(d) {
       write((db) => (db.tejedores[me] = { ...d, id: me, createdAt: db.tejedores[me]?.createdAt ?? Date.now(), hidden: db.tejedores[me]?.hidden ?? false }));
     },
@@ -152,6 +162,7 @@ export function createLocalRealtime(): Realtime {
     },
     onTejedores: (cb) => sub((db) => cb(Object.values(db.tejedores).sort((a, b) => b.createdAt - a.createdAt))),
     onQuestions: (cb) => sub((db) => cb(Object.values(db.questions).sort((a, b) => a.at - b.at))),
+    onFeedback: (cb) => sub((db) => cb(Object.values(db.feedback))),
     async removeQuestion(id) {
       write((db) => delete db.questions[id]);
     },

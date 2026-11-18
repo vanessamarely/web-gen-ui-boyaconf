@@ -5,7 +5,7 @@
 //  · Notas con RETENCIÓN: si estás escribiendo, tu pantalla no cambia de slide hasta que guardes.
 //  · 3 preguntas por el podio; la respuesta correcta solo llega cuando la presentadora revela.
 //  · Tejedor y memoria se generan EN EL DISPOSITIVO: tus notas nunca salen del teléfono.
-import { Brain, Check, Circle, Diamond, Download, FileText, Flame, GitBranch, Heart, MessageCircleQuestion, Moon, NotebookPen, Radio, Send, Shuffle, Sparkles, Square, Sun, SunMoon, Triangle, Trophy, Map as MapIcon, X, createElement, createIcons, type IconNode } from 'lucide';
+import { Brain, Check, Circle, CircleHelp, Diamond, Download, FileText, Flame, GitBranch, Heart, MessageCircleQuestion, Moon, NotebookPen, Radio, Send, Shuffle, Sparkles, Square, Sun, SunMoon, Triangle, Trophy, Map as MapIcon, X, createElement, createIcons, type IconNode } from 'lucide';
 import { SLIDES, SLIDE_BY_ID, type SlideContent } from '../shared/content';
 import { EVENT, NS, PUBLIC_DEMO_URL, REPO_URL, SKILL_URL, TALK_TITLE } from "../shared/config";
 import { downloadFile, keepsakeHTML, keepsakeMarkdown, type SavedNote } from '../shared/keepsake';
@@ -16,7 +16,7 @@ import { REACTIONS, correctCount, getRealtime, podiumKey, winnerCode, type React
 import { esc } from '../shared/esc';
 import { isOnTopic } from '../shared/ask';
 
-const ICONS = { Brain, Check, Download, FileText, Flame, GitBranch, Heart, MessageCircleQuestion, NotebookPen, Radio, Send, Shuffle, Sparkles, SunMoon, Trophy, Map: MapIcon, X };
+const ICONS = { Brain, Check, CircleHelp, Download, FileText, Flame, GitBranch, Heart, MessageCircleQuestion, NotebookPen, Radio, Send, Shuffle, Sparkles, SunMoon, Trophy, Map: MapIcon, X };
 const REACTION_ICONS: Record<Reaction, IconNode> = { fire: Flame, heart: Heart, mind: Brain, ask: MessageCircleQuestion };
 const REACTION_SHORT: Record<Reaction, string> = { fire: 'Fuego', heart: 'Me gusta', mind: '¡Wow!', ask: 'Pregunta' };
 const SHAPES: IconNode[] = [Triangle, Diamond, Circle, Square];
@@ -116,6 +116,7 @@ async function boot() {
   createIcons({ icons: ICONS, attrs: { 'stroke-width': 1.75, 'aria-hidden': 'true' } });
   setupMenu();
   setupReactions();
+  setupFeedback();
   rt = await getRealtime();
   const forcedLocal = new URLSearchParams(location.search).has('local');
   if (rt.mode === 'local' && !forcedLocal && import.meta.env.VITE_FIREBASE_API_KEY) {
@@ -127,11 +128,14 @@ async function boot() {
     const prev = live;
     live = s;
     if (s.id) markSeen(s.id);
+    // Antes del muro y del podio: asegura que el tejedor publicado siga en esta sesión.
+    if (prev?.id !== s.id && (s.kind === 'wall' || s.kind === 'podium')) setTimeout(() => void syncTejedor(), Math.random() * 2500);
     $('[data-status]').textContent = s.total ? `En vivo · ${s.label} · ${s.index + 1}/${s.total}` : 'Conectado · esperando a que empiece la charla…';
     // Cambios dentro del mismo slide (revelar, podio publicado) actualizan por partes.
     const sameSlide = prev?.id === s.id;
     if (view === 'live') renderLive(!sameSlide);
     renderHold();
+    renderLost();
   });
   rt.onMyVotes((v) => {
     myVotes = v;
@@ -140,7 +144,7 @@ async function boot() {
     renderHold();
   });
   renderMe();
-  if (name) void rt.join(name).catch(() => undefined);
+  if (name) void rt.join(name).then(() => syncTejedor()).catch(() => undefined);
   render();
 }
 
@@ -382,7 +386,17 @@ function renderLobby(screen: HTMLElement) {
     <p class="kicker">Hola, ${esc(name)}</p>
     <h1>¡Estás dentro!</h1>
     <div class="lobby-dolls" aria-hidden="true">${[0, 1, 2, 3].map((i) => tejedorSVG({ ruana: i, patron: i % 5, sombrero: (i * 2) % 6, piel: (i + 1) % 5, accesorio: (i + 1) % 7, expresion: i % 4 })).join('')}</div>
-    <p class="muted">En cada slide verás las ideas clave y podrás escribir tus notas. Hay <b>3 preguntas</b> por el podio: responde rápido. Si estás escribiendo, <b>la app no te cambia de slide</b> hasta que guardes.</p>
+    <p class="muted">En cada slide verás las ideas clave y podrás escribir tus notas. Si estás escribiendo, <b>la app no te cambia de slide</b> hasta que guardes.</p>
+    <h2 class="how-title">Cómo sumar puntos</h2>
+    <ul class="how-list">
+      <li><span>Entrar antes de empezar</span><b>+100</b></li>
+      <li><span>Publicar tu tejedor en el muro</span><b>+100</b></li>
+      <li><span>Reaccionar con los botones de abajo</span><b>+10 c/u, hasta 100</b></li>
+      <li><span>Tocar <b>Pregunta</b> abajo y escribirla</span><b>+100</b></li>
+      <li><span>Acertar cada pregunta del podio</span><b>+500</b></li>
+      <li><span>Responder rápido</span><b>hasta +500</b></li>
+    </ul>
+    <p class="muted small"><b>Me perdí</b> no da puntos: solo le avisa a Vanessa que debe explicar mejor ese slide.</p>
     <p class="legend">${esc(LEYENDA)}</p>
     <button class="btn wide primary" type="button" data-go-tejedor>${icon(Sparkles, 18)} Crear mi tejedor</button>
   </section>`;
@@ -478,12 +492,69 @@ function renderPodium(screen: HTMLElement) {
     }
     ${podium.length ? `<ol class="podium-list">${podium.slice(0, 5).map((p, i) => `<li ${i === pos ? 'data-me' : ''}><span class="pl-avatar">${p.opts ? tejedorSVG(p.opts, p.name) : tejedorSilhouette()}</span><span class="pl-name">${i + 1}. ${esc(p.name)}</span><b>${p.score.toLocaleString('es-CO')}</b></li>`).join('')}</ol>` : '<p class="muted">Esperando el podio…</p>'}
     <p class="fine">Tu código: <b>${myCode}</b></p>
-  </section>`;
+  </section>${feedbackHTML()}`;
   // Vibra una sola vez cuando entras al podio.
   if (onPodium && celebratedPos !== pos) {
     celebratedPos = pos;
     navigator.vibrate?.([120, 60, 120, 60, 240]);
   }
+}
+
+// ── Satisfacción: privada, anónima para el público y sin puntos ─────────
+const rating: { clara?: number; util?: number } = store.get('rating', {});
+const lostSlides: string[] = store.get('lost', []);
+const RATE_QUESTIONS = [
+  { key: 'clara', text: '¿Qué tan clara fue la charla?', low: 'Nada clara', high: 'Muy clara' },
+  { key: 'util', text: '¿Qué tan útil es para tu trabajo?', low: 'Nada útil', high: 'Muy útil' },
+] as const;
+function feedbackHTML() {
+  return `<section class="card-sheet rate-card">
+    <p class="kicker">Tu opinión</p>
+    ${RATE_QUESTIONS.map((q) => `<fieldset class="rate"><legend>${q.text}</legend>
+      <div class="rate-row">${[1, 2, 3, 4, 5].map((n) => `<button type="button" data-rate="${q.key}" data-v="${n}" aria-pressed="${rating[q.key] === n}" aria-label="${n} de 5">${n}</button>`).join('')}</div>
+      <p class="rate-ends"><span>${q.low}</span><span>${q.high}</span></p></fieldset>`).join('')}
+    <p class="fine" data-rate-msg role="status">${rating.clara && rating.util ? '¡Gracias por tu opinión!' : 'Solo Vanessa ve el resultado.'}</p>
+  </section>`;
+}
+function setupFeedback() {
+  $('#screen').addEventListener('click', async (e) => {
+    const b = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-rate]');
+    if (!b) return;
+    const key = b.dataset.rate as 'clara' | 'util';
+    rating[key] = Number(b.dataset.v);
+    store.set('rating', rating);
+    document.querySelectorAll<HTMLElement>(`[data-rate="${key}"]`).forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    const msg = $('[data-rate-msg]');
+    try {
+      await rt.rate({ [key]: rating[key] });
+      msg.textContent = rating.clara && rating.util ? '¡Gracias por tu opinión!' : 'Falta una respuesta.';
+    } catch (err) {
+      console.error('[live] calificación', err);
+      msg.textContent = 'No se pudo enviar. Revisa tu conexión y toca otra vez.';
+    }
+  });
+}
+/** El botón muestra si ya avisaste en el slide que está en pantalla. */
+function renderLost() {
+  const b = document.querySelector<HTMLButtonElement>('[data-lost]');
+  if (!b) return;
+  const done = Boolean(live?.id) && lostSlides.includes(live!.id);
+  b.disabled = done || !live?.id;
+  b.querySelector('span')!.textContent = done ? 'Avisado' : 'Me perdí';
+}
+async function sendLost(b: HTMLButtonElement) {
+  const id = live?.id;
+  if (!id || lostSlides.includes(id)) return;
+  b.disabled = true;
+  navigator.vibrate?.(15);
+  try {
+    await rt.markLost(id);
+    lostSlides.push(id);
+    store.set('lost', lostSlides);
+  } catch (err) {
+    console.error('[live] me perdí', err);
+  }
+  renderLost();
 }
 
 function renderWallCta(screen: HTMLElement) {
@@ -563,9 +634,9 @@ function renderEnd(screen: HTMLElement) {
     ${tejedor.saved ? `<div class="end-doll">${tejedorSVG(tejedor.opts, tejedor.name)}<div><b>${esc(tejedor.name)}</b><span>“${esc(HILOS[tejedor.hilo])}”</span></div></div>` : `<button class="btn wide" type="button" data-go-tejedor>${icon(Sparkles, 18)} Crear mi tejedor para la memoria</button>`}
     ${keepsakeButtons()}
     <a class="btn wide" href="${SKILL_URL}" target="_blank" rel="noreferrer">${icon(Sparkles, 18)} Guía para tu agente de código</a>
-    <p class="fine">Instálala en Claude Code, Gemini CLI o Cursor y pídele: <i>“revisa mi UI generativa y agrégale tools de WebMCP”</i>. Aplica las 10 puntadas de la charla en tu proyecto.</p>
+    <p class="fine">Instálala en Claude Code, Gemini CLI o Cursor y pídele: <i>“revisa mi UI generativa con esta guía”</i>. Aplica las 5 reglas de la charla en tu proyecto.</p>
     <a class="btn wide ghost" href="${REPO_URL}" target="_blank" rel="noreferrer">${icon(GitBranch, 18)} Ver el repositorio</a>
-  </section>`;
+  </section>${feedbackHTML()}`;
   screen.querySelector('[data-go-tejedor]')?.addEventListener('click', () => go('tejedor'));
   bindKeepsake(screen);
 }
@@ -598,6 +669,21 @@ function renderNotes(screen: HTMLElement) {
   $('[data-close]', screen).addEventListener('click', () => go('live'));
 }
 
+/** Publica (o vuelve a publicar) el tejedor de quien ya decidió publicarlo. */
+let republishTimer = 0;
+async function syncTejedor() {
+  if (!tejedor.saved || !name) return false;
+  try {
+    await rt.publishTejedor({ name: cleanName(tejedor.name || name), hilo: tejedor.hilo, opts: tejedor.opts });
+    tejedor.published = true;
+    store.set('tejedor', tejedor);
+    return true;
+  } catch (err) {
+    console.error('[live] publicar tejedor', err);
+    return false;
+  }
+}
+
 // ── Crea tu tejedor (todo en el dispositivo) ───────────────────────────
 function renderTejedor(screen: HTMLElement) {
   screen.dataset.screen = 'tejedor';
@@ -616,11 +702,8 @@ function renderTejedor(screen: HTMLElement) {
     <div data-opts></div>
     <button class="btn ghost" type="button" data-random>${icon(Shuffle, 16)} Sorpréndeme</button>
     <p class="fine">Se dibuja <b>en tu celular</b> (SVG). Si lo publicas, al muro solo viajan tus elecciones.</p>
-    <div class="row">
-      <button class="btn" type="button" data-download>${icon(Download, 18)} Descargar PNG</button>
-      <button class="btn primary" type="button" data-save>${icon(Check, 18)} ${tejedor.saved ? 'Guardado' : 'Guardar en mi memoria'}</button>
-    </div>
-    <button class="btn wide" type="button" data-publish>${icon(Send, 18)} ${tejedor.published ? 'Actualizar en el muro' : 'Publicar en el muro (+100)'}</button>
+    <button class="btn wide primary" type="button" data-publish>${icon(Send, 18)} ${tejedor.published ? 'Actualizar en el muro y el podio' : 'Publicar en el muro y el podio (+100)'}</button>
+    <button class="btn wide" type="button" data-download>${icon(Download, 18)} Descargar PNG</button>
     <p class="fine" data-msg role="status"></p>
   </section>`;
 
@@ -640,6 +723,9 @@ function renderTejedor(screen: HTMLElement) {
   const changed = () => {
     persist();
     preview();
+    // Si ya lo publicó, el muro y el podio siempre muestran su última versión.
+    clearTimeout(republishTimer);
+    if (tejedor.saved) republishTimer = window.setTimeout(() => void syncTejedor(), 1200);
   };
   $('.creator', screen).addEventListener('click', (e) => {
     const b = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-opt],[data-hilo]');
@@ -664,27 +750,14 @@ function renderTejedor(screen: HTMLElement) {
     tejedor.name = cleanName(tejedor.name || name || '');
     downloadFile(`tejedor-${slug()}.png`, await tejedorPNG(tejedor));
   });
-  $('[data-save]', screen).addEventListener('click', (e) => {
-    tejedor.name = cleanName(tejedor.name || name || '');
-    tejedor.saved = true;
-    persist();
-    (e.currentTarget as HTMLElement).innerHTML = `${icon(Check, 18)} Guardado`;
-    $('[data-msg]', screen).textContent = 'Listo: tu tejedor estará en tu memoria de la charla.';
-  });
   $('[data-publish]', screen).addEventListener('click', async () => {
     const msg = $('[data-msg]', screen);
     tejedor.name = cleanName(tejedor.name || name || '');
     msg.textContent = 'Publicando…';
-    try {
-      await rt.publishTejedor({ name: tejedor.name, hilo: tejedor.hilo, opts: tejedor.opts });
-      tejedor.published = true;
-      tejedor.saved = true;
-      persist();
-      msg.textContent = '¡Listo! Tu tejedor está en el muro y en tu memoria.';
-    } catch (err) {
-      console.error(err);
-      msg.textContent = 'No se pudo publicar. Revisa tu conexión e inténtalo de nuevo.';
-    }
+    // Queda marcado aunque falle la red: la app lo reintenta antes del muro y del podio.
+    tejedor.saved = true;
+    persist();
+    msg.textContent = (await syncTejedor()) ? '¡Listo! Tu tejedor está en el muro, en el podio y en tu memoria.' : 'No se pudo publicar. Lo intentaremos otra vez antes del podio.';
   });
   preview();
 }
@@ -731,9 +804,11 @@ function setupReactions() {
   const bar = $('[data-reactions]');
   bar.innerHTML = (Object.keys(REACTIONS) as Reaction[])
     .map((r) => `<button type="button" data-r="${r}" title="${REACTIONS[r].label}" style="--c:${REACTIONS[r].color}">${icon(REACTION_ICONS[r], 24)}<span>${REACTION_SHORT[r]}</span></button>`)
-    .join('');
+    .join('') + `<button type="button" data-lost title="Avisarle a Vanessa que no entendiste este slide" style="--c:#f2a33a" disabled>${icon(CircleHelp, 24)}<span>Me perdí</span></button>`;
   let last = 0;
   bar.addEventListener('click', async (e) => {
+    const lostBtn = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-lost]');
+    if (lostBtn && rt) return void sendLost(lostBtn);
     const b = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-r]');
     if (!b || !rt) return;
     const r = b.dataset.r as Reaction;
@@ -750,16 +825,16 @@ function setupReactions() {
 
 // Preguntas para la presentadora: texto libre, por eso NO se proyecta (solo ella las lee).
 // Solo sobre el tema de la charla: se elige el tema y el texto debe mencionar algo relacionado.
-const ASK_TOPICS = ['Web agéntica', 'WebMCP', 'Renderizado y streaming', 'DOM y estado', 'Accesibilidad', 'La demo'] as const;
+const ASK_TOPICS = ['Harness', 'Rendimiento', 'DOM y estado', 'Accesibilidad', 'Agentes de IA', 'La demo'] as const;
 let lastAsk = 0;
 function openAsk() {
   const dlg = document.createElement('dialog');
   dlg.className = 'ask-sheet';
   dlg.innerHTML = `<form>
     <h2>${icon(MessageCircleQuestion, 22)} ¿Tienes una pregunta sobre la charla?</h2>
-    <p class="fine">Solo preguntas sobre <b>web agéntica, WebMCP y UI generativa</b>. Le llegan a Vanessa con tu apodo${name ? ` <b>${esc(name)}</b>` : ''}; no se proyectan y las responde al final.</p>
-    <fieldset class="field"><legend>Tema</legend><div class="chips" role="radiogroup" aria-label="Tema">${ASK_TOPICS.map((tp, i) => `<button type="button" role="radio" aria-checked="${i === 1}" data-topic="${esc(tp)}">${esc(tp)}</button>`).join('')}</div></fieldset>
-    <textarea name="q" rows="4" maxlength="280" required placeholder="Ej.: ¿Cómo marco una tool como irreversible en WebMCP?"></textarea>
+    <p class="fine">Cuéntale a Vanessa <b>qué parte no entendiste</b> o qué quieres saber. Le llega con tu apodo${name ? ` <b>${esc(name)}</b>` : ''}, no se proyecta y la responde al final.</p>
+    <fieldset class="field"><legend>Tema</legend><div class="chips" role="radiogroup" aria-label="Tema">${ASK_TOPICS.map((tp, i) => `<button type="button" role="radio" aria-checked="${i === 0}" data-topic="${esc(tp)}">${esc(tp)}</button>`).join('')}</div></fieldset>
+    <textarea name="q" rows="4" maxlength="280" required placeholder="Ej.: No entendí qué hace un harness"></textarea>
     <p class="fine" data-ask-msg role="status"></p>
     <div class="row"><button class="btn ghost" type="button" data-cancel>Cancelar</button><button class="btn primary" type="submit">${icon(Send, 18)} Enviar</button></div>
   </form>`;
@@ -776,11 +851,11 @@ function openAsk() {
   dlg.querySelector('form')!.addEventListener('submit', async (e) => {
     e.preventDefault();
     const text = dlg.querySelector('textarea')!.value.trim();
-    const topic = dlg.querySelector<HTMLElement>('[data-topic][aria-checked="true"]')?.dataset.topic ?? 'Web agéntica';
+    const topic = dlg.querySelector<HTMLElement>('[data-topic][aria-checked="true"]')?.dataset.topic ?? 'Harness';
     const msg = $('[data-ask-msg]', dlg);
     if (!text) return;
     if (!isOnTopic(text)) {
-      msg.textContent = 'Tu pregunta no parece ser sobre la charla. Escríbela sobre MCP, WebMCP, agentes, la demo o la seguridad de las tools.';
+      msg.textContent = 'Tu pregunta no parece ser sobre la charla. Cuéntanos qué parte no entendiste o sobre qué tema quieres saber más.';
       return;
     }
     if (Date.now() - lastAsk < 15000) return void (msg.textContent = 'Espera unos segundos antes de enviar otra.');

@@ -36,22 +36,22 @@ export const EXPRESIONES = ['Sonrisa', 'Guiño', 'Sorpresa', 'Concentrado'] as c
 
 /** El hilo que teje tu tejedor: la práctica que te llevas (lista cerrada: nada de texto libre llega al proyector). */
 export const HILOS = [
-  'Mi web ya registra tools',
-  'Lee, usa, genera',
-  'Primero el plan, luego el contenido',
-  'Datos, no HTML',
-  'Cambios por id, no documentos',
-  'Refino sin regenerar',
-  'moveBefore() y nada de innerHTML',
-  'Un solo estado para todos',
-  'Lo de la persona gana',
-  'Mi agente avisa lo que hace',
-  'Todo se puede deshacer',
-  'Mi UI generativa ya no se traba',
+  'Mis pruebas pasan en el navegador',
+  'La IA propone, el harness comprueba',
+  'Primero reservo el espacio',
+  'Una pintura por frame',
+  'Cada fila tiene su id',
+  'Tu nota no se borra',
+  'Ya tengo mi AGENTS.md',
+  'Mido en un navegador real',
+  'Presupuesto de rendimiento activado',
+  'Mi agente no entrega en rojo',
+  'También mido la accesibilidad',
+  'Hoy instalo mi harness',
 ] as const;
 
 export const LEYENDA =
-  'En Boyacá las ruanas se tejen en telar: la urdimbre queda fija y la trama llega hilo a hilo, sin destejer lo que ya está hecho. Así se construye una UI generativa sin fricción: estructura estable, datos que llegan en streaming y nada que se rehaga sin necesidad.';
+  'Las ruanas de Boyacá se tejen a mano, hilo a hilo. Tu tejedor lleva el hilo que te llevas de esta charla.';
 
 const INK = '#2a211b';
 const HAIR = '#2b2118';

@@ -1,0 +1,18 @@
+:root { font-family: system-ui, sans-serif; color: #1f2420; background: #f7f5f0; }
+body { margin: 0; }
+.barra { position: sticky; top: 0; z-index: 2; display: flex; gap: 10px; align-items: center; padding: 12px 20px; background: #fff; border-bottom: 1px solid #e2ded4; }
+.barra h1 { font-size: 18px; margin: 0 auto 0 0; }
+button { padding: 8px 12px; border: 1px solid #2e7d4f; border-radius: 8px; background: #fff; color: #1f5c39; font: inherit; cursor: pointer; }
+main { max-width: 900px; margin: 16px auto; padding: 0 16px; }
+/* El consejo llega al final, encima de la lista: su espacio queda reservado desde el inicio. */
+#consejo { min-height: 154px; }
+@media (max-width: 851px) { #consejo { min-height: 207px; } }
+@media (max-width: 603px) { #consejo { min-height: 260px; } }
+@media (max-width: 467px) { #consejo { min-height: 339px; } }
+@media (max-width: 371px) { #consejo { min-height: 418px; } }
+.consejo { margin: 0 0 12px; padding: 18px 20px; border-radius: 10px; background: #fff6d6; line-height: 1.65; }
+#lista { list-style: none; margin: 0; padding: 0; background: #fff; border: 1px solid #e2ded4; border-radius: 10px; min-height: calc(var(--filas, 0) * 61px); }
+.fila { display: grid; grid-template-columns: 24px minmax(0, 1fr) 170px minmax(0, 1fr); gap: 10px; align-items: center; height: 60px; padding: 0 14px; border-top: 1px solid #eee9de; }
+.fila small { display: block; color: #5b625c; }
+.fila input[type='text'] { min-width: 0; padding: 7px 9px; border: 1px solid #e2ded4; border-radius: 7px; font: inherit; }
+.solo-lector { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }

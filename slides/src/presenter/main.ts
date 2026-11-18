@@ -41,6 +41,9 @@ function render(m: Extract<PresenterMsg, { type: 'state' }>) {
   $('[data-stat="votes"]').textContent = `${m.votes} jugando`;
   $('[data-reveal]').hidden = c?.kind !== 'poll';
   $('[data-stat="questions"]').textContent = `${m.questions} preguntas`;
+  const lost = $('[data-stat="lost"]');
+  lost.textContent = `${m.lostHere} perdidos aquí`;
+  lost.classList.toggle('alert', m.lostHere > 0);
   const live = $('[data-stat="live"]');
   live.textContent = m.live ? '● transmitiendo' : 'sin transmitir';
   live.className = m.live ? 'on' : 'off';

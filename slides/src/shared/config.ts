@@ -1,3 +1,9 @@
+/** Quien abre los slides publicados: sin controles ni secciones de la charla en vivo. */
+export const isPublicView = () => {
+  const q = new URLSearchParams(location.search);
+  return !q.has('presenter') && !q.has('local');
+};
+
 export const REPO_OWNER = 'vanessamarely';
 export const REPO_NAME = 'web-gen-ui-boyaconf';
 export const REPO_URL = `https://github.com/${REPO_OWNER}/${REPO_NAME}`;

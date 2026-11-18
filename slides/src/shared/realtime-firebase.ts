@@ -1,10 +1,10 @@
 import { GithubAuthProvider, getAuth, linkWithPopup, signInAnonymously, signInWithCredential } from 'firebase/auth';
-import { Timestamp, addDoc, collection, deleteDoc, doc, getDoc, getDocs, getFirestore, limit, onSnapshot, orderBy, query, serverTimestamp, setDoc, updateDoc, writeBatch } from 'firebase/firestore';
+import { Timestamp, addDoc, arrayUnion, collection, deleteDoc, doc, getDoc, getDocs, getFirestore, limit, onSnapshot, orderBy, query, serverTimestamp, setDoc, updateDoc, writeBatch } from 'firebase/firestore';
 import { PRESENTER_GITHUB_ID, SESSION_ID } from './config';
 import { getFirebaseApp } from './firebase';
 import { nameKey } from './names';
 import { QUESTION_IDS, type AnswerKey } from './questions';
-import { emptySlide, type AudienceQuestion, type TejedorData, type Player, type Reaction, type Realtime, type SlideState, type VoteRecord, type Votes } from './realtime';
+import { emptySlide, type AudienceQuestion, type Feedback, type TejedorData, type Player, type Reaction, type Realtime, type SlideState, type VoteRecord, type Votes } from './realtime';
 
 const ms = (v: unknown) => (v instanceof Timestamp ? v.toMillis() : typeof v === 'number' ? v : undefined);
 
@@ -89,6 +89,12 @@ export async function createFirebaseRealtime(): Promise<Realtime> {
     async ask(q) {
       await addDoc(sub('questions'), { ...q, uid: uid(), at: serverTimestamp() });
     },
+    async markLost(slideId) {
+      await setDoc(doc(sub('feedback'), uid()), { lost: arrayUnion(slideId), at: serverTimestamp() }, { merge: true });
+    },
+    async rate(r) {
+      await setDoc(doc(sub('feedback'), uid()), { ...r, at: serverTimestamp() }, { merge: true });
+    },
     async publishTejedor(d) {
       const ref = doc(sub('tejedores'), uid());
       const prev = await getDoc(ref);
@@ -163,6 +169,13 @@ export async function createFirebaseRealtime(): Promise<Realtime> {
         off?.();
       };
     },
+    onFeedback(cb, onError) {
+      return onSnapshot(
+        sub('feedback'),
+        (snap) => cb(snap.docs.map((d): Feedback => ({ uid: d.id, lost: d.data().lost ?? [], clara: d.data().clara, util: d.data().util }))),
+        (err) => onError?.(err.message),
+      );
+    },
     async removeQuestion(id) {
       await deleteDoc(doc(sub('questions'), id));
     },
@@ -171,7 +184,7 @@ export async function createFirebaseRealtime(): Promise<Realtime> {
     },
     async resetSession() {
       let n = 0;
-      for (const name of ['players', 'names', 'votes', 'reactions', 'questions', 'tejedores']) {
+      for (const name of ['players', 'names', 'votes', 'reactions', 'questions', 'tejedores', 'feedback']) {
         const snap = await getDocs(sub(name));
         for (let i = 0; i < snap.docs.length; i += 400) {
           const batch = writeBatch(db);

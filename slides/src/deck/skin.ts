@@ -1,7 +1,5 @@
-// Piel "Telar de luz" + "la charla se genera en vivo":
-//  · hilos de luz (SVG) que atraviesan cada slide, con colores de BoyaConf y del telar;
-//  · un estado por slide que pasa de "generando…" a "listo" mientras los bloques aparecen
-//    como UI generativa (esqueleto → contenido): la charla demuestra su propio tema;
+// Piel "Telar de luz":
+//  · hilos de luz (SVG) en el borde inferior de cada slide, con colores de BoyaConf y del telar;
 //  · el logo oficial de BoyaConf en el pie (pequeño, sin tapar contenido).
 const COLORS = ['#22c68d', '#f43f5e', '#f3c94f', '#8fa9ec'];
 
@@ -12,12 +10,12 @@ function rng(seed: number) {
 
 /**
  * Los hilos viven SOLO en una franja delgada del borde inferior (debajo del pie), donde nunca
- * hay texto: decoran sin cruzar el contenido. En portada y capítulos la franja es un poco más alta.
+ * hay texto: decoran sin cruzar el contenido ni las redes del pie.
  */
 function hilos(i: number, fuerte: boolean): string {
   const r = rng(i * 97 + 13);
   const n = fuerte ? 4 : 3;
-  const top = fuerte ? 660 : 694; // y mínima de la franja (lienzo de 720 de alto)
+  const top = 700; // siempre debajo del pie: los hilos nunca pasan por tus redes (lienzo de 720 de alto)
   const span = 720 - top;
   const y = () => (top + 4 + r() * (span - 6)).toFixed(0);
   const paths = Array.from({ length: n }, (_, k) => {
@@ -32,12 +30,8 @@ export function mountSkin(sections: HTMLElement[]) {
   sections.forEach((s, i) => {
     const portada = s.classList.contains('cover') || s.classList.contains('section-slide');
     s.insertAdjacentHTML('afterbegin', hilos(i, portada));
-    if (portada) return;
-    const n = s.querySelectorAll('.reveal > *').length;
-    s.style.setProperty('--n', String(n));
-    s.insertAdjacentHTML('beforeend', `<div class="gen-status" aria-hidden="true"><span class="g1"><i></i> generando</span><span class="g2">✓ listo · 0 saltos</span></div>`);
   });
   document.querySelectorAll('.footer').forEach((f) =>
-    f.insertAdjacentHTML('afterbegin', `<span class="foot-logo"><img src="/brand/boyaconf-isotipo.svg" alt="" width="18" height="18" /><span class="lt">‹</span>BoyaConf<span class="gt">›</span> 2026</span>`),
+    f.querySelector('.foot-num')!.insertAdjacentHTML('beforebegin', `<span class="foot-logo"><img src="/brand/boyaconf-isotipo.svg" alt="" width="18" height="18" /><span class="foot-evento"><span class="lt">‹</span>BoyaConf<span class="gt">›</span></span></span>`),
   );
 }
