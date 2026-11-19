@@ -1534,3 +1534,43 @@ section[data-id='inicio'] .terminal { padding-block: 12px; } section[data-id='in
 .beneficios .destacado { border-top-color: var(--green); box-shadow: inset 0 0 0 2px var(--green); }
 .beneficios.dos code { font: 600 0.9em var(--mono); color: var(--green); overflow-wrap: anywhere; }
 section[data-id='agentica'] .pasaba b { color: var(--ink); }
+
+/* Cómo se implementa: qué evitar y qué usar en cada framework. */
+.matriz { width: 100%; border-collapse: separate; border-spacing: 0 6px; table-layout: fixed; }
+.matriz th, .matriz td { padding: 7px 12px; text-align: left; vertical-align: middle; }
+.matriz thead th { padding-block: 2px; font: 700 18px/1.2 var(--sans); color: var(--ink-dim); }
+.matriz thead th:first-child { width: 112px; }
+.matriz thead .mal { color: var(--red); } .matriz thead .bien { color: var(--green); }
+.matriz tbody th { font: 700 19px var(--sans); color: var(--ink); background: var(--glass); border-radius: 10px 0 0 10px; }
+.matriz td { background: var(--code-bg); }
+.matriz td.mal { box-shadow: inset 4px 0 0 var(--red); }
+.matriz td.bien { box-shadow: inset 4px 0 0 var(--green); border-radius: 0 10px 10px 0; }
+.matriz pre, .comun pre { margin: 0; font: 500 16px/1.35 var(--mono); font-variant-ligatures: none; color: var(--code-ink); white-space: pre-wrap; overflow-wrap: anywhere; }
+.comun { margin-bottom: 6px; } .comun pre { padding: 8px 14px; }
+.codigo-slide .porque { margin-top: 8px; font-size: 22px; }
+:root[data-ratio='4-3'] .matriz pre, :root[data-ratio='4-3'] .comun pre { font-size: 13px; }
+:root[data-ratio='4-3'] .matriz thead th { font-size: 15px; } :root[data-ratio='4-3'] .matriz thead th:first-child { width: 84px; } :root[data-ratio='4-3'] .matriz tbody th { font-size: 15px; }
+.archivos.con-dato li { grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 16px; }
+.archivos.con-dato li > div { display: grid; gap: 1px; }
+.archivos.con-dato b { font: 800 30px var(--display); color: var(--green); }
+section[data-id='industria'] .medida { margin-top: 10px; font-size: 19px; }
+@media (max-width: 640px) {
+  deck-stage > section .matriz, deck-stage > section .matriz tbody, deck-stage > section .matriz tr, deck-stage > section .matriz th, deck-stage > section .matriz td { display: block; width: auto; }
+  deck-stage > section .matriz thead { display: none; }
+  deck-stage > section .matriz tr { margin-bottom: 10px; }
+  deck-stage > section .matriz tbody th { border-radius: 10px 10px 0 0; }
+  deck-stage > section .matriz td.bien { border-radius: 0 0 10px 10px; }
+  deck-stage > section .matriz td.mal::before { content: '✗ Evita'; display: block; font: 700 13px var(--sans); color: #ff8fa3; }
+  deck-stage > section .matriz td.bien::before { content: '✓ Usa'; display: block; font: 700 13px var(--sans); color: #5fe0b0; }
+  deck-stage > section .matriz pre { font-size: 13px; }
+}
+
+/* Primer acierto: aparece en cuanto alguien responde bien. */
+.pill.primero { gap: 10px; padding: 4px 16px 4px 6px; border-color: var(--green); animation: primero-entra 420ms cubic-bezier(0.2, 1.4, 0.4, 1) both; }
+.primero-avatar { width: 46px; height: 46px; flex: none; overflow: hidden; border-radius: 50%; background: #fff; }
+.primero-avatar svg { display: block; width: 100%; height: auto; }
+.primero small { display: block; font: 700 12px var(--mono); text-transform: uppercase; letter-spacing: 0.05em; color: var(--green); }
+.primero b { display: block; max-width: 230px; overflow: hidden; font-size: 18px; line-height: 1.1; text-overflow: ellipsis; white-space: nowrap; }
+@keyframes primero-entra { from { opacity: 0; transform: scale(0.8); } }
+@media (prefers-reduced-motion: reduce) { .pill.primero { animation: none; } }
+.poll-foot { flex-wrap: wrap; row-gap: 8px; }

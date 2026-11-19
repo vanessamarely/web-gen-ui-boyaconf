@@ -110,6 +110,7 @@ export async function initLive(stage: DeckStage, sections: HTMLElement[]) {
       }
     }
     syncPresenterUi();
+    renderPolls();
   };
 
   // ── Publicar el slide actual (solo la presentadora) ───────────────────
@@ -218,6 +219,7 @@ export async function initLive(stage: DeckStage, sections: HTMLElement[]) {
     players = ps;
     setCount('players', ps.length);
     tellConsole();
+    renderPolls();
     renderPodium();
   });
   rt.onSlide((s) => {
@@ -252,6 +254,23 @@ export async function initLive(stage: DeckStage, sections: HTMLElement[]) {
       });
     });
   }
+  /** Quien acertó primero. Solo se muestra la persona: la opción correcta sigue oculta hasta revelar. */
+  function pintarPrimero(section: HTMLElement, q: QuestionId) {
+    const pie = section.querySelector<HTMLElement>('.poll-foot');
+    const correcta = answers[q]?.correct ?? slide?.answers?.[q]?.correct;
+    if (!pie || !correcta) return;
+    const primero = votes.filter((v) => v.votes[q] === correcta && typeof v.at[q] === 'number').sort((a, b) => a.at[q]! - b.at[q]!)[0];
+    let el = pie.querySelector<HTMLElement>('[data-primero]');
+    if (!primero) return void el?.remove();
+    const nombre = players.find((p) => p.id === primero.uid)?.name ?? 'Alguien';
+    const opts = tejedores.find((t) => t.id === primero.uid && !t.hidden)?.opts;
+    const firma = `${primero.uid}|${nombre}|${opts ? JSON.stringify(opts) : ''}`;
+    if (el?.dataset.primero === firma) return;
+    el ??= pie.appendChild(document.createElement('span'));
+    el.className = 'pill primero';
+    el.dataset.primero = firma;
+    el.innerHTML = `<span class="primero-avatar">${avatar(opts, nombre)}</span><span><small>Primer acierto</small><b>${esc(nombre)}</b></span>`;
+  }
   function renderPolls() {
     document.querySelectorAll<HTMLElement>('[data-poll]').forEach((box) => {
       const q = box.dataset.poll as QuestionId;
@@ -262,6 +281,7 @@ export async function initLive(stage: DeckStage, sections: HTMLElement[]) {
       section.toggleAttribute('data-revealed', revealed);
       section.querySelectorAll<HTMLElement>('[data-total]').forEach((el) => (el.textContent = String(total)));
       const published = revealed ? slide?.answers?.[q] : undefined;
+      pintarPrimero(section, q);
       const explain = section.querySelector<HTMLElement>('[data-explain]');
       if (explain) {
         explain.hidden = !published;
@@ -304,6 +324,7 @@ export async function initLive(stage: DeckStage, sections: HTMLElement[]) {
     const visible = presenter ? list : list.filter((d) => !d.hidden);
     setCount('tejedores', list.filter((d) => !d.hidden).length);
     tellConsole();
+    renderPolls();
     renderPodium();
     if (!wall) return;
     if (!visible.length && !wall.querySelector('.wall-empty')) {

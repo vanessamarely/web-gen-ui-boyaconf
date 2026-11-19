@@ -111,10 +111,15 @@ document.querySelectorAll<HTMLElement>('[data-ronda]').forEach((sec) => {
 document.querySelectorAll<HTMLElement>('[data-codigo]').forEach((sec) => {
   const d = RONDAS.find((x) => x.id === sec.dataset.codigo);
   if (!d) return;
+  const celda = (c: string) => `<pre>${highlight(c, 'js')}</pre>`;
   sec.querySelector('.card-frame')!.innerHTML = `
     <p class="eyebrow">Regla ${d.n} de ${RONDAS.length} · Cómo se implementa</p>
     <h2 class="title">${esc(d.correccion)}</h2>
-    <div class="frameworks">${d.frameworks.map((f) => `<div class="code sm"><div class="bar"><span>${esc(f.nombre)}</span></div><pre>${highlight(f.codigo, 'js')}</pre></div>`).join('')}</div>
+    ${d.comun ? `<div class="code sm comun">${celda(d.comun)}</div>` : ''}
+    <table class="matriz">
+      <thead><tr><th scope="col">Framework</th><th scope="col" class="mal">✗ Evita: ${esc(d.evitaTitulo)}</th><th scope="col" class="bien">✓ Usa: ${esc(d.usaTitulo)}</th></tr></thead>
+      <tbody>${d.frameworks.map((f) => `<tr><th scope="row">${esc(f.nombre)}</th><td class="mal">${celda(f.evita)}</td><td class="bien">${celda(f.usa)}</td></tr>`).join('')}</tbody>
+    </table>
     <p class="porque">${esc(d.porque)}</p>`;
 });
 const salida = (filas: FilaSalida[]) => filas.map((f) => `<div class="t-fila ${f.ok ? 'ok' : 'mal'}"><b>${f.ok ? '✓' : '✗'}</b><span>${esc(f.nombre)}</span><code>${esc(f.valor)}</code></div>`).join('') + `<p class="t-total">${filas.filter((f) => f.ok).length} de ${filas.length} reglas cumplidas</p>`;
