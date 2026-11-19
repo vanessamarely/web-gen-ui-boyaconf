@@ -116,7 +116,7 @@ document.querySelectorAll<HTMLElement>('[data-codigo]').forEach((sec) => {
     <div class="frameworks">${d.frameworks.map((f) => `<div class="code sm"><div class="bar"><span>${esc(f.nombre)}</span></div><pre>${highlight(f.codigo, 'js')}</pre></div>`).join('')}</div>
     <p class="porque">${esc(d.porque)}</p>`;
 });
-const salida = (filas: FilaSalida[]) => filas.map((f) => `<div class="t-fila ${f.ok ? 'ok' : 'mal'}"><b>${f.ok ? '✓' : '✗'}</b><span>${esc(f.nombre)}</span><code>${esc(f.valor)}</code></div>`).join('') + `<p class="t-total">${filas.filter((f) => f.ok).length} de ${filas.length} pruebas pasaron</p>`;
+const salida = (filas: FilaSalida[]) => filas.map((f) => `<div class="t-fila ${f.ok ? 'ok' : 'mal'}"><b>${f.ok ? '✓' : '✗'}</b><span>${esc(f.nombre)}</span><code>${esc(f.valor)}</code></div>`).join('') + `<p class="t-total">${filas.filter((f) => f.ok).length} de ${filas.length} reglas cumplidas</p>`;
 document.querySelectorAll<HTMLElement>('[data-salida]').forEach((el) => (el.innerHTML = salida(el.dataset.salida === 'final' ? SALIDA_FINAL : SALIDA_INICIAL)));
 
 // ── Preguntas: texto en el deck (las respuestas NO están en el bundle) ──

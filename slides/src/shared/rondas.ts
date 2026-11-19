@@ -26,11 +26,11 @@ export interface Ronda {
 }
 
 export const SALIDA_INICIAL: FilaSalida[] = [
-  { ok: false, nombre: 'No ejecuta HTML del modelo', valor: 'Lo ejecutó 43 veces' },
-  { ok: false, nombre: 'Actualiza por tandas', valor: '204 actualizaciones' },
-  { ok: false, nombre: 'Reutiliza lo que ya está', valor: 'Creó 5.274 elementos' },
-  { ok: false, nombre: 'Lo de la persona gana', valor: 'Volvió de 5 kg a 2 kg' },
-  { ok: false, nombre: 'Avisa sin saturar', valor: '204 avisos · 8 campos sin nombre' },
+  { ok: false, nombre: 'Lo que escribe la IA no se ejecuta como código', valor: 'Lo ejecutó 43 veces' },
+  { ok: false, nombre: 'La pantalla se actualiza por grupos de cambios', valor: '204 actualizaciones' },
+  { ok: false, nombre: 'Solo cambia lo necesario', valor: 'Creó 5.274 elementos' },
+  { ok: false, nombre: 'La IA no sobrescribe lo que cambió la persona', valor: 'Volvió de 5 kg a 2 kg' },
+  { ok: false, nombre: 'El lector de pantalla no recibe avisos de más', valor: '204 avisos · 8 campos sin nombre' },
 ];
 
 export const RONDAS: Ronda[] = [
@@ -127,9 +127,9 @@ export const RONDAS: Ronda[] = [
 ];
 
 export const SALIDA_FINAL: FilaSalida[] = [
-  { ok: true, nombre: 'No ejecuta HTML del modelo', valor: '0 veces' },
-  { ok: true, nombre: 'Actualiza por tandas', valor: '51 actualizaciones' },
-  { ok: true, nombre: 'Reutiliza lo que ya está', valor: '56 elementos' },
-  { ok: true, nombre: 'Lo de la persona gana', valor: 'Se queda en 5 kg' },
-  { ok: true, nombre: 'Avisa sin saturar', valor: '2 avisos · 0 campos sin nombre' },
+  { ok: true, nombre: 'Lo que escribe la IA no se ejecuta como código', valor: '0 veces' },
+  { ok: true, nombre: 'La pantalla se actualiza por grupos de cambios', valor: '51 actualizaciones' },
+  { ok: true, nombre: 'Solo cambia lo necesario', valor: '56 elementos' },
+  { ok: true, nombre: 'La IA no sobrescribe lo que cambió la persona', valor: 'Se queda en 5 kg' },
+  { ok: true, nombre: 'El lector de pantalla no recibe avisos de más', valor: '2 avisos · 0 campos sin nombre' },
 ];

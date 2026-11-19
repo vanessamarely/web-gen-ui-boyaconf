@@ -1524,3 +1524,5 @@ section[data-id='industria'] .archivos { gap: 9px; } section[data-id='industria'
 :root[data-ratio='4-3'] .dos-listas li { font-size: 19px; } :root[data-ratio='4-3'] .dos-listas h3 { font-size: 24px; }
 :root[data-ratio='4-3'] .frameworks .code pre { font-size: 13.5px; }
 @media (max-width: 640px) { deck-stage > section .dos-listas, deck-stage > section .frameworks { grid-template-columns: minmax(0, 1fr); } deck-stage > section .dos-listas li { font-size: 17px; } deck-stage > section .frameworks .code pre { font-size: 13px; } }
+section[data-id='inicio'] .terminal { padding-block: 12px; } section[data-id='inicio'] .t-fila { padding: 7px 0; }
+.dos-listas li:has(> b) { display: grid; grid-template-columns: 62px minmax(0, 1fr); gap: 10px; align-items: baseline; }
