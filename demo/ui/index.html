@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mercado generativo · Plaza de Tunja</title>
+    <meta name="description" content="Demo de UI generativa: la IA elige qué interfaz mostrar según cada pedido." />
+    <link rel="icon" href="/favicon.svg" />
+    <link rel="stylesheet" href="/src/ui/ui.css" />
+  </head>
+  <body>
+    <header class="cabeza">
+      <div class="marca"><img src="/favicon.svg" alt="" width="34" height="34" /><div><h1>Mercado generativo</h1><p data-motor>Preparando la IA…</p></div></div>
+      <div class="modo" role="radiogroup" aria-label="Versión de la web">
+        <button type="button" role="radio" data-modo="directo" aria-checked="false">Sin preparar</button>
+        <button type="button" role="radio" data-modo="preparada" aria-checked="true">Preparada</button>
+      </div>
+    </header>
+    <form class="pedido" data-pedido>
+      <label for="q">¿Qué necesitas de la plaza?</label>
+      <div class="pedido-fila"><input id="q" autocomplete="off" required /><button type="submit">Pedir</button></div>
+      <div class="chips" data-chips></div>
+    </form>
+    <p class="estado" data-estado role="status"></p>
+    <main id="superficie" class="superficie" data-superficie></main>
+    <section class="medidas" aria-label="Medidas de esta respuesta" data-medidas></section>
+    <script type="module" src="/src/ui/main.ts"></script>
+  </body>
+</html>

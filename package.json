@@ -13,7 +13,7 @@
     "test": "npm run test -w slides && npm run test -w demo",
     "format": "prettier --write .",
     "deploy": "npm run build && firebase deploy",
-    "clips": "node scripts/record-clips.mjs"
+    "clips": "npm run build -w demo && node scripts/record-demo.mjs"
   },
   "devDependencies": {
     "prettier": "^3.9.10",

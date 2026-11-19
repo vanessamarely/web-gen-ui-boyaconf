@@ -18,7 +18,7 @@ import {
   createIcons,
 } from 'lucide';
 import { CHECKLIST, SLIDE_BY_ID } from '../shared/content';
-import { CODIGO_PRUEBA, RONDAS, SALIDA_FINAL, SALIDA_INICIAL, type FilaSalida } from '../shared/rondas';
+import { RONDAS, SALIDA_FINAL, SALIDA_INICIAL, type FilaSalida } from '../shared/rondas';
 import { DEMO_URL, NS, PUBLIC_DEMO_URL, REPO_URL, isPublicView, prettyUrl, publicLiveUrl, withSessionParams } from '../shared/config';
 import { tejedorSVG, type TejedorOptions } from '../shared/tejedor';
 import { QUESTIONS, type QuestionId } from '../shared/questions';
@@ -92,33 +92,30 @@ const toggleJoinQr = () => {
   save('joinqr', off ? '0' : '1');
 };
 
-// ── Rondas: salen de la corrida real del agente (una sola fuente para deck, celular y memoria) ──
+// ── Reglas: una sola fuente para deck, celular y memoria ──
 document.querySelectorAll<HTMLElement>('[data-ronda]').forEach((sec) => {
   const d = RONDAS.find((x) => x.id === sec.dataset.ronda);
   if (!d) return;
+  const video = (v: string, texto: string) => `<video muted loop playsinline preload="none" data-src="/clips/g-${d.id}-${v}.webm" poster="/clips/g-${d.id}-${v}.jpg" aria-label="${esc(d.problema)}: ${texto}"></video>`;
   sec.querySelector('.card-frame')!.innerHTML = `
-    <p class="eyebrow">Corrección ${d.n} de ${RONDAS.length} · ${esc(d.prueba)}</p>
+    <p class="eyebrow">Regla ${d.n} de ${RONDAS.length} · ${esc(d.tema)}</p>
     <h2 class="title">${esc(d.problema)}</h2>
-    <p class="pasaba">${esc(d.pasaba)}</p>
+    <p class="pasaba"><b>Ya sabíamos</b> ${esc(d.yaSabiamos)} <b>Ahora</b> ${esc(d.ahora)}</p>
     <div class="ronda-videos">
-      <figure class="rojo"><figcaption><span>Antes</span><b>${esc(d.antes)}</b></figcaption><video muted loop playsinline preload="none" data-src="/clips/r-${d.id}-antes.webm" poster="/clips/r-${d.id}-antes.jpg" aria-label="${esc(d.problema)}: versión con el error"></video></figure>
-      <figure class="verde"><figcaption><span>Después</span><b>${esc(d.despues)}</b></figcaption><video muted loop playsinline preload="none" data-src="/clips/r-${d.id}-despues.webm" poster="/clips/r-${d.id}-despues.jpg" aria-label="${esc(d.problema)}: versión corregida"></video></figure>
+      <figure class="rojo"><figcaption><span>Sin preparar</span><b>${esc(d.antes)}</b></figcaption>${video('antes', 'versión sin preparar')}</figure>
+      <figure class="verde"><figcaption><span>Preparada</span><b>${esc(d.despues)}</b></figcaption>${video('despues', 'versión preparada')}</figure>
     </div>
     <p class="medida"><b>${esc(d.mide)}</b> · ${esc(d.limite)}</p>`;
 });
 document.querySelectorAll<HTMLElement>('[data-codigo]').forEach((sec) => {
   const d = RONDAS.find((x) => x.id === sec.dataset.codigo);
   if (!d) return;
-  const panel = (tipo: string, cls: string, c: { archivo: string; texto: string }) =>
-    `<div class="code sm ${cls}"><div class="bar"><span>${tipo}</span><span>${esc(c.archivo)}</span></div><pre>${highlight(c.texto, 'js')}</pre></div>`;
   sec.querySelector('.card-frame')!.innerHTML = `
-    <p class="eyebrow">Corrección ${d.n} de ${RONDAS.length} · el código real</p>
+    <p class="eyebrow">Regla ${d.n} de ${RONDAS.length} · Cómo se implementa</p>
     <h2 class="title">${esc(d.correccion)}</h2>
-    <div class="codigo-grid">${panel('Código con el error', 'mal', d.codigoAntes)}${panel('Código corregido', 'bien', d.codigoDespues)}</div>
-    <p class="porque"><b>Por qué funciona:</b> ${esc(d.porque)}</p>${d.extra ? `<p class="extra">${d.extra}</p>` : ''}`;
+    <div class="frameworks">${d.frameworks.map((f) => `<div class="code sm"><div class="bar"><span>${esc(f.nombre)}</span></div><pre>${highlight(f.codigo, 'js')}</pre></div>`).join('')}</div>
+    <p class="porque">${esc(d.porque)}</p>`;
 });
-document.querySelectorAll<HTMLElement>('[data-objetivo]').forEach((el) => (el.innerHTML = RONDAS.map((d) => `<li><b>${d.n}</b><span>${esc(d.problema)}</span></li>`).join('')));
-document.querySelectorAll<HTMLElement>('[data-prueba]').forEach((el) => (el.innerHTML = highlight(CODIGO_PRUEBA, 'js')));
 const salida = (filas: FilaSalida[]) => filas.map((f) => `<div class="t-fila ${f.ok ? 'ok' : 'mal'}"><b>${f.ok ? '✓' : '✗'}</b><span>${esc(f.nombre)}</span><code>${esc(f.valor)}</code></div>`).join('') + `<p class="t-total">${filas.filter((f) => f.ok).length} de ${filas.length} pruebas pasaron</p>`;
 document.querySelectorAll<HTMLElement>('[data-salida]').forEach((el) => (el.innerHTML = salida(el.dataset.salida === 'final' ? SALIDA_FINAL : SALIDA_INICIAL)));
 
@@ -301,8 +298,34 @@ async function guardarVideos() {
 }
 if (!publico) void guardarVideos();
 
+// Antes de cada pregunta se avisa, y al mostrarla corre un tiempo visible para responder.
+const SEGUNDOS_PREGUNTA = 20;
+if (!publico) {
+  sections.forEach((s, i) => {
+    if (sections[i + 1]?.dataset.q) s.insertAdjacentHTML('beforeend', '<p class="aviso-pregunta"><b>Sigue una pregunta:</b> abre la app o prepárate para levantar la mano</p>');
+    if (s.dataset.q) s.querySelector('.poll-foot')?.insertAdjacentHTML('afterbegin', `<span class="pill poll-tiempo" data-tiempo>${SEGUNDOS_PREGUNTA} s</span>`);
+  });
+}
+let relojPregunta = 0;
+function iniciarTiempo(slide: HTMLElement) {
+  clearInterval(relojPregunta);
+  const el = slide.querySelector<HTMLElement>('[data-tiempo]');
+  if (!el) return;
+  let queda = SEGUNDOS_PREGUNTA;
+  el.textContent = `${queda} s`;
+  el.classList.remove('fin');
+  relojPregunta = window.setInterval(() => {
+    queda -= 1;
+    el.textContent = queda > 0 ? `${queda} s` : '¡Tiempo!';
+    if (queda > 0) return;
+    el.classList.add('fin');
+    clearInterval(relojPregunta);
+  }, 1000);
+}
+
 stage.addEventListener('slidechange', (e) => {
   const { index, slide } = (e as CustomEvent).detail as { index: number; slide: HTMLElement };
+  iniciarTiempo(slide);
   current = index;
   renderMenuList();
   playClips(slide);

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { isOnTopic } from './ask';
+import { isOnTopic, respuestaDeLaCharla } from './ask';
+import { SLIDES } from './content';
 
 describe('preguntas solo sobre la charla', () => {
   it.each([
@@ -19,4 +20,13 @@ describe('preguntas solo sobre la charla', () => {
   it.each(['¿Qué comiste hoy?', '¿Dónde compraste tu blusa?', 'hola', '¿Cuál es tu equipo de fútbol?', 'qué puta charla de MCP'])('rechaza: %s', (q) =>
     expect(isOnTopic(q)).toBe(false),
   );
+});
+
+describe('respuesta con el contenido de la charla', () => {
+  it.each([
+    ['No entendí qué es un harness', /harness/i],
+    ['¿Qué mide CLS en Core Web Vitals?', /medíamos/i],
+    ['¿Qué es la web agéntica?', /agéntica/i],
+  ])('encuentra: %s', (q, titulo) => expect(respuestaDeLaCharla(q, SLIDES)?.title).toMatch(titulo));
+  it('no inventa una respuesta', () => expect(respuestaDeLaCharla('¿Sirve con kubernetes?', SLIDES)).toBeNull());
 });

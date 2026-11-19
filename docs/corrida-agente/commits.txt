@@ -1,6 +1,0 @@
-f9ae1be Versión inicial generada con IA
-3ca9b93 Ronda 1: Renderizado
-27eafca Ronda 2: Streaming
-5ad7d0f Ronda 3: DOM
-b17cc85 Ronda 4: Accesibilidad
-2c79134 Ronda 5: Estado

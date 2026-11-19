@@ -4,33 +4,38 @@ Charla técnica para **BoyaConf 2026** (Tunja, Boyacá) de [Vanessa Aristizabal]
 
 > La UI generativa crea experiencias personalizadas, pero también nuevos retos de rendimiento. Veremos cómo optimizar el renderizado, el streaming, la reutilización del DOM y el estado para construir interfaces rápidas, fluidas y accesibles.
 
-El hilo de la charla: una web con UI generativa tiene **5 errores**. Un **harness web** (instrucciones, límites y pruebas en un navegador real) los encuentra, y un agente de código los corrige **uno por uno** hasta que las 5 pruebas pasan.
+La idea de la charla: la UI generativa cambia cómo construimos la web, pero nos enfrenta a retos que ya conocíamos en **buenas prácticas, rendimiento y accesibilidad**.
 
 | Carpeta | Qué es | URL publicada | URL local |
 |---|---|---|---|
 | [`slides/`](slides) | **Presentación** + **consola de la presentadora** en `/presenter/` + **app de asistentes** en `/live/` | https://genui-boyaconf-slides.web.app | http://localhost:5291 |
-| [`base/`](base) | **Ejemplo para probar**: la web con los 5 errores y su harness | — | — |
-| [`docs/corrida-agente/`](docs/corrida-agente) | **La corrida real del agente**: mediciones, cambios y resultado final | — | — |
-| [`demo/`](demo) | **Mercado campesino**: demo complementaria de la lista generada en streaming | https://genui-boyaconf-demo.web.app | http://localhost:5292 |
+| [`demo/ui`](demo/ui) | **Mercado generativo**: Gemini Nano elige qué interfaz mostrar según cada pedido | https://genui-boyaconf-demo.web.app/ui/ | http://localhost:5292/ui/ |
+| [`demo/tests`](demo/tests) | **Las 5 reglas** comprobadas con Playwright | — | — |
 | [`skills/frictionless-genui`](skills/frictionless-genui) | **Guía para tu agente de código** | — | — |
 
-## Los 5 errores
+## Las 5 reglas
 
-Estas cifras salen de la primera y la última ejecución del harness, guardadas en [`corridas.jsonl`](docs/corrida-agente/corridas.jsonl).
+Cifras medidas con la misma respuesta de Gemini Nano en las dos versiones de la demo. En la regla de renderizado se agrega HTML peligroso a propósito.
 
-| Prueba | Qué pasaba | Antes | Después |
-|---|---|---|---|
-| **Renderizado** | El contenido saltaba (CLS) | 0,103 | 0 |
-| **Streaming** | La web se congelaba mientras la IA generaba | 29 veces | 0 |
-| **DOM** | La web borraba la lista y la creaba otra vez | 117.460 elementos | 60 |
-| **Accesibilidad** | Un lector de pantalla no sabía qué era cada campo | 86 campos sin etiqueta | 0 |
-| **Estado** | La nota y la marca de la persona se perdían | Perdidas | Intactas |
+| Regla | Sin preparar | Preparada |
+|---|---|---|
+| **Renderizado:** HTML del modelo ejecutado | 43 veces | 0 |
+| **Streaming:** actualizaciones de pantalla | 204 | 51 |
+| **DOM:** elementos creados | 5.274 | 56 |
+| **Estado:** papa cambiada a 5 kg mientras la IA responde | Vuelve a 2 kg | Se queda en 5 kg |
+| **Accesibilidad:** avisos al lector de pantalla | 204 | 2 |
 
-## Qué es real y qué es simulado
+## Prueba la demo
 
-- **Real:** la ejecución del agente, las pruebas en Chrome, las mediciones y el código que se muestra.
-- **Simulado:** la respuesta del modelo. [`base/src/modelo.ts`](base/src/modelo.ts) reproduce una respuesta grabada para que las mediciones se puedan repetir sin red ni costo.
-- **Creado para esta charla:** la carpeta `base/` es un ejemplo, no un estándar de la industria.
+```bash
+npm run build -w demo && npm run preview -w demo
+```
+
+Abre http://localhost:5292/ui/ en Chrome. Donde Gemini Nano no está disponible, como en los celulares, la página usa una respuesta grabada de Nano y lo indica.
+
+```bash
+cd demo && npx playwright test
+```
 
 ## La app de asistentes
 
@@ -42,26 +47,6 @@ Estas cifras salen de la primera y la última ejecución del harness, guardadas 
 - **Memoria descargable** con el resumen de cada slide, tus notas y tu tejedor. Las notas nunca salen del celular.
 
 La URL pública de la presentación muestra solo el contenido. No incluye las preguntas, el muro, el podio ni los controles de presentadora.
-
-## Prueba el ejemplo
-
-Necesitas Node.js y Google Chrome.
-
-```bash
-cd base
-```
-
-```bash
-npm install
-```
-
-```bash
-npm run harness
-```
-
-La web termina en rojo. Abre tu agente de código en esa carpeta y pídele:
-
-> Sigue AGENTS.md y no termines hasta que `npm run harness` esté en 5/5.
 
 ## Correr la charla en local
 

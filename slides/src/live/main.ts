@@ -14,7 +14,7 @@ import { claimUniqueName, cleanName, randomName, TOTAL_COMBINATIONS } from '../s
 import { QUESTIONS, type QuestionId } from '../shared/questions';
 import { REACTIONS, correctCount, getRealtime, podiumKey, winnerCode, type Reaction, type Realtime, type SlideState, type Votes } from '../shared/realtime';
 import { esc } from '../shared/esc';
-import { isOnTopic } from '../shared/ask';
+import { isOnTopic, respuestaDeLaCharla } from '../shared/ask';
 
 const ICONS = { Brain, Check, CircleHelp, Download, FileText, Flame, GitBranch, Heart, MessageCircleQuestion, NotebookPen, Radio, Send, Shuffle, Sparkles, SunMoon, Trophy, Map: MapIcon, X };
 const REACTION_ICONS: Record<Reaction, IconNode> = { fire: Flame, heart: Heart, mind: Brain, ask: MessageCircleQuestion };
@@ -118,6 +118,7 @@ function paintStatus() {
   const el = $('[data-status]');
   el.classList.toggle('offline', !netOnline);
   el.textContent = netOnline ? statusText : 'Sin señal · reconectando…';
+  document.querySelectorAll<HTMLElement>('[data-nav-offline]').forEach((n) => (n.hidden = netOnline));
 }
 function setStatus(text: string) {
   statusText = text;
@@ -141,6 +142,37 @@ async function sendWithHint<T>(task: Promise<T>, onSlow: () => void): Promise<T>
   }
 }
 const QUEUED = 'Sin señal. Se enviará cuando vuelva: no cierres la app.';
+const conLimite = <T,>(tarea: Promise<T>, ms: number) => Promise.race([tarea, new Promise<never>((_, no) => setTimeout(() => no({ code: 'unavailable' }), ms))]);
+
+/** Quien entró sin señal se registra en la sesión en cuanto vuelve la conexión. */
+async function ponerseAlDia() {
+  if (!name || !store.get('joinPending', false)) return;
+  try {
+    const definitivo = await claimUniqueName(name, (n) => rt.reserveName(n));
+    if (definitivo !== name) {
+      name = definitivo;
+      store.set('name', name);
+      renderMe();
+    }
+    await rt.join(name);
+    store.set('joinPending', false);
+    await syncTejedor();
+  } catch (err) {
+    console.warn('[live] registro pendiente', err);
+  }
+}
+
+// Sin señal, cada persona puede seguir la charla por su cuenta con el contenido que ya tiene el celular.
+let navManual = false;
+const NAVEGABLES = SLIDES.filter((s) => s.kind === 'content' || s.kind === 'demo');
+const navOffline = () => `<nav class="nav-offline" data-nav-offline ${netOnline ? 'hidden' : ''} aria-label="Seguir la charla sin señal"><p>Sin señal: sigue la charla por tu cuenta.</p><div class="row"><button class="btn ghost" type="button" data-nav="-1">Anterior</button><button class="btn primary" type="button" data-nav="1">Siguiente</button></div></nav>`;
+function moverManual(paso: number) {
+  const i = NAVEGABLES.findIndex((s) => s.id === shownId);
+  navManual = true;
+  shownId = NAVEGABLES[Math.min(NAVEGABLES.length - 1, Math.max(0, i < 0 ? 0 : i + paso))].id;
+  renderLive(true);
+  scrollTo(0, 0);
+}
 
 async function boot() {
   applyTheme(store.get<Theme>('theme', 'system'));
@@ -148,6 +180,16 @@ async function boot() {
   setupMenu();
   setupReactions();
   setupFeedback();
+  $('#screen').addEventListener('click', (e) => {
+    const b = (e.target as HTMLElement).closest<HTMLElement>('[data-nav]');
+    if (b) moverManual(Number(b.dataset.nav));
+  });
+  if ('serviceWorker' in navigator && import.meta.env.PROD && !new URLSearchParams(location.search).has('local')) {
+    void navigator.serviceWorker.register('/live/sw.js', { scope: '/live/' }).catch(() => undefined);
+    addEventListener('load', () => {
+      void navigator.serviceWorker.ready.then((r) => r.active?.postMessage({ guardar: [location.pathname, ...performance.getEntriesByType('resource').map((x) => x.name).filter((u) => u.startsWith(location.origin))] }));
+    });
+  }
   rt = await getRealtime();
   const forcedLocal = new URLSearchParams(location.search).has('local');
   if (rt.mode === 'local' && !forcedLocal && import.meta.env.VITE_FIREBASE_API_KEY) {
@@ -157,8 +199,15 @@ async function boot() {
   } else {
     setStatus(rt.mode === 'local' ? 'Modo ensayo (local) · esperando el deck…' : 'Conectado · esperando el deck…');
     rt.onConnection((online) => {
+      const volvio = online && !netOnline;
       netOnline = online;
       paintStatus();
+      if (!volvio) return;
+      void ponerseAlDia();
+      if (navManual) {
+        navManual = false;
+        if (view === 'live') renderLive(true);
+      }
     });
   }
 
@@ -248,14 +297,24 @@ function renderJoin(screen: HTMLElement, msg = '') {
       $('[data-join-msg]', screen).textContent = 'Reservando tu apodo…';
       try {
         // Reserva atómica: si alguien lo tomó un segundo antes, recibes el mismo con numeración.
-        name = await sendWithHint(claimUniqueName(pick, (n) => rt.reserveName(n)), () => ($('[data-join-msg]', screen).textContent = 'La señal está débil. Seguimos intentando…'));
+        name = await sendWithHint(conLimite(claimUniqueName(pick, (n) => rt.reserveName(n)), 15000), () => ($('[data-join-msg]', screen).textContent = 'La señal está débil. Seguimos intentando…'));
         store.set('name', name);
         if (!tejedor.name) tejedor.name = name.slice(0, 18);
-        await rt.join(name);
+        await conLimite(rt.join(name), 15000);
         renderMe();
         render();
       } catch (err) {
         console.error('[live] entrar', err);
+        if ((err as { code?: string }).code === 'unavailable') {
+          // Sin señal no se bloquea a nadie: entra ya y se registra cuando vuelva la conexión.
+          name ||= pick;
+          store.set('name', name);
+          store.set('joinPending', true);
+          if (!tejedor.name) tejedor.name = name.slice(0, 18);
+          renderMe();
+          render();
+          return;
+        }
         btn.disabled = false;
         $('[data-join-msg]', screen).textContent = `No se pudo entrar. Inténtalo de nuevo. (${(err as { code?: string }).code ?? 'error'})`;
       }
@@ -274,7 +333,7 @@ function renderJoin(screen: HTMLElement, msg = '') {
 function renderLive(force = false) {
   if (!name) return renderJoin($('#screen'));
   const screen = $('#screen');
-  if (!holding()) shownId = live?.id || shownId;
+  if (!holding() && !navManual) shownId = live?.id || shownId;
   const c = shownId ? SLIDE_BY_ID.get(shownId) : undefined;
   const key = `live:${shownId ?? 'wait'}`;
   if (!force && screen.dataset.screen === key) {
@@ -288,7 +347,7 @@ function renderLive(force = false) {
   if (!c) {
     screen.innerHTML = `<section class="card-sheet"><p class="kicker">Hola, ${esc(name)}</p><h1>La charla está por empezar</h1>
       <p class="muted">Cuando la presentadora avance, aquí verás cada slide con sus ideas clave, las preguntas del podio y podrás tomar notas.</p>
-      <button class="btn wide" type="button" data-go-tejedor>${icon(Sparkles, 18)} Crear mi tejedor mientras espero</button></section>`;
+      <button class="btn wide" type="button" data-go-tejedor>${icon(Sparkles, 18)} Crear mi tejedor mientras espero</button>${navOffline()}</section>`;
     $('[data-go-tejedor]', screen).addEventListener('click', () => go('tejedor'));
     return;
   }
@@ -326,6 +385,7 @@ function renderMirror(screen: HTMLElement, c: SlideContent) {
     ${noteBoxHTML(c.id, 'Mi nota sobre este slide')}
     ${c.kind === 'demo' ? `<a class="btn wide primary" href="${PUBLIC_DEMO_URL}" target="_blank" rel="noreferrer">${icon(MapIcon, 18)} Abrir Mercado campesino (mejor en laptop con Chrome)</a>` : ''}
     <p class="muted small">Mientras escribes, tu pantalla <b>se queda en este slide</b>. Al guardar vuelves al en vivo.</p>
+    ${navOffline()}
   </section>`;
   bindNoteBox(screen, c.id, { followLiveOnSave: true });
   updateProgress(screen);
@@ -872,7 +932,7 @@ function openAsk() {
   dlg.className = 'ask-sheet';
   dlg.innerHTML = `<form>
     <h2>${icon(MessageCircleQuestion, 22)} ¿Tienes una pregunta sobre la charla?</h2>
-    <p class="fine">Cuéntale a Vanessa <b>qué parte no entendiste</b> o qué quieres saber. Le llega con tu apodo${name ? ` <b>${esc(name)}</b>` : ''}, no se proyecta y la responde al final.</p>
+    <p class="fine">Cuéntale a Vanessa <b>qué parte no entendiste</b> o qué quieres saber. Le llega con tu apodo${name ? ` <b>${esc(name)}</b>` : ''} y no se proyecta. Si el tema ya se vio, aquí mismo te mostramos lo principal.</p>
     <fieldset class="field"><legend>Tema</legend><div class="chips" role="radiogroup" aria-label="Tema">${ASK_TOPICS.map((tp, i) => `<button type="button" role="radio" aria-checked="${i === 0}" data-topic="${esc(tp)}">${esc(tp)}</button>`).join('')}</div></fieldset>
     <textarea name="q" rows="4" maxlength="280" required placeholder="Ej.: No entendí qué hace un harness"></textarea>
     <p class="fine" data-ask-msg role="status"></p>
@@ -899,19 +959,24 @@ function openAsk() {
       return;
     }
     if (Date.now() - lastAsk < 15000) return void (msg.textContent = 'Espera unos segundos antes de enviar otra.');
-    const sendBtn = dlg.querySelector<HTMLButtonElement>('[type="submit"]')!;
-    sendBtn.disabled = true;
-    msg.textContent = 'Enviando…';
+    lastAsk = Date.now();
+    // La respuesta sale del contenido que ya está en el celular: no depende de la señal.
+    const r = respuestaDeLaCharla(text, SLIDES);
+    dlg.innerHTML = `<div class="ask-res">
+      <h2>${icon(MessageCircleQuestion, 22)} ${r ? 'Esto vimos en la charla' : 'Pregunta recibida'}</h2>
+      ${r ? `<h3>${esc(r.title)}</h3><ul>${r.summary.map((p) => `<li>${esc(p)}</li>`).join('')}</ul>` : '<p>Este tema no está en los slides. Vanessa lo verá en su consola.</p>'}
+      <p class="fine" data-ask-msg role="status">Enviando tu pregunta a Vanessa…</p>
+      <button class="btn primary wide" type="button" data-cancel>Cerrar</button>
+    </div>`;
+    $('[data-cancel]', dlg).addEventListener('click', close);
+    const estado = $('[data-ask-msg]', dlg);
     try {
-      await sendWithHint(rt.ask({ name: name ?? 'Anónimo', text: `[${topic}] ${text}`.slice(0, 280), slide: (live?.label ?? '').slice(0, 80) }), () => (msg.textContent = QUEUED));
+      await sendWithHint(rt.ask({ name: name ?? 'Anónimo', text: `[${topic}] ${text}`.slice(0, 280), slide: (live?.label ?? '').slice(0, 80) }), () => (estado.textContent = QUEUED));
       void rt.react('ask').catch(() => undefined);
-      lastAsk = Date.now();
-      msg.textContent = '¡Enviada! Gracias.';
-      setTimeout(close, 1100);
+      estado.textContent = 'Tu pregunta le llegó a Vanessa.';
     } catch (err) {
       console.error('[live] pregunta', err);
-      sendBtn.disabled = false;
-      msg.textContent = `No se pudo enviar. Inténtalo de nuevo. (${(err as { code?: string }).code ?? 'error'})`;
+      estado.textContent = `No se pudo enviar a Vanessa. (${(err as { code?: string }).code ?? 'error'})`;
     }
   });
   dlg.showModal();

@@ -310,3 +310,14 @@ main { max-width: 520px; margin: 0 auto; min-height: 60dvh; }
 .rate-row button[aria-pressed='true'] { background: var(--ink); color: var(--bg); }
 .rate-ends { display: flex; justify-content: space-between; margin: 0; font-size: 12px; color: var(--ink-dim); }
 .reactions-bar button:disabled { opacity: 0.55; cursor: default; }
+
+/* Sin señal: la persona sigue la charla por su cuenta. */
+.nav-offline { display: grid; gap: 8px; margin-top: 14px; padding: 12px; border-radius: 16px; background: #ffe08a; color: #2a211b; }
+.nav-offline[hidden] { display: none; }
+.nav-offline p { margin: 0; font-size: 14px; font-weight: 700; }
+.nav-offline .btn { min-height: 44px; background: #fff; color: #2a211b; border-color: #2a211b; }
+.nav-offline .btn.primary { background: #2a211b; color: #fff; }
+.ask-res { display: grid; gap: 10px; }
+.ask-res h2, .ask-res h3, .ask-res p, .ask-res ul { margin: 0; }
+.ask-res h3 { font-size: 18px; }
+.ask-res ul { padding-left: 20px; display: grid; gap: 6px; line-height: 1.35; }

@@ -119,154 +119,118 @@
         </div>
       </section>
 
+      <section data-id="agentica" data-label="La web agéntica">
+        <div class="frame card-frame">
+          <p class="eyebrow">Y no solo la usan las personas</p>
+          <h2 class="title">La <span class="hl">web agéntica</span>: los agentes también usan la página</h2>
+          <p class="idea">Un agente puede buscar, comparar o llenar un formulario <b>por ti.</b></p>
+          <p class="idea-nota"><b>WebMCP</b> es una propuesta experimental, aún no estándar, para que la página le diga al agente qué puede hacer.</p>
+        </div>
+      </section>
+
       <section data-id="control" data-label="Cuánto control tiene la IA">
         <div class="frame card-frame">
           <p class="eyebrow">La decisión de cada equipo</p>
           <h2 class="title">¿Cuánto control <span class="hl">le damos a la IA?</span></h2>
           <ol class="beneficios niveles reveal">
-            <li style="--i: 0" class="nuestro"><small>Nuestro ejemplo</small><h3>Componentes fijos</h3><p>La IA elige datos. El equipo ya creó los componentes.</p></li>
-            <li style="--i: 1"><small>Intermedio</small><h3>Interfaz declarativa</h3><p>La IA describe la pantalla. La web la dibuja con sus reglas.</p></li>
+            <li style="--i: 0"><small>Cerrado</small><h3>Componentes fijos</h3><p>La IA elige datos. El equipo ya creó los componentes.</p></li>
+            <li style="--i: 1" class="nuestro"><small>Nuestro ejemplo</small><h3>Interfaz declarativa</h3><p>La IA describe la pantalla. La web la dibuja con sus reglas.</p></li>
             <li style="--i: 2"><small>Abierto</small><h3>Interfaz libre</h3><p>La IA escribe la interfaz. La web solo la muestra.</p></li>
           </ol>
           <p class="escala"><span>Más control del equipo</span><i aria-hidden="true"></i><span>Más libertad para la IA</span></p>
         </div>
       </section>
 
-      <section data-id="demo-app" data-label="El ejemplo de hoy">
+      <section data-id="reto" data-label="El reto">
         <div class="frame card-frame">
-          <p class="eyebrow">El ejemplo de hoy</p>
-          <h2 class="title">Una web para <span class="hl">armar el mercado de la semana</span></h2>
+          <p class="eyebrow">Lo que significa para quienes construimos la web</p>
+          <h2 class="title">La pantalla cambia <span class="hl">mientras alguien la usa</span></h2>
+          <ol class="beneficios reveal">
+            <li style="--i: 0"><h3>Buenas prácticas</h3><p>Validar también lo que llega desde la IA.</p></li>
+            <li style="--i: 1"><h3>Rendimiento</h3><p>Mostrar una respuesta que todavía no termina.</p></li>
+            <li style="--i: 2"><h3>Accesibilidad</h3><p>Que cada pantalla generada se pueda usar.</p></li>
+          </ol>
+          <p class="porque">No son retos nuevos: <b>son los que ya conocíamos, en una web que ya no es fija.</b></p>
+        </div>
+      </section>
+
+      <section data-id="demo-app" data-label="Nuestro ejemplo">
+        <div class="frame card-frame">
+          <p class="eyebrow">Veámoslo en una web real</p>
+          <h2 class="title">La misma web, <span class="hl">una interfaz distinta para cada pedido</span></h2>
           <div class="app-ej">
-            <video muted loop playsinline preload="none" data-src="/clips/generando.webm" poster="/clips/app.png" aria-label="La lista de productos aparece en la pantalla a medida que llega la respuesta"></video>
+            <video muted loop playsinline preload="none" data-src="/clips/g-tres.webm" poster="/clips/g-tres.jpg" aria-label="Demo de UI generativa"></video>
             <ol class="app-pasos">
-              <li><b>1</b><span>Presionas <strong>Armar mi mercado</strong></span></li>
-              <li><b>2</b><span>La lista aparece mientras llega la respuesta</span></li>
-              <li><b>3</b><span>Marcas lo que ya compraste y le dejas <strong>notas al vendedor</strong></span></li>
+              <li><b>1</b><span>Pido un mercado: arma una <strong>lista</strong></span></li>
+              <li><b>2</b><span>Pregunto un precio: arma un <strong>comparador</strong></span></li>
+              <li><b>3</b><span>Pregunto qué cocinar: arma una <strong>receta</strong></span></li>
+            </ol>
+          </div>
+          <p class="porque">La IA elige los componentes. <b>Gemini Nano corre aquí, en este computador.</b></p>
+        </div>
+      </section>
+
+      <section data-id="demo-roto" data-label="El problema">
+        <div class="frame card-frame">
+          <p class="eyebrow">¿Qué pasa si la uso mientras responde?</p>
+          <h2 class="title">Cambié la cantidad y <span class="hl">la IA la devolvió</span></h2>
+          <div class="app-ej">
+            <video muted loop playsinline preload="none" data-src="/clips/g-estado-antes.webm" poster="/clips/g-estado-antes.jpg" aria-label="Demo de UI generativa"></video>
+            <ol class="app-pasos">
+              <li><b>1</b><span>La IA empieza a armar mi mercado</span></li>
+              <li><b>2</b><span>Cambio la papa pastusa a <strong>5 kg</strong></span></li>
+              <li><b>3</b><span>Llega otro pedazo y <strong>vuelve a 2 kg</strong></span></li>
             </ol>
           </div>
         </div>
       </section>
 
-      <section data-id="demo-roto" data-label="El problema" class="pasos-slide">
+      <section data-id="por-que" data-label="Dónde estuvo el error" class="frase-slide">
         <div class="frame card-frame">
-          <p class="eyebrow">El problema</p>
-          <h2 class="title">Pedí un cambio y <span class="hl">se borró lo que yo había hecho</span></h2>
-          <div class="pasos">
-            <p class="paso-t"><b>1</b> Marqué la papa criolla y le dejé una nota al vendedor</p>
-            <img src="/clips/antes-1.png" alt="Papa criolla marcada con la nota bien grandes" width="1800" height="120" />
-            <p class="paso-t pide"><b>2</b> Le pedí a la IA: <em>“Sube el presupuesto”</em></p>
-            <p class="paso-t mal"><b>3</b> La lista cambió, pero mi marca y mi nota desaparecieron</p>
-            <img class="mal" src="/clips/antes-2.png" alt="La lista cambió, pero mi marca y mi nota desaparecieron" width="1800" height="120" />
+          <p class="eyebrow">¿Dónde estuvo el error?</p>
+          <p class="frase">La IA respondió bien. <span class="hl">La web no estaba preparada</span> para recibirla por partes.<small>Pasa en cualquier web que muestre respuestas mientras llegan.</small></p>
+        </div>
+      </section>
+
+      <section data-id="reglas-idea" data-label="Comprobar reglas" class="frase-slide">
+        <div class="frame card-frame">
+          <p class="eyebrow">¿Cómo encontramos estos errores?</p>
+          <p class="frase">Si cada respuesta es distinta, <span class="hl">no comparamos pantallas: comprobamos reglas.</span></p>
+        </div>
+      </section>
+
+      <section data-id="reglas" data-label="Las reglas">
+        <div class="frame card-frame">
+          <p class="eyebrow">Las reglas que siempre deben cumplirse</p>
+          <h2 class="title">Lo que ya medíamos <span class="hl">y lo que ahora sumamos</span></h2>
+          <div class="dos-listas">
+            <div><h3>Core Web Vitals</h3><ul><li><b>LCP</b> Aparece lo principal: 2,5 s o menos</li><li><b>INP</b> Responde al usarla: 200 ms o menos</li><li><b>CLS</b> La pantalla no salta: 0,1 o menos</li></ul></div>
+            <div><h3>UI generativa</h3><ul><li>No ejecuta HTML del modelo</li><li>Actualiza por tandas</li><li>Reutiliza lo que ya está</li><li>Lo de la persona gana</li><li>Avisa sin saturar</li></ul></div>
           </div>
-        </div>
-      </section>
-
-      <section data-id="por-que" data-label="Por qué pasó" class="frase-slide">
-        <div class="frame card-frame">
-          <p class="eyebrow">¿Por qué pasa esto en la UI generativa?</p>
-          <p class="frase">Cada respuesta de la IA <span class="hl">vuelve a crear la lista</span> y reemplaza lo que ya estaba.<small>Puede pasar en cualquier web, pero aquí es más fácil: la pantalla cambia con cada respuesta.</small></p>
-        </div>
-      </section>
-
-      <section data-id="objetivo" data-label="El objetivo de hoy">
-        <div class="frame card-frame">
-          <p class="eyebrow">El objetivo de esta charla</p>
-          <h2 class="title">Encontrar y corregir <span class="hl">5 errores de esta web</span></h2>
-          <ol class="objetivo" data-objetivo></ol>
-          <p class="porque">Vamos a entender cada error y a corregirlo, <b>uno por uno</b>.</p>
-        </div>
-      </section>
-
-      <section data-id="prueba" data-label="Cómo se prueba">
-        <div class="frame card-frame">
-          <p class="eyebrow">¿Cómo se hace una prueba automática?</p>
-          <h2 class="title">Un programa <span class="hl">usa la web como una persona</span></h2>
-          <div class="prueba-grid">
-            <ol class="prueba-pasos reveal">
-              <li style="--i: 0"><b>1</b>Abre la web en Chrome</li>
-              <li style="--i: 1"><b>2</b>Marca un producto y escribe una nota</li>
-              <li style="--i: 2"><b>3</b>Pide el cambio a la lista</li>
-              <li style="--i: 3"><b>4</b>Revisa si la nota sigue ahí</li>
-            </ol>
-            <div class="code sm"><div class="bar"><span>Prueba real con Playwright</span><span>harness/check.mjs</span></div><pre data-prueba></pre></div>
-          </div>
-          <p class="porque">Se ejecuta en el computador con <code>npm run harness</code>.</p>
-        </div>
-      </section>
-
-      <section data-id="para-que" data-label="Para qué nos sirve">
-        <div class="frame card-frame">
-          <p class="eyebrow">Si desarrollas para la web</p>
-          <h2 class="title">¿Para qué <span class="hl">nos sirven estas pruebas?</span></h2>
-          <ol class="beneficios reveal">
-            <li style="--i: 0"><h3>Encuentras el error antes que tus usuarios</h3><p>Falla en tu computador, no en producción.</p></li>
-            <li style="--i: 1"><h3>Cambias código con confianza</h3><p>Cada cambio, tuyo o de la IA, se comprueba otra vez.</p></li>
-            <li style="--i: 2"><h3>La IA sabe qué debe corregir</h3><p>Lee qué prueba falló y lo intenta de nuevo.</p></li>
-          </ol>
-        </div>
-      </section>
-
-      <section data-id="metricas" data-label="Core Web Vitals">
-        <div class="frame card-frame">
-          <p class="eyebrow">Cómo se mide la experiencia</p>
-          <h2 class="title"><span class="hl">Core Web Vitals</span>: tres métricas</h2>
-          <div class="metricas reveal">
-            <div class="metrica" style="--i: 0"><b>LCP</b><p>¿Cuánto tarda en aparecer lo principal?</p><span>Bueno: 2,5 s o menos</span></div>
-            <div class="metrica" style="--i: 1"><b>INP</b><p>¿Cuánto tarda en responder cuando la usas?</p><span>Bueno: 200 ms o menos</span></div>
-            <div class="metrica" style="--i: 2"><b>CLS</b><p>¿Cuánto se mueve el contenido en pantalla?</p><span>Bueno: 0,1 o menos</span></div>
-          </div>
-        </div>
-      </section>
-
-      <section data-id="medir" data-label="Cómo se mide">
-        <div class="frame card-frame">
-          <p class="eyebrow">Si la respuesta de la IA cambia</p>
-          <h2 class="title">¿Cómo medimos <span class="hl">el rendimiento?</span></h2>
-          <ol class="beneficios reveal">
-            <li style="--i: 0"><h3>La IA cambia los datos</h3><p>El código de la interfaz sigue siendo el mismo.</p></li>
-            <li style="--i: 1"><h3>Probamos con una respuesta grabada</h3><p>Siempre es igual, así podemos comparar cada corrección.</p></li>
-            <li style="--i: 2"><h3>Medimos con usuarios reales</h3><p>En producción seguimos LCP, INP y CLS.</p></li>
-          </ol>
-        </div>
-      </section>
-
-      <section data-id="inicio" data-label="Punto de partida">
-        <div class="frame card-frame">
-          <p class="eyebrow">Resultado de las pruebas en la primera versión</p>
-          <h2 class="title">La web <span class="hl">no pasó ninguna</span> de las 5 pruebas</h2>
-          <div class="terminal" data-salida="inicial"></div>
-          <p class="porque">Cada prueba fallida es un error. <b>Ahora los corregimos uno por uno.</b></p>
-        </div>
-      </section>
-
-      <section data-id="agente" data-label="Qué es un agente de IA" class="frase-slide">
-        <div class="frame card-frame">
-          <p class="eyebrow">Qué es un agente de IA</p>
-          <p class="frase">Una IA que <span class="hl">escribe y cambia código</span> por ti.<small>Por ejemplo: Claude Code, Codex o Cursor.</small></p>
         </div>
       </section>
 
       <section data-id="harness" data-label="Qué es un harness" class="frase-slide">
         <div class="frame card-frame">
-          <p class="eyebrow">Qué es un harness</p>
-          <p class="frase">Un harness <span class="hl">le da instrucciones al agente y comprueba el resultado</span> con pruebas automáticas.</p>
+          <p class="eyebrow">¿Quién comprueba esas reglas cada vez?</p>
+          <p class="frase">Un harness <span class="hl">le da instrucciones al agente y comprueba el resultado</span> con esas reglas.</p>
         </div>
       </section>
 
-      <section data-id="harness-pasos" data-label="Cómo funciona">
+      <section data-id="flujo" data-label="El nuevo flujo">
         <div class="frame card-frame">
-          <p class="eyebrow">Cómo funciona un harness</p>
-          <h2 class="title">Cuatro <span class="hl">pasos</span></h2>
+          <p class="eyebrow">Cómo cambia nuestro trabajo</p>
+          <h2 class="title">El nuevo flujo <span class="hl">de desarrollo</span></h2>
           <div class="lazo reveal">
-            <div class="lazo-p" style="--i: 0"><span class="ico"><i data-lucide="book-open"></i></span><b>1. Instrucciones</b><small>El agente las lee</small></div>
+            <div class="lazo-p" style="--i: 0"><span class="ico"><i data-lucide="message-square"></i></span><b>1. Pides</b><small>Qué debe hacer la web</small></div>
             <div class="lazo-f" style="--i: 1"></div>
-            <div class="lazo-p" style="--i: 2"><span class="ico"><i data-lucide="bot"></i></span><b>2. Código</b><small>El agente lo cambia</small></div>
+            <div class="lazo-p" style="--i: 2"><span class="ico"><i data-lucide="bot"></i></span><b>2. El agente escribe</b><small>Sigue AGENTS.md</small></div>
             <div class="lazo-f" style="--i: 3"></div>
-            <div class="lazo-p" style="--i: 4"><span class="ico"><i data-lucide="gauge"></i></span><b>3. Pruebas</b><small>Usan la web</small></div>
+            <div class="lazo-p" style="--i: 4"><span class="ico"><i data-lucide="gauge"></i></span><b>3. Se comprueba</b><small>A mano, con un agente o e2e</small></div>
             <div class="lazo-f" style="--i: 5"></div>
-            <div class="lazo-p ok" style="--i: 6"><span class="ico"><i data-lucide="check"></i></span><b>4. Entrega</b><small>Si todas pasan</small></div>
+            <div class="lazo-p ok" style="--i: 6"><span class="ico"><i data-lucide="check"></i></span><b>4. Tú revisas</b><small>Decides si se entrega</small></div>
           </div>
-          <p class="lazo-rojo reveal"><span style="--i: 7"><i data-lucide="refresh-cw"></i> Si una prueba falla, el agente corrige y vuelve a intentar.</span></p>
+          <p class="lazo-rojo reveal"><span style="--i: 7"><i data-lucide="refresh-cw"></i> Si una regla falla, el agente corrige y se comprueba otra vez.</span></p>
         </div>
       </section>
 
@@ -279,22 +243,31 @@
         </div>
       </section>
 
-      <section data-id="r-renderizado" data-label="Corrección: resultado" class="ronda-slide" data-ronda="renderizado"><div class="frame card-frame"></div></section>
+      <section data-id="inicio" data-label="Resultado">
+        <div class="frame card-frame">
+          <p class="eyebrow">Aplicamos las reglas a la demo</p>
+          <h2 class="title">La versión sin preparar <span class="hl">no cumplió ninguna</span></h2>
+          <div class="terminal" data-salida="inicial"></div>
+          <p class="porque">Cada regla es algo que ya sabíamos resolver. <b>Vamos una por una.</b></p>
+        </div>
+      </section>
 
-      <section data-id="c-renderizado" data-label="Corrección: código" class="codigo-slide" data-codigo="renderizado"><div class="frame card-frame"></div></section>
+      <section data-id="r-renderizado" data-label="Regla: resultado" class="ronda-slide" data-ronda="renderizado"><div class="frame card-frame"></div></section>
 
-      <section data-id="r-streaming" data-label="Corrección: resultado" class="ronda-slide" data-ronda="streaming"><div class="frame card-frame"></div></section>
+      <section data-id="c-renderizado" data-label="Regla: cómo se implementa" class="codigo-slide" data-codigo="renderizado"><div class="frame card-frame"></div></section>
 
-      <section data-id="c-streaming" data-label="Corrección: código" class="codigo-slide" data-codigo="streaming"><div class="frame card-frame"></div></section>
+      <section data-id="r-streaming" data-label="Regla: resultado" class="ronda-slide" data-ronda="streaming"><div class="frame card-frame"></div></section>
 
-      <section data-id="r-dom" data-label="Corrección: resultado" class="ronda-slide" data-ronda="dom"><div class="frame card-frame"></div></section>
+      <section data-id="c-streaming" data-label="Regla: cómo se implementa" class="codigo-slide" data-codigo="streaming"><div class="frame card-frame"></div></section>
 
-      <section data-id="c-dom" data-label="Corrección: código" class="codigo-slide" data-codigo="dom"><div class="frame card-frame"></div></section>
+      <section data-id="r-dom" data-label="Regla: resultado" class="ronda-slide" data-ronda="dom"><div class="frame card-frame"></div></section>
 
-      <section data-id="vecino" data-label="Explícale a tu vecino" class="frase-slide">
+      <section data-id="c-dom" data-label="Regla: cómo se implementa" class="codigo-slide" data-codigo="dom"><div class="frame card-frame"></div></section>
+
+      <section data-id="vecino" data-label="Conversa" class="frase-slide">
         <div class="frame card-frame">
           <p class="eyebrow">20 segundos con quien tengas al lado</p>
-          <p class="frase">De estos 3 errores, <span class="hl">¿cuál has visto en una web?</span><small>Contenido que salta · web congelada · lista que se borra</small></p>
+          <p class="frase">En tu proyecto, <span class="hl">¿cuál de estos retos ya has visto?</span><small>Contenido sin revisar · actualizaciones de más · interfaz reconstruida</small></p>
         </div>
       </section>
 
@@ -307,32 +280,25 @@
         </div>
       </section>
 
-      <section data-id="r-accesibilidad" data-label="Corrección: resultado" class="ronda-slide" data-ronda="accesibilidad"><div class="frame card-frame"></div></section>
+      <section data-id="r-estado" data-label="Regla: resultado" class="ronda-slide" data-ronda="estado"><div class="frame card-frame"></div></section>
 
-      <section data-id="c-accesibilidad" data-label="Corrección: código" class="codigo-slide" data-codigo="accesibilidad"><div class="frame card-frame"></div></section>
+      <section data-id="c-estado" data-label="Regla: cómo se implementa" class="codigo-slide" data-codigo="estado"><div class="frame card-frame"></div></section>
 
-      <section data-id="r-estado" data-label="Corrección: resultado" class="ronda-slide" data-ronda="estado"><div class="frame card-frame"></div></section>
+      <section data-id="r-accesibilidad" data-label="Regla: resultado" class="ronda-slide" data-ronda="accesibilidad"><div class="frame card-frame"></div></section>
 
-      <section data-id="c-estado" data-label="Corrección: código" class="codigo-slide" data-codigo="estado"><div class="frame card-frame"></div></section>
+      <section data-id="c-accesibilidad" data-label="Regla: cómo se implementa" class="codigo-slide" data-codigo="accesibilidad"><div class="frame card-frame"></div></section>
 
-      <section data-id="verde" data-label="Todo pasó">
+      <section data-id="demo-sano" data-label="La demo preparada">
         <div class="frame card-frame">
-          <p class="eyebrow">Corregimos los 5 errores, uno por uno</p>
-          <h2 class="title">La web <span class="hl">pasó las 5 pruebas</span></h2>
-          <div class="terminal" data-salida="final"></div>
-        </div>
-      </section>
-
-      <section data-id="demo-sano" data-label="La web corregida" class="pasos-slide">
-        <div class="frame card-frame">
-          <p class="eyebrow">La web corregida: repito los mismos pasos</p>
-          <h2 class="title">Ahora <span class="hl">mi marca y mi nota siguen ahí</span></h2>
-          <div class="pasos">
-            <p class="paso-t"><b>1</b> Marqué la papa criolla y le dejé una nota al vendedor</p>
-            <img src="/clips/despues-1.png" alt="Papa criolla marcada con la nota bien grandes" width="1800" height="120" />
-            <p class="paso-t pide"><b>2</b> Le pedí a la IA: <em>“Sube el presupuesto”</em></p>
-            <p class="paso-t bien"><b>3</b> La lista cambió y no perdí nada</p>
-            <img class="bien" src="/clips/despues-2.png" alt="La lista cambió y no perdí nada" width="1800" height="120" />
+          <p class="eyebrow">La misma demo, con la misma respuesta de la IA</p>
+          <h2 class="title">Mi cambio se queda y <span class="hl">las 5 reglas se cumplen</span></h2>
+          <div class="app-ej">
+            <video muted loop playsinline preload="none" data-src="/clips/g-estado-despues.webm" poster="/clips/g-estado-despues.jpg" aria-label="Demo de UI generativa"></video>
+            <ol class="app-pasos">
+              <li><b>1</b><span>Cambio la papa a <strong>5 kg</strong> y se queda</span></li>
+              <li><b>2</b><span>La IA deja su sugerencia y <strong>yo decido</strong></span></li>
+              <li><b>3</b><span>La web cumple las <strong>5 reglas</strong></span></li>
+            </ol>
           </div>
         </div>
       </section>
@@ -340,44 +306,40 @@
       <section data-id="frase" data-label="La idea" class="frase-slide">
         <div class="frame card-frame">
           <p class="eyebrow">Lo que aprendimos</p>
-          <p class="frase">La IA construye la página. <span class="hl">Las pruebas dicen si quedó bien.</span></p>
+          <p class="frase">La UI generativa cambia cómo construimos la web. <span class="hl">No cambia lo que le debemos a quien la usa.</span></p>
         </div>
       </section>
 
-      <section data-id="industria" data-label="Esto ya se usa">
+      <section data-id="industria" data-label="Herramientas">
         <div class="frame card-frame">
-          <p class="eyebrow">No es teoría</p>
-          <h2 class="title">Esto ya se usa <span class="hl">en la industria</span></h2>
+          <p class="eyebrow">¿Con qué lo aplico en mi proyecto?</p>
+          <h2 class="title">Herramientas <span class="hl">que ya existen</span></h2>
           <ul class="archivos reveal">
-            <li style="--i: 0"><code>AGENTS.md</code><span>Instrucciones para agentes de IA</span></li>
-            <li style="--i: 1"><code>Playwright</code><span>Pruebas automáticas en un navegador real</span></li>
-            <li style="--i: 2"><code>Modern Web Guidance</code><span>Guías de Chrome, Edge y Firefox para agentes de código</span></li>
-            <li style="--i: 3"><code>Web Codegen Scorer</code><span>Evalúa código generado con IA, en cualquier framework</span></li>
+            <li style="--i: 0"><code>Streamdown</code><span>Muestra respuestas de IA mientras llegan</span></li>
+            <li style="--i: 1"><code>AG-UI</code><span>Comparte el estado entre el agente y la interfaz</span></li>
+            <li style="--i: 2"><code>A2UI</code><span>Describe interfaces generadas por agentes</span></li>
+            <li style="--i: 3"><code>Playwright</code><span>Comprueba reglas en un navegador real</span></li>
           </ul>
         </div>
       </section>
 
-      <section data-id="agentica" data-label="La web agéntica">
+      <section data-id="empezar" data-label="Cómo empezar">
         <div class="frame card-frame">
-          <p class="eyebrow">Hacia dónde vamos</p>
-          <h2 class="title">La <span class="hl">web agéntica</span></h2>
-          <p class="idea">Los agentes de IA no solo construirán páginas:<br /><b>también las usarán por nosotros.</b></p>
-          <p class="idea-nota"><b>WebMCP</b> es una propuesta experimental para que una página le diga a un agente qué puede hacer en ella.</p>
+          <p class="eyebrow">¿Por dónde empiezo?</p>
+          <h2 class="title">Mañana, <span class="hl">empieza con una sola regla</span></h2>
+          <ol class="beneficios reveal">
+            <li style="--i: 0"><h3>Elige una regla</h3><p>La que más te duela hoy.</p></li>
+            <li style="--i: 1"><h3>Escríbela en AGENTS.md</h3><p>Para que el agente la siga.</p></li>
+            <li style="--i: 2"><h3>Compruébala en cada cambio</h3><p>A mano, con un agente o con e2e.</p></li>
+          </ol>
         </div>
       </section>
 
-      <section data-id="base" data-label="Tu base">
+      <section data-id="futuro" data-label="Hacia dónde vamos">
         <div class="frame card-frame">
-          <p class="eyebrow">El código de esta charla</p>
-          <h2 class="title">Prueba este <span class="hl">ejemplo</span></h2>
-          <div class="base-grid">
-            <ol class="archivos reveal">
-              <li style="--i: 0"><code>AGENTS.md</code><span>Las instrucciones para tu agente</span></li>
-              <li style="--i: 1"><code>presupuestos.json</code><span>Los límites de rendimiento</span></li>
-              <li style="--i: 2"><code>check.mjs</code><span>Las pruebas en el navegador</span></li>
-            </ol>
-            <div class="qr-card sm"><div data-qr="repo"></div><strong>Repositorio</strong><span>carpeta base/</span></div>
-          </div>
+          <p class="eyebrow">Hacia dónde vamos</p>
+          <h2 class="title">Páginas para personas <span class="hl">y también para agentes</span></h2>
+          <p class="idea">Si más agentes van a usar la web,<br /><b>estas reglas serán todavía más importantes.</b></p>
         </div>
       </section>
 
@@ -405,7 +367,7 @@
       <section data-id="cierre" data-label="Para llevar" class="frase-slide">
         <div class="frame card-frame">
           <p class="eyebrow">Para llevar</p>
-          <p class="frase">La IA construye la página. <span class="hl">Las pruebas dicen si quedó bien.</span></p>
+          <p class="frase">La UI generativa cambia cómo construimos la web. <span class="hl">No cambia lo que le debemos a quien la usa.</span></p>
         </div>
       </section>
 
