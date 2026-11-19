@@ -246,7 +246,10 @@ const openMenu = () => {
   menu.hidden = false;
   menuBtn.setAttribute('aria-expanded', 'true');
   menuBtn.setAttribute('aria-label', 'Cerrar menú');
-  menu.querySelector<HTMLElement>('a, button')?.focus();
+  // Abre en el slide actual: al final de la charla no obliga a recorrer toda la lista.
+  const actual = menu.querySelector<HTMLElement>('.slides-list [aria-current]') ?? menu.querySelector<HTMLElement>('a, button');
+  actual?.focus({ preventScroll: true });
+  if (actual) menu.scrollTop += actual.getBoundingClientRect().top - menu.getBoundingClientRect().top - (menu.clientHeight - actual.offsetHeight) / 2;
 };
 const closeMenu = () => {
   menu.hidden = true;
@@ -254,9 +257,20 @@ const closeMenu = () => {
   menuBtn.setAttribute('aria-label', 'Abrir menú');
 };
 menuBtn.addEventListener('click', () => (menu.hidden ? openMenu() : closeMenu()));
+let cerradoPorFuera = false;
 addEventListener('pointerdown', (e) => {
-  if (!menu.hidden && !menu.contains(e.target as Node) && !menuBtn.contains(e.target as Node)) closeMenu();
+  if (menu.hidden || menu.contains(e.target as Node) || menuBtn.contains(e.target as Node)) return;
+  closeMenu();
+  cerradoPorFuera = true;
 });
+// Tocar fuera solo cierra el menú: ese toque no debe cambiar de slide.
+addEventListener('click', (e) => {
+  if (!cerradoPorFuera) return;
+  cerradoPorFuera = false;
+  e.stopPropagation();
+  e.preventDefault();
+}, true);
+addEventListener('pointercancel', () => (cerradoPorFuera = false));
 menu.addEventListener('click', (e) => {
   const t = e.target as HTMLElement;
   const pickRatio = t.closest<HTMLElement>('[data-ratio-pick]')?.dataset.ratioPick as RatioMode | undefined;

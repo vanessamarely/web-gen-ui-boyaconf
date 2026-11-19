@@ -1574,3 +1574,7 @@ section[data-id='industria'] .medida { margin-top: 10px; font-size: 19px; }
 @keyframes primero-entra { from { opacity: 0; transform: scale(0.8); } }
 @media (prefers-reduced-motion: reduce) { .pill.primero { animation: none; } }
 .poll-foot { flex-wrap: wrap; row-gap: 8px; }
+
+/* Menú en celulares: usa la altura visible real y no arrastra la página al llegar al final. */
+.deck-menu-panel { max-height: calc(100vh - 80px); max-height: calc(100dvh - 76px - env(safe-area-inset-bottom)); overscroll-behavior: contain; -webkit-overflow-scrolling: touch; touch-action: pan-y; }
+.deck-menu-panel a, .deck-menu-panel button { min-height: 44px; }
