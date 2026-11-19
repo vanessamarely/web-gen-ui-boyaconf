@@ -30,7 +30,7 @@ export interface Ronda {
 }
 
 export const SALIDA_INICIAL: FilaSalida[] = [
-  { ok: false, nombre: 'Lo que escribe la IA no se ejecuta como código', valor: 'Ejecutó un código dañino' },
+  { ok: false, nombre: 'Si la respuesta de la IA trae código, la web no lo ejecuta', valor: 'Ejecutó un código dañino' },
   { ok: false, nombre: 'La pantalla se actualiza por grupos de cambios', valor: '204 actualizaciones' },
   { ok: false, nombre: 'Solo cambia lo necesario', valor: 'Creó 5.274 elementos' },
   { ok: false, nombre: 'La IA no sobrescribe lo que cambió la persona', valor: 'Volvió de 5 kg a 2 kg' },
@@ -142,7 +142,7 @@ export const RONDAS: Ronda[] = [
 ];
 
 export const SALIDA_FINAL: FilaSalida[] = [
-  { ok: true, nombre: 'Lo que escribe la IA no se ejecuta como código', valor: 'No lo ejecutó' },
+  { ok: true, nombre: 'Si la respuesta de la IA trae código, la web no lo ejecuta', valor: 'No lo ejecutó' },
   { ok: true, nombre: 'La pantalla se actualiza por grupos de cambios', valor: '51 actualizaciones' },
   { ok: true, nombre: 'Solo cambia lo necesario', valor: '56 elementos' },
   { ok: true, nombre: 'La IA no sobrescribe lo que cambió la persona', valor: 'Se queda en 5 kg' },
