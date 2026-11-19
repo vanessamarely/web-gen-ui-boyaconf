@@ -1528,3 +1528,9 @@ section[data-id='inicio'] .terminal { padding-block: 12px; } section[data-id='in
 .dos-listas li:has(> b) { display: grid; grid-template-columns: 62px minmax(0, 1fr); gap: 10px; align-items: baseline; }
 .ronda-videos figcaption b::first-letter { text-transform: uppercase; }
 .frameworks .code pre { font-variant-ligatures: none; }
+
+/* Web agéntica: hoy y con WebMCP. */
+@media (min-width: 641px) { :root:not([data-ratio='4-3']) .beneficios.dos { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.beneficios .destacado { border-top-color: var(--green); box-shadow: inset 0 0 0 2px var(--green); }
+.beneficios.dos code { font: 600 0.9em var(--mono); color: var(--green); overflow-wrap: anywhere; }
+section[data-id='agentica'] .pasaba b { color: var(--ink); }

@@ -16,6 +16,7 @@ import {
   ArrowRight,
   ArrowUpRight,
   createIcons,
+  MessageSquare,
 } from 'lucide';
 import { CHECKLIST, SLIDE_BY_ID } from '../shared/content';
 import { RONDAS, SALIDA_FINAL, SALIDA_INICIAL, type FilaSalida } from '../shared/rondas';
@@ -337,7 +338,7 @@ setTimeout(() => {
 renderMenuList();
 
 createIcons({
-  icons: { Bot, Camera, CirclePlay, GitBranch, Globe, BookOpen, Check, Eye, Gauge, RefreshCw, Trophy, Users, ArrowRight, ArrowUpRight },
+  icons: { MessageSquare, Bot, Camera, CirclePlay, GitBranch, Globe, BookOpen, Check, Eye, Gauge, RefreshCw, Trophy, Users, ArrowRight, ArrowUpRight },
   attrs: { 'stroke-width': 1.75, 'aria-hidden': 'true' },
 });
 dispatchEvent(new Event('tweakchange'));
