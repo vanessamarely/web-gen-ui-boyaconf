@@ -15,11 +15,11 @@ La idea de la charla: la UI generativa cambia cómo construimos la web, pero nos
 
 ## Las 5 reglas
 
-Cifras medidas con la misma respuesta de Gemini Nano en las dos versiones de la demo. En la regla de renderizado se agrega HTML peligroso a propósito.
+Cifras medidas con la misma respuesta de Gemini Nano en las dos versiones de la demo. En la regla de renderizado se agrega un código dañino a propósito.
 
 | Regla | Sin preparar | Preparada |
 |---|---|---|
-| **Renderizado:** HTML del modelo ejecutado | 43 veces | 0 |
+| **Renderizado:** código dañino incluido a propósito en la respuesta | Se ejecutó | No se ejecutó |
 | **Streaming:** actualizaciones de pantalla | 204 | 51 |
 | **DOM:** elementos creados | 5.274 | 56 |
 | **Estado:** papa cambiada a 5 kg mientras la IA responde | Vuelve a 2 kg | Se queda en 5 kg |

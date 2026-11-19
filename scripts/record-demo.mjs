@@ -17,7 +17,7 @@ const TIPOS = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/cs
 const srv = createServer((q, r) => { let u = normalize(q.url.split('?')[0]); if (u.endsWith('/')) u += 'index.html'; try { const b = readFileSync(join(DIST, u)); r.writeHead(200, { 'content-type': TIPOS[extname(u)] ?? 'application/octet-stream' }); r.end(b); } catch { r.writeHead(404); r.end(); } }).listen(5383);
 
 const ESCENAS = {
-  renderizado: { marcador: (m) => [['HTML peligroso ejecutado', m.xss]], antes: 'El texto del modelo se ejecuta como HTML', despues: 'El texto del modelo se muestra solo como texto' },
+  renderizado: { marcador: (m) => [['Código dañino', m.xss ? 'se ejecutó' : 'no se ejecutó']], antes: 'La web ejecuta el código que llegó en la respuesta', despues: 'La web lo muestra como texto y no lo ejecuta' },
   streaming: { marcador: (m) => [['Actualizaciones de pantalla', m.pintadas]], antes: 'Actualiza la pantalla con cada pedazo', despues: 'Actualiza la pantalla cada 100 ms' },
   dom: { marcador: (m) => [['Elementos creados', m.nodos.toLocaleString('es-CO')]], antes: 'Reconstruye toda la interfaz', despues: 'Reutiliza lo que ya está en pantalla', resaltar: true },
   estado: { marcador: (_, v) => [['Papa pastusa', `${v} kg`]], antes: 'Cambié la papa a 5 kg y la IA la devolvió a 2 kg', despues: 'Cambié la papa a 5 kg y mi cambio se queda', editar: true },
@@ -58,7 +58,7 @@ async function grabar(nombre, url, escena) {
 }
 
 const resultados = {};
-for (const [id, e] of Object.entries(ESCENAS)) for (const [version, modo] of [['antes', 'directo'], ['despues', 'preparada']]) {
+for (const [id, e] of Object.entries(ESCENAS).filter(([k]) => !process.env.SOLO || process.env.SOLO === k)) for (const [version, modo] of [['antes', 'directo'], ['despues', 'preparada']]) {
   await grabar(`g-${id}-${version}`, `http://localhost:5383/ui/?modo=${modo}&motor=grabacion${id === 'renderizado' ? '&inyectar=1' : ''}`, async (page) => {
     await page.evaluate((t) => { document.querySelector('#m-rotulo').textContent = t; }, e[version]);
     if (e.resaltar) await page.evaluate(() => new MutationObserver((l) => { for (const r of l) for (const n of r.addedNodes) if (n.classList?.contains('fila') || n.classList?.contains('bloque')) n.classList.add('m-nuevo'); }).observe(document.querySelector('[data-superficie]'), { childList: true, subtree: true }));
@@ -86,7 +86,7 @@ for (const [id, e] of Object.entries(ESCENAS)) for (const [version, modo] of [['
 }
 
 // La misma web, tres interfaces distintas.
-await grabar('g-tres', 'http://localhost:5383/ui/?modo=preparada&motor=grabacion', async (page) => {
+if (!process.env.SOLO) await grabar('g-tres', 'http://localhost:5383/ui/?modo=preparada&motor=grabacion', async (page) => {
   await page.evaluate(() => document.querySelector('#m-tablero').remove());
   for (const p of [PEDIDO, '¿Dónde está más barata la papa?', '¿Qué cocino con papa, habas y cubios?']) {
     await page.evaluate((t) => { document.querySelector('#m-rotulo').textContent = `“${t}”`; scrollTo(0, 0); }, p);

@@ -26,7 +26,7 @@ export interface Ronda {
 }
 
 export const SALIDA_INICIAL: FilaSalida[] = [
-  { ok: false, nombre: 'Lo que escribe la IA no se ejecuta como código', valor: 'Lo ejecutó 43 veces' },
+  { ok: false, nombre: 'Lo que escribe la IA no se ejecuta como código', valor: 'Ejecutó un código dañino' },
   { ok: false, nombre: 'La pantalla se actualiza por grupos de cambios', valor: '204 actualizaciones' },
   { ok: false, nombre: 'Solo cambia lo necesario', valor: 'Creó 5.274 elementos' },
   { ok: false, nombre: 'La IA no sobrescribe lo que cambió la persona', valor: 'Volvió de 5 kg a 2 kg' },
@@ -36,20 +36,20 @@ export const SALIDA_INICIAL: FilaSalida[] = [
 export const RONDAS: Ronda[] = [
   {
     id: 'renderizado', n: 1, tema: 'Renderizado',
-    problema: 'Lo que escribe la IA se mostraba sin revisar',
+    problema: 'La web ejecutó código dañino de la respuesta',
     yaSabiamos: 'no confiar en contenido externo.',
-    ahora: 'el modelo escribe parte de la interfaz.',
-    mide: 'HTML peligroso ejecutado', antes: '43 veces', despues: '0', limite: 'Agregamos ese HTML a propósito para comprobar la regla',
-    correccion: 'Muestra el texto de la IA como texto',
-    porque: 'Tu framework escapa el texto. Reserva también el espacio para que nada salte.',
+    ahora: 'eso incluye la respuesta de la IA.',
+    mide: 'Prueba de seguridad', antes: 'se ejecutó', despues: 'no se ejecutó', limite: 'Pusimos ese código a propósito para comprobar la regla',
+    correccion: 'Muestra la respuesta como texto, no como código',
+    porque: 'Si de verdad necesitas mostrar HTML, límpialo antes con un sanitizador como DOMPurify.',
     frameworks: [
-      { nombre: 'React', codigo: '<aside style={{ minHeight: 104 }}>\n  <p>{consejo}</p>\n</aside>' },
-      { nombre: 'Vue', codigo: '<aside style="min-height: 104px">\n  <p>{{ consejo }}</p>\n</aside>' },
-      { nombre: 'Angular', codigo: '<aside style="min-height: 104px">\n  <p>{{ consejo() }}</p>\n</aside>' },
-      { nombre: 'Svelte', codigo: '<aside style="min-height: 104px">\n  <p>{consejo}</p>\n</aside>' },
+      { nombre: 'React', codigo: '// Evita\n<p\n  dangerouslySetInnerHTML={{ __html: consejo }}\n/>\n// Usa\n<p>{consejo}</p>' },
+      { nombre: 'Vue', codigo: '<!-- Evita -->\n<p v-html="consejo"></p>\n<!-- Usa -->\n<p>{{ consejo }}</p>' },
+      { nombre: 'Angular', codigo: '<!-- Evita -->\n<p [innerHTML]="consejo()"></p>\n<!-- Usa -->\n<p>{{ consejo() }}</p>' },
+      { nombre: 'Svelte', codigo: '<!-- Evita -->\n<p>{@html consejo}</p>\n<!-- Usa -->\n<p>{consejo}</p>' },
     ],
-    notas: 'Empecemos por lo primero que ve la persona. Siempre supimos que no se debe confiar en contenido externo. Ahora ese contenido también lo escribe un modelo. Para comprobarlo, agregamos HTML peligroso a propósito a la respuesta: la versión sin preparar lo ejecutó 43 veces.',
-    notasCodigo: 'La solución es la que ya conocemos: mostrar el texto como texto. Los frameworks lo hacen por defecto, siempre que no usemos innerHTML ni sus equivalentes. Y si de verdad necesitas HTML, sanitízalo primero.',
+    notas: 'Empecemos por lo primero que ve la persona. Siempre supimos que el contenido externo no es confiable. Ahora la respuesta de la IA también es contenido externo. Para comprobarlo, pusimos a propósito un código dañino dentro de la respuesta. La versión sin preparar lo ejecutó. La preparada lo mostró como texto y no pasó nada.',
+    notasCodigo: 'Cada framework tiene una forma de insertar HTML y una forma segura de mostrar texto. Arriba está lo que debemos evitar y abajo lo que debemos usar. Angular limpia lo que pasa por innerHTML, pero si solo necesitas texto, usa interpolación. Y si de verdad necesitas HTML, límpialo antes con un sanitizador como DOMPurify.',
     time: '10:40', timeCodigo: '11:15',
   },
   {
@@ -127,7 +127,7 @@ export const RONDAS: Ronda[] = [
 ];
 
 export const SALIDA_FINAL: FilaSalida[] = [
-  { ok: true, nombre: 'Lo que escribe la IA no se ejecuta como código', valor: '0 veces' },
+  { ok: true, nombre: 'Lo que escribe la IA no se ejecuta como código', valor: 'No lo ejecutó' },
   { ok: true, nombre: 'La pantalla se actualiza por grupos de cambios', valor: '51 actualizaciones' },
   { ok: true, nombre: 'Solo cambia lo necesario', valor: '56 elementos' },
   { ok: true, nombre: 'La IA no sobrescribe lo que cambió la persona', valor: 'Se queda en 5 kg' },

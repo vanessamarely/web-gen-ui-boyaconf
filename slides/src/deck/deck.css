@@ -1526,3 +1526,5 @@ section[data-id='industria'] .archivos { gap: 9px; } section[data-id='industria'
 @media (max-width: 640px) { deck-stage > section .dos-listas, deck-stage > section .frameworks { grid-template-columns: minmax(0, 1fr); } deck-stage > section .dos-listas li { font-size: 17px; } deck-stage > section .frameworks .code pre { font-size: 13px; } }
 section[data-id='inicio'] .terminal { padding-block: 12px; } section[data-id='inicio'] .t-fila { padding: 7px 0; }
 .dos-listas li:has(> b) { display: grid; grid-template-columns: 62px minmax(0, 1fr); gap: 10px; align-items: baseline; }
+.ronda-videos figcaption b::first-letter { text-transform: uppercase; }
+.frameworks .code pre { font-variant-ligatures: none; }
