@@ -871,7 +871,7 @@ function mostrarSticker(screen: HTMLElement) {
   const caja = document.createElement('div');
   caja.className = 'sticker-cta';
   caja.dataset.sticker = '';
-  caja.innerHTML = `<p><b>¡Reclama tu sticker!</b> Compártelo en tus historias y etiqueta a <b>@boyaca.dev</b> y <b>@vanessamarelycode</b>.</p>
+  caja.innerHTML = `<p><b>¡Reclama tu sticker!</b> Compártelo en tus historias de Instagram y etiqueta a <b>@boyaca.dev</b> y <b>@vanessamarelycode</b>. En LinkedIn, menciona a <b>Boyacá Dev</b>.</p>
     <div class="row"><button class="btn primary" type="button" data-sticker-share>${icon(Send, 18)} Compartir sticker</button><button class="btn ghost" type="button" data-sticker-dl>${icon(Download, 18)} Descargar</button></div>`;
   screen.querySelector('[data-msg]')?.after(caja);
   const archivo = async () => new File([await tejedorSticker(tejedor)], `sticker-${slug()}.png`, { type: 'image/png' });
