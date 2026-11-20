@@ -1589,10 +1589,6 @@ section[data-id='industria'] .medida { margin-top: 10px; font-size: 19px; }
 
 /* Escuchar al lector de pantalla. */
 .ronda-videos figure { position: relative; }
-.escuchar { position: absolute; right: 12px; bottom: 12px; z-index: 2; min-height: 40px; padding: 0 16px; border: 2px solid #2a211b; border-radius: 999px; background: #ffe08a; color: #2a211b; font: 700 17px var(--sans); cursor: pointer; }
-.nota-audio { margin: 6px 0 0; font-size: 16px; color: var(--ink-dim); text-align: center; }
-.escuchar { top: 64px; bottom: auto; }
-@media (max-width: 640px) { .escuchar { top: 40px; min-height: 36px; font-size: 14px; } }
 .beneficios .accion { display: block; margin-top: 10px; padding: 10px 14px; border-radius: 10px; background: var(--code-bg); color: var(--code-ink); font: 600 19px var(--mono); font-variant-ligatures: none; overflow-wrap: anywhere; }
 :root[data-ratio='4-3'] .beneficios .accion { font-size: 15px; }
 section[data-id='agentica'] .title { margin-bottom: 10px; }
@@ -1611,3 +1607,15 @@ deck-stage > section .card-frame > :is(.pasaba, .porque, .medida) { max-width: 1
 section[data-id='agentica'] .medida { margin-top: 6px; }
 @media (max-width: 640px) { deck-stage > section .ganas li { font-size: 16px; } }
 .app-pasos code { font: 600 0.85em var(--mono); color: var(--green); overflow-wrap: anywhere; }
+
+/* Regla 2: cuántas veces se redibuja la pantalla. */
+.diagrama { display: grid; gap: 6px; margin: 0 auto 10px; max-width: 1040px; }
+section .diagrama .dg { display: grid; grid-template-columns: 150px minmax(0, 1fr) 150px; gap: 12px; align-items: center; margin: 0; font-size: 18px; }
+.diagrama .mal { color: var(--red); font-weight: 700; } .diagrama .bien { color: var(--green); font-weight: 700; } .diagrama b { text-align: right; color: var(--ink); }
+.marcas { display: block; width: 100%; height: 22px; border-radius: 4px; }
+.marcas.muchas { background: repeating-linear-gradient(90deg, var(--red) 0 2px, transparent 2px 5px); }
+.marcas.pocas { background: repeating-linear-gradient(90deg, var(--green) 0 4px, transparent 4px 20px); }
+:root[data-ratio='4-3'] section .diagrama .dg { grid-template-columns: 110px minmax(0, 1fr) 110px; font-size: 14px; }
+@media (max-width: 640px) { deck-stage > section .diagrama .dg { grid-template-columns: 1fr; gap: 4px; font-size: 14px; } deck-stage > section .diagrama b { text-align: left; } }
+section .diagrama .marcas { display: block; width: 100%; min-width: 120px; height: 22px; border-radius: 4px; }
+section .diagrama .dg span:first-child { text-align: left; }

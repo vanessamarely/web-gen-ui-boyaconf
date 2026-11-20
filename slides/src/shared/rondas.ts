@@ -19,8 +19,8 @@ export interface Ronda {
   correccion: string;
   /** Una frase bajo el título del slide de implementación */
   idea: string;
-  /** Sus videos traen la voz sintética del lector de pantalla */
-  audio?: boolean;
+  /** Dibujo que compara cuántas veces se redibuja la pantalla */
+  diagrama?: boolean;
   /** Fragmento que se muestra como ejemplo de la prueba */
   ejemplo?: string;
   porque?: string;
@@ -69,14 +69,15 @@ export const RONDAS: Ronda[] = [
   {
     id: 'streaming', n: 2, tema: 'Streaming',
     problema: "La pantalla se redibujaba con cada pedacito de la respuesta",
-    yaSabiamos: "no redibujar de más, como en un buscador con debounce.",
-    ahora: "la respuesta de la IA llega en cientos de pedacitos.",
+    yaSabiamos: "no redibujar con cada tecla, como en un buscador.",
+    ahora: "la IA envía su respuesta en cientos de pedacitos.",
     mide: "Veces que se redibujó la pantalla", antes: '204', despues: '51', limite: "En esta demo no se congeló, pero es trabajo de más: en un celular sencillo sí se nota",
-    correccion: "Redibuja cada 100 ms, no con cada pedacito",
-    porque: "throttle viene en librerías como lodash o es-toolkit, o puedes escribir tu propia función.",
-    evitaTitulo: "Actualizar con cada pedacito",
-    usaTitulo: "Actualizar con throttle",
-    idea: "Con throttle, la pantalla se actualiza como máximo una vez cada 100 ms, aunque lleguen muchos pedacitos.",
+    correccion: "Junta los pedacitos y redibuja cada 100 ms",
+    porque: "Para la persona se ve igual de fluido. Para el navegador es 4 veces menos trabajo. throttle viene en lodash o es-toolkit.",
+    evitaTitulo: "Redibujar con cada pedacito",
+    usaTitulo: "Redibujar cada 100 ms (throttle)",
+    idea: "Igual que en un buscador: no reaccionas a cada tecla. Aquí no redibujas con cada pedacito, sino una vez cada 100 ms con todo lo que llegó.",
+    diagrama: true,
     frameworks: [
       { nombre: "React", evita: "onTrozo = (t) => setTexto(t);", usa: "onTrozo = throttle((t) => setTexto(t), 100);" },
       { nombre: "Vue", evita: "onTrozo = (t) => (texto.value = t);", usa: "onTrozo = throttle((t) => (texto.value = t), 100);" },
@@ -84,7 +85,7 @@ export const RONDAS: Ronda[] = [
       { nombre: "Svelte", evita: "onTrozo = (t) => (texto = t);", usa: "onTrozo = throttle((t) => (texto = t), 100);" },
     ],
     notas: "Ya se ve bien, pero la respuesta de la IA llega en cientos de pedacitos. La versión sin preparar redibujaba la pantalla con cada uno: 204 veces. Seamos claros: en esta demo no se congeló. El problema es trabajo que nadie alcanza a ver, y en una interfaz más grande o en un celular sencillo sí se nota.",
-    notasCodigo: "Esto ya lo conocemos de los buscadores: no reaccionar a cada tecla. Aquí usamos throttle: la pantalla se actualiza como máximo cada 100 milisegundos. Pasamos de 204 actualizaciones a 51.",
+    notasCodigo: "Piensen en un buscador: no lanzamos una búsqueda con cada tecla. Aquí es igual. La IA manda cientos de pedacitos; en lugar de redibujar con cada uno, juntamos lo que llegó y redibujamos una vez cada 100 milisegundos. La persona lo ve igual de fluido, y el navegador hace 4 veces menos trabajo: de 204 redibujos a 51. En código es una sola línea con throttle.",
     time: "10:55", timeCodigo: "11:30",
   },
   {
@@ -134,7 +135,6 @@ export const RONDAS: Ronda[] = [
     problema: 'El lector de pantalla recibía un aviso tras otro',
     yaSabiamos: 'nombrar los campos y anunciar los cambios.',
     ahora: 'el contenido cambia cientos de veces en segundos.',
-    audio: true,
     mide: 'Avisos al lector de pantalla', antes: '204', despues: '2', limite: 'Campos sin nombre: de 8 a 0',
     correccion: "Avisa al empezar y al terminar, no con cada cambio",
     porque: "Además, cada campo necesita un nombre, por ejemplo: aria-label=\"Cantidad de papa\".",
