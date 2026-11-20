@@ -20,3 +20,4 @@ body { margin: 0 auto; max-width: 860px; padding: 18px 16px 150px; background: v
 .pasos { margin: 12px 0 0; padding-left: 22px; line-height: 1.4; } .pasos li { margin-bottom: 6px; }
 .medidas { position: fixed; left: 0; right: 0; bottom: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; padding: 10px 12px; background: #1a0e1c; color: #fff; } .medidas div { text-align: center; } .medidas small { display: block; font-size: 12px; color: #d9cfdb; } .medidas b { font-size: 20px; }
 @media (max-width: 520px) { .fila { grid-template-columns: minmax(0, 1fr) 68px 36px 70px; font-size: 14px; } .medidas b { font-size: 16px; } .medidas small { font-size: 10px; } }
+.explica { margin: 10px 0 0; padding: 10px 14px; border-radius: 10px; background: #e9e5da; font-size: 15px; line-height: 1.35; }

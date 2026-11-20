@@ -32,6 +32,9 @@ function montar() {
   raiz.replaceChildren();
   estado.textContent = '';
   document.querySelectorAll<HTMLElement>('[data-modo]').forEach((b) => b.setAttribute('aria-checked', String(b.dataset.modo === modo)));
+  $('[data-explica]').innerHTML = modo === 'directo'
+    ? '<b>Sin preparar:</b> la web muestra la respuesta de la IA tal como llega y no cumple las 5 reglas de la charla.'
+    : '<b>Preparada:</b> la misma respuesta de la IA, pero la web cumple las 5 reglas: es segura, eficiente, respeta tus cambios y es accesible.';
 }
 document.querySelectorAll<HTMLElement>('[data-modo]').forEach((b) => b.addEventListener('click', () => { modo = b.dataset.modo!; control?.abort(); montar(); }));
 

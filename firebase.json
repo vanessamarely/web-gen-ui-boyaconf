@@ -58,6 +58,13 @@
             }
           ]
         }
+      ],
+      "redirects": [
+        {
+          "source": "/",
+          "destination": "/ui/",
+          "type": 302
+        }
       ]
     }
   ],
