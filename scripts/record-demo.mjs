@@ -17,7 +17,7 @@ const TIPOS = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/cs
 const srv = createServer((q, r) => { let u = normalize(q.url.split('?')[0]); if (u.endsWith('/')) u += 'index.html'; try { const b = readFileSync(join(DIST, u)); r.writeHead(200, { 'content-type': TIPOS[extname(u)] ?? 'application/octet-stream' }); r.end(b); } catch { r.writeHead(404); r.end(); } }).listen(5383);
 
 const ESCENAS = {
-  renderizado: { marcador: (m) => [['Código dañino', m.xss ? 'se ejecutó' : 'no se ejecutó']], antes: 'La web ejecuta el código que llegó en la respuesta', despues: 'La web lo muestra como texto y no lo ejecuta' },
+  renderizado: { marcador: (m) => [['Script en la respuesta', m.xss ? 'se ejecutó' : 'no se ejecutó']], antes: 'La web ejecuta el script que traía la respuesta', despues: 'La web lo muestra como texto y no se ejecuta' },
   streaming: { marcador: (m) => [['Actualizaciones de pantalla', m.pintadas]], antes: 'Actualiza la pantalla con cada pedazo', despues: 'Actualiza la pantalla cada 100 ms' },
   dom: { marcador: (m) => [['Elementos creados', m.nodos.toLocaleString('es-CO')]], antes: 'Reconstruye toda la interfaz', despues: 'Reutiliza lo que ya está en pantalla', resaltar: true },
   estado: { marcador: (_, v) => [['Papa pastusa', `${v} kg`]], antes: 'Cambié la papa a 5 kg y la IA la devolvió a 2 kg', despues: 'Cambié la papa a 5 kg y mi cambio se queda', editar: true },

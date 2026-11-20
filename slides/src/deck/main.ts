@@ -106,7 +106,7 @@ document.querySelectorAll<HTMLElement>('[data-ronda]').forEach((sec) => {
       <figure class="rojo"><figcaption><span>Sin preparar</span><b>${esc(d.antes)}</b></figcaption>${video('antes', 'versión sin preparar')}</figure>
       <figure class="verde"><figcaption><span>Preparada</span><b>${esc(d.despues)}</b></figcaption>${video('despues', 'versión preparada')}</figure>
     </div>
-    <p class="medida"><b>${esc(d.mide)}</b> · ${esc(d.limite)}</p>`;
+    <p class="medida"><b>${esc(d.mide)}</b> · ${esc(d.limite)}${d.ejemplo ? ` <code>${esc(d.ejemplo)}</code>` : ''}</p>`;
 });
 document.querySelectorAll<HTMLElement>('[data-codigo]').forEach((sec) => {
   const d = RONDAS.find((x) => x.id === sec.dataset.codigo);
@@ -115,14 +115,15 @@ document.querySelectorAll<HTMLElement>('[data-codigo]').forEach((sec) => {
   sec.querySelector('.card-frame')!.innerHTML = `
     <p class="eyebrow">Regla ${d.n} de ${RONDAS.length} · Cómo se implementa</p>
     <h2 class="title">${esc(d.correccion)}</h2>
+    <p class="pasaba idea">${esc(d.idea)}</p>
     ${d.comun ? `<div class="code sm comun">${celda(d.comun)}</div>` : ''}
     <table class="matriz">
       <thead><tr><th scope="col">Framework</th><th scope="col" class="mal">✗ Evita: ${esc(d.evitaTitulo)}</th><th scope="col" class="bien">✓ Usa: ${esc(d.usaTitulo)}</th></tr></thead>
       <tbody>${d.frameworks.map((f) => `<tr><th scope="row">${esc(f.nombre)}</th><td class="mal">${celda(f.evita)}</td><td class="bien">${celda(f.usa)}</td></tr>`).join('')}</tbody>
     </table>
-    <p class="porque">${esc(d.porque)}</p>`;
+    ${d.porque ? `<p class="porque">${esc(d.porque)}</p>` : ''}`;
 });
-const salida = (filas: FilaSalida[]) => filas.map((f) => `<div class="t-fila ${f.ok ? 'ok' : 'mal'}"><b>${f.ok ? '✓' : '✗'}</b><span>${esc(f.nombre)}</span><code>${esc(f.valor)}</code></div>`).join('') + `<p class="t-total">${filas.filter((f) => f.ok).length} de ${filas.length} reglas cumplidas</p>`;
+const salida = (filas: FilaSalida[]) => `<div class="t-fila t-cab"><b></b><span>Regla</span><code>Lo que pasó en la demo</code></div>` + filas.map((f) => `<div class="t-fila ${f.ok ? 'ok' : 'mal'}"><b>${f.ok ? '✓' : '✗'}</b><span>${esc(f.nombre)}</span><code>${esc(f.valor)}</code></div>`).join('') + `<p class="t-total">${filas.filter((f) => f.ok).length} de ${filas.length} reglas cumplidas</p>`;
 document.querySelectorAll<HTMLElement>('[data-salida]').forEach((el) => (el.innerHTML = salida(el.dataset.salida === 'final' ? SALIDA_FINAL : SALIDA_INICIAL)));
 
 // ── Preguntas: texto en el deck (las respuestas NO están en el bundle) ──

@@ -17,7 +17,11 @@ export interface Ronda {
   despues: string;
   limite: string;
   correccion: string;
-  porque: string;
+  /** Una frase bajo el título del slide de implementación */
+  idea: string;
+  /** Fragmento que se muestra como ejemplo de la prueba */
+  ejemplo?: string;
+  porque?: string;
   evitaTitulo: string;
   usaTitulo: string;
   /** Código que es igual en todos los frameworks */
@@ -30,7 +34,7 @@ export interface Ronda {
 }
 
 export const SALIDA_INICIAL: FilaSalida[] = [
-  { ok: false, nombre: 'Si la respuesta de la IA trae código, la web no lo ejecuta', valor: 'Ejecutó un código dañino' },
+  { ok: false, nombre: 'Si la respuesta de la IA trae código, la web no lo ejecuta', valor: 'Ejecutó un script de la respuesta' },
   { ok: false, nombre: 'La pantalla se actualiza por grupos de cambios', valor: '204 actualizaciones' },
   { ok: false, nombre: 'Solo cambia lo necesario', valor: 'Creó 5.274 elementos' },
   { ok: false, nombre: 'La IA no sobrescribe lo que cambió la persona', valor: 'Volvió de 5 kg a 2 kg' },
@@ -40,44 +44,46 @@ export const SALIDA_INICIAL: FilaSalida[] = [
 export const RONDAS: Ronda[] = [
   {
     id: 'renderizado', n: 1, tema: 'Renderizado',
-    problema: 'La web ejecutó código dañino de la respuesta',
-    yaSabiamos: 'no confiar en contenido externo.',
-    ahora: 'eso incluye la respuesta de la IA.',
-    mide: 'Prueba de seguridad', antes: 'se ejecutó', despues: 'no se ejecutó', limite: 'Pusimos ese código a propósito para comprobar la regla',
-    correccion: "Muestra la respuesta como texto, no como código",
+    problema: "La respuesta de la IA traía un script y la web lo ejecutó",
+    yaSabiamos: "no confiar en lo que escriben los usuarios.",
+    ahora: "tampoco confiamos a ciegas en lo que responde la IA.",
+    mide: "Prueba de seguridad", antes: "lo ejecutó", despues: "solo lo mostró", limite: "Agregamos a propósito este HTML al consejo de la IA:",
+    correccion: "Muestra la respuesta de la IA como texto",
     porque: "Si de verdad necesitas mostrar HTML, límpialo antes con un sanitizador como DOMPurify.",
-    evitaTitulo: "La web lo ejecuta como HTML",
-    usaTitulo: "La web lo muestra como texto",
+    evitaTitulo: "Insertarla como HTML: se ejecuta",
+    usaTitulo: "Mostrarla como texto: no se ejecuta",
+    ejemplo: "<img src=\"x\" onerror=\"robarDatos()\">",
+    idea: "Así, si la respuesta trae ese HTML, la persona solo ve esos caracteres y nada se ejecuta.",
     frameworks: [
       { nombre: "React", evita: "<p dangerouslySetInnerHTML={{ __html: consejo }} />", usa: "<p>{consejo}</p>" },
       { nombre: "Vue", evita: "<p v-html=\"consejo\"></p>", usa: "<p>{{ consejo }}</p>" },
       { nombre: "Angular", evita: "<p [innerHTML]=\"consejo()\"></p>", usa: "<p>{{ consejo() }}</p>" },
       { nombre: "Svelte", evita: "<p>{@html consejo}</p>", usa: "<p>{consejo}</p>" },
     ],
-    notas: 'Empecemos por lo primero que ve la persona. Siempre supimos que el contenido externo no es confiable. Ahora la respuesta de la IA también es contenido externo. Para comprobarlo, pusimos a propósito un código dañino dentro de la respuesta. La versión sin preparar lo ejecutó. La preparada lo mostró como texto y no pasó nada.',
+    notas: "Empecemos por lo primero que ve la persona. Siempre supimos que no se debe confiar en lo que escriben los usuarios. Pues la respuesta de la IA es igual: puede traer contenido que copió de una reseña o de otra página. Para probarlo, agregamos a propósito al consejo de la IA una imagen con un onerror que ejecuta JavaScript. La versión sin preparar lo ejecutó. La preparada lo mostró como texto.",
     notasCodigo: 'Cada framework tiene una forma de insertar HTML y una forma segura de mostrar texto. A la izquierda está lo que debemos evitar y a la derecha lo que debemos usar. Angular limpia lo que pasa por innerHTML, pero si solo necesitas texto, usa interpolación. Y si de verdad necesitas HTML, límpialo antes con un sanitizador como DOMPurify.',
-    time: '10:40', timeCodigo: '11:15',
+    time: "9:50", timeCodigo: "10:25",
   },
   {
     id: 'streaming', n: 2, tema: 'Streaming',
-    problema: 'La pantalla se actualizaba con cada pedacito',
-    yaSabiamos: 'agrupar actualizaciones para no trabajar de más.',
-    ahora: 'la interfaz se construye mientras la respuesta llega.',
-    mide: 'Actualizaciones de pantalla', antes: '204', despues: '51', limite: 'En esta demo no se congeló: el costo fue trabajo innecesario',
-    correccion: "No actualices la pantalla con cada pedazo",
-    porque: "Cada pedazo se guarda al llegar, y la pantalla se actualiza como máximo cada 100 ms.",
-    evitaTitulo: "Actualiza con cada pedazo",
-    usaTitulo: "Actualiza una vez por tanda",
-    comun: "// Igual en todos: guarda el pedazo y espera 100 ms\nbuffer += trozo;\ntimer ??= setTimeout(() => { timer = null; mostrar(buffer); }, 100);",
+    problema: "La pantalla se redibujaba con cada pedacito de la respuesta",
+    yaSabiamos: "no redibujar de más, como en un buscador con debounce.",
+    ahora: "la respuesta de la IA llega en cientos de pedacitos.",
+    mide: "Veces que se redibujó la pantalla", antes: '204', despues: '51', limite: "En esta demo no se congeló: el costo fue trabajo de más",
+    correccion: "Redibuja cada 100 ms, no con cada pedacito",
+    porque: "throttle viene en librerías como lodash o es-toolkit, o puedes escribir tu propia función.",
+    evitaTitulo: "Actualizar con cada pedacito",
+    usaTitulo: "Actualizar con throttle",
+    idea: "Con throttle, la pantalla se actualiza como máximo una vez cada 100 ms, aunque lleguen muchos pedacitos.",
     frameworks: [
-      { nombre: "React", evita: "setTexto((t) => t + trozo);", usa: "const mostrar = (b) => setTexto(b);" },
-      { nombre: "Vue", evita: "texto.value += trozo;", usa: "const mostrar = (b) => (texto.value = b);" },
-      { nombre: "Angular", evita: "texto.update((t) => t + trozo);", usa: "const mostrar = (b) => texto.set(b);" },
-      { nombre: "Svelte", evita: "texto += trozo;", usa: "const mostrar = (b) => (texto = b);" },
+      { nombre: "React", evita: "onTrozo = (t) => setTexto(t);", usa: "onTrozo = throttle((t) => setTexto(t), 100);" },
+      { nombre: "Vue", evita: "onTrozo = (t) => (texto.value = t);", usa: "onTrozo = throttle((t) => (texto.value = t), 100);" },
+      { nombre: "Angular", evita: "onTrozo = (t) => this.texto.set(t);", usa: "onTrozo = throttle((t) => this.texto.set(t), 100);" },
+      { nombre: "Svelte", evita: "onTrozo = (t) => (texto = t);", usa: "onTrozo = throttle((t) => (texto = t), 100);" },
     ],
-    notas: 'Ya se ve bien, pero la respuesta llega por pedazos. La versión sin preparar actualizó la pantalla 204 veces. Seamos claros: en esta demo no se congeló. El problema es hacer trabajo que nadie alcanza a ver, y en una interfaz más grande eso sí se nota.',
-    notasCodigo: 'A la izquierda, cada pedazo actualiza la pantalla. A la derecha, cada pedazo solo se guarda, y la pantalla se actualiza cada 100 milisegundos. Pasamos de 204 actualizaciones a 51.',
-    time: '11:45', timeCodigo: '12:20',
+    notas: "Ya se ve bien, pero la respuesta de la IA llega en cientos de pedacitos. La versión sin preparar redibujaba la pantalla con cada uno: 204 veces. Seamos claros: en esta demo no se congeló. El problema es trabajo que nadie alcanza a ver, y en una interfaz más grande o en un celular sencillo sí se nota.",
+    notasCodigo: "Esto ya lo conocemos de los buscadores: no reaccionar a cada tecla. Aquí usamos throttle: la pantalla se actualiza como máximo cada 100 milisegundos. Pasamos de 204 actualizaciones a 51.",
+    time: "10:55", timeCodigo: "11:30",
   },
   {
     id: 'dom', n: 3, tema: 'Reutilizar el DOM',
@@ -86,9 +92,9 @@ export const RONDAS: Ronda[] = [
     ahora: 'la IA puede cambiar la estructura en cada respuesta.',
     mide: 'Elementos creados', antes: '5.274', despues: '56', limite: 'Regla de esta demo: 100 o menos',
     correccion: "Usa el id del dato como clave, no su posición",
-    porque: "La IA puede cambiar el orden. Con el id, el framework reconoce cada elemento y lo reutiliza.",
     evitaTitulo: "Clave por posición",
     usaTitulo: "Clave por id",
+    idea: "La IA puede cambiar el orden. Con el id, el framework reconoce cada producto y lo reutiliza.",
     frameworks: [
       { nombre: "React", evita: "<Fila key={i} item={p} />", usa: "<Fila key={p.id} item={p} />" },
       { nombre: "Vue", evita: "<Fila v-for=\"(p, i) in items\" :key=\"i\" />", usa: "<Fila v-for=\"p in items\" :key=\"p.id\" />" },
@@ -97,27 +103,27 @@ export const RONDAS: Ronda[] = [
     ],
     notas: 'Actualizar menos veces ayuda, pero cada actualización también debe costar menos. La versión sin preparar reconstruía toda la interfaz cada vez: 5.274 elementos para mostrar solo 56.',
     notasCodigo: 'Esto ya lo sabemos hacer: claves estables. Lo importante en UI generativa es que la clave salga del dato, como el id del producto, y no de la posición en la que el modelo decidió ponerlo.',
-    time: '12:50', timeCodigo: '13:25',
+    time: "12:00", timeCodigo: "12:35",
   },
   {
     id: 'estado', n: 4, tema: 'Estado',
-    problema: 'La IA sobrescribía lo que cambió la persona',
-    yaSabiamos: 'guardar el estado de la aplicación.',
-    ahora: 'persona, IA y agente pueden cambiar el mismo dato a la vez.',
-    mide: 'Papa pastusa después de cambiarla a 5 kg', antes: '2 kg', despues: '5 kg', limite: 'Regla: lo que cambia la persona gana',
+    problema: "Cambié la cantidad y la IA la devolvió a su valor",
+    yaSabiamos: "guardar lo que cambia el usuario.",
+    ahora: "la IA sigue enviando datos mientras la persona edita.",
+    mide: 'Papa pastusa después de cambiarla a 5 kg', antes: '2 kg', despues: '5 kg', limite: "AG-UI recomienda resolver los conflictos entre el agente y la interfaz",
     correccion: "Si la persona cambió un dato, la IA no lo sobrescribe",
-    porque: "Si la persona cambió la cantidad, se usa su valor. Si no, se usa lo que sugiere la IA.",
     evitaTitulo: "Siempre gana la IA",
     usaTitulo: "Primero lo de la persona",
+    idea: "Si la persona cambió la cantidad, se usa su valor. Si no, se usa lo que sugiere la IA.",
     frameworks: [
       { nombre: "React", evita: "const cantidad = sugerida;", usa: "const cantidad = dePersona[id] ?? sugerida;" },
       { nombre: "Vue", evita: "computed(() => sugerida.value)", usa: "computed(() => dePersona.value[id] ?? sugerida.value)" },
       { nombre: "Angular", evita: "computed(() => this.sugerida())", usa: "computed(() => this.dePersona()[id] ?? this.sugerida())" },
       { nombre: "Svelte", evita: "$derived(sugerida)", usa: "$derived(dePersona[id] ?? sugerida)" },
     ],
-    notas: 'La pantalla ya es estable. Falta la pregunta más propia de esta nueva web: ¿quién gana? El estado sí estaba guardado. El problema es que ahora dos actores cambian el mismo dato al mismo tiempo: yo puse 5 kg y la IA seguía diciendo 2.',
+    notas: "La pantalla ya es estable. Ahora una situación propia de esta nueva web. Mientras la IA seguía respondiendo, cambié la papa a 5 kilos. Llegó el siguiente pedazo de la respuesta y volvió a 2. Mi cambio sí estaba guardado: el problema es que la IA seguía enviando datos. Esto no es solo de la demo: la documentación de AG-UI, el protocolo que conecta agentes con interfaces, recomienda resolver los conflictos entre lo que cambia el agente y lo que cambia la interfaz.",
     notasCodigo: 'La regla cabe en una línea: si la persona cambió el dato, se usa su valor; si no, se usa lo que sugiere la IA. Lo mismo aplica cuando un agente actúa en la página.',
-    time: '15:15', timeCodigo: '15:50',
+    time: "13:35", timeCodigo: "14:10",
   },
   {
     id: 'accesibilidad', n: 5, tema: 'Accesibilidad',
@@ -129,6 +135,7 @@ export const RONDAS: Ronda[] = [
     porque: "Además, cada campo necesita un nombre, por ejemplo: aria-label=\"Cantidad de papa\".",
     evitaTitulo: "Anuncia cada pedazo",
     usaTitulo: "Anuncia solo el estado",
+    idea: "aria-busy indica que se está generando, y un solo mensaje avisa cuando termina.",
     frameworks: [
       { nombre: "React", evita: "<main aria-live=\"polite\">", usa: "<main aria-busy={generando}>\n<p role=\"status\">{mensaje}</p>" },
       { nombre: "Vue", evita: "<main aria-live=\"polite\">", usa: "<main :aria-busy=\"generando\">\n<p role=\"status\">{{ mensaje }}</p>" },
@@ -137,12 +144,12 @@ export const RONDAS: Ronda[] = [
     ],
     notas: 'Una web rápida también debe funcionar para quien no la ve. Quien usa un lector de pantalla recibía un aviso con cada pedazo de la respuesta: 204 en pocos segundos. Además, 8 campos no decían de qué producto eran.',
     notasCodigo: 'A la izquierda, aria-live anuncia cada pedazo que llega. A la derecha, aria-busy indica que se está generando y un solo mensaje avisa cuando empieza y cuando termina.',
-    time: '16:20', timeCodigo: '16:55',
+    time: "14:40", timeCodigo: "15:15",
   },
 ];
 
 export const SALIDA_FINAL: FilaSalida[] = [
-  { ok: true, nombre: 'Si la respuesta de la IA trae código, la web no lo ejecuta', valor: 'No lo ejecutó' },
+  { ok: true, nombre: 'Si la respuesta de la IA trae código, la web no lo ejecuta', valor: 'Lo mostró como texto' },
   { ok: true, nombre: 'La pantalla se actualiza por grupos de cambios', valor: '51 actualizaciones' },
   { ok: true, nombre: 'Solo cambia lo necesario', valor: '56 elementos' },
   { ok: true, nombre: 'La IA no sobrescribe lo que cambió la persona', valor: 'Se queda en 5 kg' },
