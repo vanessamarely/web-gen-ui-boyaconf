@@ -36,18 +36,18 @@ export const EXPRESIONES = ['Sonrisa', 'Guiño', 'Sorpresa', 'Concentrado'] as c
 
 /** El hilo que teje tu tejedor: la práctica que te llevas (lista cerrada: nada de texto libre llega al proyector). */
 export const HILOS = [
-  'Mis pruebas pasan en el navegador',
-  'La IA propone, el harness comprueba',
-  'Primero reservo el espacio',
-  'Una pintura por frame',
-  'Cada fila tiene su id',
-  'Tu nota no se borra',
+  'La IA arma la pantalla, yo pongo las reglas',
+  'Lo que dice la IA se muestra como texto',
+  'Redibujo cada 100 ms, no con cada pedacito',
+  'Mis listas usan el id como clave',
+  'Lo que cambia la persona no se pierde',
+  'Aviso al empezar y al terminar',
   'Ya tengo mi AGENTS.md',
   'Mido en un navegador real',
-  'Presupuesto de rendimiento activado',
+  'Core Web Vitals en verde',
   'Mi agente no entrega en rojo',
   'También mido la accesibilidad',
-  'Hoy instalo mi harness',
+  'Mañana empiezo con una regla',
 ] as const;
 
 export const LEYENDA =

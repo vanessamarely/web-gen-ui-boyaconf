@@ -1619,3 +1619,5 @@ section .diagrama .dg { display: grid; grid-template-columns: 150px minmax(0, 1f
 @media (max-width: 640px) { deck-stage > section .diagrama .dg { grid-template-columns: 1fr; gap: 4px; font-size: 14px; } deck-stage > section .diagrama b { text-align: left; } }
 section .diagrama .marcas { display: block; width: 100%; min-width: 120px; height: 22px; border-radius: 4px; }
 section .diagrama .dg span:first-child { text-align: left; }
+.aviso-pregunta { width: max-content; max-width: calc(100% - 40px); white-space: nowrap; font-size: 18px; padding: 6px 18px; }
+@media (max-width: 640px) { .aviso-pregunta { width: auto; white-space: normal; } }
