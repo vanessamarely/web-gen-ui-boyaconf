@@ -67,7 +67,7 @@ if (ESCENA === 'tres') {
   await page.addStyleTag({ content: 'body{zoom:.74} .ui-titulo,.b-consejo,[data-estado]{display:none!important}' });
   await page.evaluate(() => { Element.prototype.scrollIntoView = () => {}; });
   grabando = true;
-  for (const p of ['Agrega 2 kg de papa criolla', 'Cambia la arracacha a 3 kg', 'Quita las rubas']) {
+  for (const p of ['Agrega 2 kg de papa criolla', 'Cambia la arracacha a 3 kg', 'Quita las habas']) {
     await page.evaluate(() => scrollTo(0, 0));
     await page.fill('#qa', '');
     await page.type('#qa', p, { delay: 45 });

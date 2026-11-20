@@ -20,6 +20,6 @@ describe('agente sin Nano', () => {
   it.each([
     ['Agrega 2 kg de papa criolla', 'agregar_producto', 'papa-criolla', 2],
     ['Cambia la arracacha a 3 kg', 'cambiar_cantidad', 'arracacha', 3],
-    ['Quita las rubas', 'quitar_producto', 'ruba', 1],
+    ['Quita las habas', 'quitar_producto', 'habas', 1],
   ])('%s', (t, tool, id, cantidad) => expect(interpretar(t)).toEqual({ tool, args: { id, cantidad } }));
 });

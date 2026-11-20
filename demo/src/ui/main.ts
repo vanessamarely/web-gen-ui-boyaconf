@@ -90,7 +90,7 @@ montar();
 pintarMedidas();
 void motor().then((x) => { $('[data-motor]').textContent = x === 'nano' ? 'Gemini Nano en este navegador' : 'Respuesta grabada de Gemini Nano'; document.body.dataset.motor = x; });
 // ── Web agéntica: el agente usa la página con acciones ───────────────
-const PEDIDOS_AGENTE = ['Agrega 2 kg de papa criolla', 'Cambia la arracacha a 3 kg', 'Quita las rubas'];
+const PEDIDOS_AGENTE = ['Agrega 2 kg de papa criolla', 'Cambia la arracacha a 3 kg', 'Quita las habas'];
 const registro = $<HTMLElement>('[data-registro]');
 const anotar = (html: string, clase = '') => { registro.insertAdjacentHTML('afterbegin', `<li class="${clase}">${html}</li>`); while (registro.children.length > 6) registro.lastElementChild!.remove(); };
 let via: 'nativo' | 'local' = 'local';
