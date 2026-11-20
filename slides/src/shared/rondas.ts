@@ -51,7 +51,7 @@ export const RONDAS: Ronda[] = [
     ahora: "la IA puede traer contenido copiado de una reseña o de otra página.",
     mide: "Prueba de seguridad", antes: "lo ejecutó", despues: "solo lo mostró", limite: "Agregamos a propósito este HTML al consejo de la IA:",
     correccion: "Muestra la respuesta de la IA como texto",
-    porque: "Si de verdad necesitas HTML, límpialo con DOMPurify. Angular limpia [innerHTML] por defecto, pero para texto usa {{ }}.",
+    porque: "Si de verdad necesitas HTML, límpialo con DOMPurify, como recomiendan OWASP y Chrome. Angular limpia [innerHTML] por defecto, pero para texto usa {{ }}.",
     evitaTitulo: "Insertarla como HTML: se ejecuta",
     usaTitulo: "Mostrarla como texto: no se ejecuta",
     ejemplo: "<img src=\"x\" onerror=\"robarDatos()\">",
@@ -63,7 +63,7 @@ export const RONDAS: Ronda[] = [
       { nombre: "Svelte", evita: "<p>{@html consejo}</p>", usa: "<p>{consejo}</p>" },
     ],
     notas: "Empecemos por lo primero que ve la persona. Siempre supimos que no se debe confiar en lo que escriben los usuarios. Pues la respuesta de la IA es igual: puede traer contenido que copió de una reseña o de otra página. Para probarlo, agregamos a propósito al consejo de la IA una imagen con un onerror que ejecuta JavaScript. La versión sin preparar lo ejecutó. La preparada lo mostró como texto.",
-    notasCodigo: "Ojo, esto no significa que la IA solo pueda mostrar texto. En A2UI o AG-UI, la IA pide componentes visuales, como una tarjeta o un botón, y la web los dibuja con sus propios componentes. Lo que nunca hacemos es ejecutar HTML que venga en la respuesta. En la tabla, a la izquierda está lo que debemos evitar y a la derecha lo que debemos usar. Y si de verdad necesitas mostrar HTML, límpialo antes con un sanitizador como DOMPurify.",
+    notasCodigo: "Ojo, esto no significa que la IA solo pueda mostrar texto. En A2UI o AG-UI, la IA pide componentes visuales, como una tarjeta o un botón, y la web los dibuja con sus propios componentes. Lo que nunca hacemos es ejecutar HTML que venga en la respuesta. En la tabla, a la izquierda está lo que debemos evitar y a la derecha lo que debemos usar. Y si de verdad necesitas mostrar HTML, límpialo antes con un sanitizador como DOMPurify: es lo que recomiendan OWASP, la referencia de seguridad web, y la guía de Chrome para mostrar respuestas de modelos de IA.",
     time: "9:50", timeCodigo: "10:25",
   },
   {
