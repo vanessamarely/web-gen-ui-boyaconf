@@ -1,5 +1,5 @@
 // Mercado generativo: la misma web muestra una interfaz distinta según cada pedido.
-import { motor, pedirAlModelo, PEDIDOS, prueba, ultima } from './modelo';
+import { estadoMotor, motor, pedirAlModelo, PEDIDOS, prueba, ultima } from './modelo';
 import { VistaDirecta } from './directo';
 import { VistaPreparada } from './preparada';
 import { conteo } from './conteo';
@@ -36,7 +36,7 @@ function pintarCwv() {
 }
 setInterval(pintarCwv, 500);
 function pintarMedidas() {
-  $('[data-medidas]').innerHTML = [['Script ejecutado', `${(window as unknown as { __xss?: number }).__xss ?? 0} veces`], ['Actualizaciones', conteo.pintadas], ['Elementos creados', m.nodos.toLocaleString('es-CO')], ['Papa pastusa', papa()], ['Avisos al lector', m.anuncios]].map(([k, v]) => `<div><small>${k}</small><b>${v}</b></div>`).join('');
+  $('[data-medidas]').innerHTML = '<p class="medidas-t">Las 5 reglas, medidas en esta respuesta</p>' + [['Script ejecutado', `${(window as unknown as { __xss?: number }).__xss ?? 0} veces`], ['Actualizaciones', conteo.pintadas], ['Elementos creados', m.nodos.toLocaleString('es-CO')], ['Papa pastusa', papa()], ['Avisos al lector', m.anuncios]].map(([k, v]) => `<div><small>${k}</small><b>${v}</b></div>`).join('');
 }
 
 function montar() {
@@ -74,6 +74,7 @@ async function pedir(texto: string) {
     if (control === mio) progreso.hidden = true;
   }
   m.ms = Math.round(performance.now() - t0);
+  if (estadoMotor.respaldo) estado.insertAdjacentText('beforeend', ' (Gemini Nano no respondió: se usó la respuesta grabada.)');
   await new Promise((ok) => setTimeout(ok, 300));
   pintarMedidas();
   document.body.dataset.listo = String(Date.now());

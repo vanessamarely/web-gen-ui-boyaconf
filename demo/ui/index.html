@@ -19,12 +19,13 @@
     <p class="explica" data-explica></p>
     <label class="prueba"><input type="checkbox" data-prueba /> Prueba de seguridad: incluir un script en la respuesta de la IA</label>
     <form class="pedido" data-pedido>
+      <h2 class="zona">UI generativa: la IA arma la pantalla</h2>
       <label for="q">¿Qué necesitas de la plaza?</label>
       <div class="pedido-fila"><input id="q" autocomplete="off" required /><button type="submit">Pedir</button></div>
       <div class="chips" data-chips></div>
     </form>
     <section class="agente" aria-labelledby="agente-t">
-      <h2 id="agente-t">Web agéntica: un agente usa esta página</h2>
+      <h2 id="agente-t" class="zona">Web agéntica: un agente usa la página</h2>
       <p class="agente-nota">El agente no ve la pantalla: llama acciones que la página publica, como <code>agregar_producto</code>.</p>
       <form class="pedido-fila" data-agente><label class="sr" for="qa">Pídele al agente</label><input id="qa" autocomplete="off" placeholder="Ej.: agrega 2 kg de papa criolla" /><button type="submit">Pedir al agente</button></form>
       <div class="chips" data-chips-agente></div>
@@ -34,7 +35,7 @@
     <p class="estado" data-estado role="status"></p>
     <main id="superficie" class="superficie" data-superficie></main>
     <p class="cwv" data-cwv aria-label="Core Web Vitals de esta visita"></p>
-    <section class="medidas" aria-label="Medidas de esta respuesta" data-medidas></section>
+    <section class="medidas" aria-label="Las 5 reglas medidas en esta respuesta" data-medidas></section>
     <script type="module" src="/src/ui/main.ts"></script>
   </body>
 </html>

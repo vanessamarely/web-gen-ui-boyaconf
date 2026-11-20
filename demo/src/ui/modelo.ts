@@ -50,17 +50,39 @@ async function* conPrueba(fuente: AsyncGenerator<string>): AsyncGenerator<string
 export function pedirAlModelo(pedido: string, signal?: AbortSignal): AsyncGenerator<string> {
   return conPrueba(desdeElModelo(pedido, signal));
 }
+/** Si Nano no responde, la demo sigue con la respuesta grabada y lo avisa. */
+export const estadoMotor = { respaldo: false };
 async function* desdeElModelo(pedido: string, signal?: AbortSignal): AsyncGenerator<string> {
-  if ((await motor()) === 'grabacion') {
+  estadoMotor.respaldo = false;
+  if ((await motor()) === 'nano') {
+    let primero = true;
+    try {
+      for await (const t of desdeNano(pedido, signal)) {
+        primero = false;
+        yield t;
+      }
+      return;
+    } catch (e) {
+      if ((e as DOMException).name === 'AbortError' || !primero) throw e;
+      console.warn('[modelo] Gemini Nano no respondió, uso la grabación:', e);
+      estadoMotor.respaldo = true;
+    }
+  }
+  yield* desdeGrabacion(pedido, signal);
+}
+async function* desdeGrabacion(pedido: string, signal?: AbortSignal): AsyncGenerator<string> {
+  {
     const g = GRABADAS.find((x) => x.pedido === pedido) ?? GRABADAS[0];
     if (!g) throw new Error('No hay respuestas grabadas');
     for (const [t, dt] of g.trozos) {
       await espera(dt, signal);
       yield t;
     }
-    return;
   }
-  const sesion = await LM()!.create({ ...IDIOMA, signal });
+}
+async function* desdeNano(pedido: string, signal?: AbortSignal): AsyncGenerator<string> {
+  // Si Nano tarda demasiado en empezar, se usa la grabación.
+  const sesion = await Promise.race([LM()!.create({ ...IDIOMA, signal }), espera(15000, signal).then(() => { throw new Error('Nano tardó demasiado'); })]);
   const lector = sesion.promptStreaming(instrucciones(pedido), { responseConstraint: ESQUEMA, signal }).getReader();
   const trozos: [string, number][] = [];
   let previo = performance.now();

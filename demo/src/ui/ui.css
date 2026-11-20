@@ -36,3 +36,7 @@ body { margin: 0 auto; max-width: 860px; padding: 18px 16px 150px; background: v
 .registro .ok { border-left: 4px solid var(--marca); } .registro .mal { border-left: 4px solid #e5294f; } .registro .quien { font-weight: 700; margin-right: 4px; }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 .fila.por-agente { animation: por-agente 1.6s ease-out; } @keyframes por-agente { from { background: #dfe7fb; box-shadow: inset 4px 0 0 #3f5fb5; } }
+.zona { margin: 0 0 6px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--marca); }
+.agente .zona { color: #3f5fb5; }
+.medidas-t { grid-column: 1 / -1; margin: 0 0 2px; text-align: center; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: #d9cfdb; }
+.cwv { bottom: 82px; }
