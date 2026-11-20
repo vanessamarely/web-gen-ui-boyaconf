@@ -40,3 +40,4 @@ body { margin: 0 auto; max-width: 860px; padding: 18px 16px 150px; background: v
 .agente .zona { color: #3f5fb5; }
 .medidas-t { grid-column: 1 / -1; margin: 0 0 2px; text-align: center; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: #d9cfdb; }
 .cwv { bottom: 82px; }
+.agente input { flex: 1; min-width: 0; min-height: 46px; padding: 0 12px; border: 1px solid #aaa79c; border-radius: 10px; font: 16px inherit; }
