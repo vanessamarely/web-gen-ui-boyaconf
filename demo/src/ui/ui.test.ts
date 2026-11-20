@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { normalizar } from './esquema';
 import { parsearParcial } from './parcial';
-import { interpretar } from './agente';
+import { interpretar, mencionado } from './agente';
 
 describe('respuesta que llega por partes', () => {
   it('lee un texto que aún no termina', () => expect(parsearParcial('{"titulo": "Merca')).toEqual({ titulo: 'Merca' }));
@@ -22,4 +22,10 @@ describe('agente sin Nano', () => {
     ['Cambia la arracacha a 3 kg', 'cambiar_cantidad', 'arracacha', 3],
     ['Quita las habas', 'quitar_producto', 'habas', 1],
   ])('%s', (t, tool, id, cantidad) => expect(interpretar(t)).toEqual({ tool, args: { id, cantidad } }));
+});
+
+describe('el agente no cambia un producto por otro', () => {
+  it('mango no es durazno', () => expect(mencionado('Agrega 1 kg de mango', 'durazno')).toBe(false));
+  it('reconoce papa criolla', () => expect(mencionado('Quita la papa criolla', 'papa-criolla')).toBe(true));
+  it('reconoce habas', () => expect(mencionado('quita las habas', 'habas')).toBe(true));
 });

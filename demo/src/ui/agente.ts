@@ -3,6 +3,7 @@
 import { BY_ID, CATALOGO } from '../catalog';
 
 export interface Acciones {
+  cantidad?(id: string): number | null;
   agregar(id: string, cantidad: number): string | null;
   cambiar(id: string, cantidad: number): string | null;
   quitar(id: string): string | null;
@@ -34,6 +35,14 @@ export function ejecutar(acciones: Acciones, l: Llamada): string | null {
   if (l.tool === 'cambiar_cantidad') return acciones.cambiar(l.args.id, cant);
   if (l.tool === 'quitar_producto') return acciones.quitar(l.args.id);
   return 'Acción desconocida.';
+}
+
+/** El producto debe aparecer en lo que pidió la persona: así el agente no cambia una cosa por otra. */
+export function mencionado(texto: string, id: string) {
+  const t = norm(texto);
+  const p = BY_ID.get(id);
+  if (!p) return false;
+  return norm(p.nombre).split(/\s+/).filter((w) => w.length >= 4).some((w) => t.includes(w.replace(/s$/, '')));
 }
 
 const norm = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();

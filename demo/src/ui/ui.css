@@ -41,3 +41,7 @@ body { margin: 0 auto; max-width: 860px; padding: 18px 16px 150px; background: v
 .medidas-t { grid-column: 1 / -1; margin: 0 0 2px; text-align: center; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: #d9cfdb; }
 .cwv { bottom: 82px; }
 .agente input { flex: 1; min-width: 0; min-height: 46px; padding: 0 12px; border: 1px solid #aaa79c; border-radius: 10px; font: 16px inherit; }
+.aviso-agente { position: fixed; z-index: 5; top: 14px; left: 50%; transform: translateX(-50%); max-width: calc(100% - 32px); margin: 0; padding: 10px 18px; border-radius: 999px; color: #fff; font-weight: 700; box-shadow: 0 8px 24px rgba(0,0,0,.2); }
+.aviso-agente.ok { background: #3f5fb5; } .aviso-agente.mal { background: #b42343; } .aviso-agente[hidden] { display: none; }
+.fila { scroll-margin: 90px 0 190px; }
+.fila.saliendo { animation: saliendo 1.4s ease-in forwards; } @keyframes saliendo { 0% { background: #ffd9df; box-shadow: inset 4px 0 0 #b42343; } 70% { opacity: 1; } 100% { opacity: 0; } }

@@ -142,10 +142,17 @@ export class VistaPreparada {
   quitar(id: string) {
     const f = this.filas.get(id);
     if (!f) return 'Ese producto no está en la lista.';
-    f.raiz.remove();
+    // Se ve salir antes de desaparecer.
+    f.raiz.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    f.raiz.classList.add('saliendo');
+    setTimeout(() => f.raiz.remove(), 1400);
     this.filas.delete(id);
     this.dePersona.delete(id);
     return null;
+  }
+  cantidad(id: string) {
+    const f = this.filas.get(id);
+    return f ? Number(f.input.value) : null;
   }
   productos() {
     return [...this.filas.keys()];

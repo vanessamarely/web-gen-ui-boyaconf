@@ -3,7 +3,8 @@ import { estadoMotor, motor, pedirAlModelo, PEDIDOS, prueba, ultima } from './mo
 import { VistaDirecta } from './directo';
 import { VistaPreparada } from './preparada';
 import { conteo } from './conteo';
-import { decidirConNano, ejecutar, interpretar, registrar } from './agente';
+import { decidirConNano, ejecutar, interpretar, mencionado, registrar } from './agente';
+import { BY_ID } from '../catalog';
 
 const $ = <T extends HTMLElement>(s: string) => document.querySelector<T>(s)!;
 const params = new URLSearchParams(location.search);
@@ -95,6 +96,15 @@ const PEDIDOS_AGENTE = ['Agrega 2 kg de papa criolla', 'Cambia la arracacha a 3 
 const registro = $<HTMLElement>('[data-registro]');
 const anotar = (html: string, clase = '') => { registro.insertAdjacentHTML('afterbegin', `<li class="${clase}">${html}</li>`); while (registro.children.length > 6) registro.lastElementChild!.remove(); };
 let via: 'nativo' | 'local' = 'local';
+const aviso = $<HTMLElement>('[data-aviso-agente]');
+let avisoT = 0;
+function avisar(texto: string, ok: boolean) {
+  aviso.textContent = texto;
+  aviso.className = `aviso-agente ${ok ? 'ok' : 'mal'}`;
+  aviso.hidden = false;
+  clearTimeout(avisoT);
+  avisoT = window.setTimeout(() => (aviso.hidden = true), 3500);
+}
 async function usarAgente(texto: string) {
   if (!(vista instanceof VistaPreparada)) return anotar('El agente funciona en la versión <b>Preparada</b>.', 'mal');
   if (!vista.productos().length) return anotar('Primero pídele un mercado a la IA: el agente trabaja sobre esa lista.', 'mal');
@@ -106,10 +116,29 @@ async function usarAgente(texto: string) {
   } catch (e) {
     console.error(e);
   }
-  if (!llamada) return anotar('El agente no encontró una acción para ese pedido.', 'mal');
+  // Si el producto no aparece en el pedido, el agente no inventa uno parecido.
+  if (llamada && !mencionado(texto, llamada.args.id)) llamada = interpretar(texto);
+  if (!llamada) {
+    anotar('El agente no encontró ese producto en la plaza, así que no cambió nada.', 'mal');
+    return avisar('Ese producto no existe en esta plaza', false);
+  }
+  const nombre = BY_ID.get(llamada.args.id)!.nombre;
+  const unidad = BY_ID.get(llamada.args.id)!.unidad;
+  const antes = vista.cantidad(llamada.args.id);
   const args = `{ id: "${llamada.args.id}"${llamada.tool === 'quitar_producto' ? '' : `, cantidad: ${llamada.args.cantidad ?? 1}`} }`;
   const error = ejecutar(vista, llamada);
-  anotar(`<span class="quien">${nano ? 'Gemini Nano' : 'Agente'}</span> llamó <code>${llamada.tool}(${args})</code>${error ? ` · ${error}` : ' ✓'}`, error ? 'mal' : 'ok');
+  const despues = vista.cantidad(llamada.args.id);
+  const resultado = error
+    ? `${nombre}: ${error.toLowerCase()}`
+    : llamada.tool === 'quitar_producto'
+      ? `${nombre}: quitado de la lista`
+      : antes === null
+        ? `${nombre}: agregado con ${despues} ${unidad}`
+        : antes === despues
+          ? `${nombre}: ya tenía ${despues} ${unidad}`
+          : `${nombre}: de ${antes} a ${despues} ${unidad}`;
+  anotar(`<span class="quien">${nano ? 'Gemini Nano' : 'Agente'}</span> llamó <code>${llamada.tool}(${args})</code><br>→ <b>${resultado}</b>`, error ? 'mal' : 'ok');
+  avisar(error ? `No se pudo: ${resultado}` : `El agente cambió tu lista · ${resultado}`, !error);
 }
 $('[data-chips-agente]').innerHTML = PEDIDOS_AGENTE.map((p) => `<button type="button">${p}</button>`).join('');
 $('[data-chips-agente]').addEventListener('click', (e) => { const b = (e.target as HTMLElement).closest('button'); if (b) { $<HTMLInputElement>('#qa').value = b.textContent!; void usarAgente(b.textContent!); } });
