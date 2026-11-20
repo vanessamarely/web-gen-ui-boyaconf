@@ -1593,3 +1593,10 @@ section[data-id='industria'] .medida { margin-top: 10px; font-size: 19px; }
 .nota-audio { margin: 6px 0 0; font-size: 16px; color: var(--ink-dim); text-align: center; }
 .escuchar { top: 64px; bottom: auto; }
 @media (max-width: 640px) { .escuchar { top: 40px; min-height: 36px; font-size: 14px; } }
+.beneficios .accion { display: block; margin-top: 10px; padding: 10px 14px; border-radius: 10px; background: var(--code-bg); color: var(--code-ink); font: 600 19px var(--mono); font-variant-ligatures: none; overflow-wrap: anywhere; }
+:root[data-ratio='4-3'] .beneficios .accion { font-size: 15px; }
+section[data-id='agentica'] .title { margin-bottom: 10px; }
+section[data-id='agentica'] .pasaba { margin: 0 0 14px; }
+section[data-id='agentica'] .beneficios { margin-top: 0; }
+section[data-id='agentica'] .beneficios li { padding: 20px 22px; gap: 10px; }
+section[data-id='agentica'] .porque { margin-top: 14px; }
