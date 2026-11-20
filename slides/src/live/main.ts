@@ -871,7 +871,7 @@ function mostrarSticker(screen: HTMLElement) {
   const caja = document.createElement('div');
   caja.className = 'sticker-cta';
   caja.dataset.sticker = '';
-  caja.innerHTML = `<p><b>¡Reclama tu sticker!</b> Compártelo en tus historias y etiqueta a <b>@vanessamarelycode</b>.</p>
+  caja.innerHTML = `<p><b>¡Reclama tu sticker!</b> Compártelo en tus historias y etiqueta a <b>@boyaca.dev</b> y <b>@vanessamarelycode</b>.</p>
     <div class="row"><button class="btn primary" type="button" data-sticker-share>${icon(Send, 18)} Compartir sticker</button><button class="btn ghost" type="button" data-sticker-dl>${icon(Download, 18)} Descargar</button></div>`;
   screen.querySelector('[data-msg]')?.after(caja);
   const archivo = async () => new File([await tejedorSticker(tejedor)], `sticker-${slug()}.png`, { type: 'image/png' });
@@ -879,7 +879,7 @@ function mostrarSticker(screen: HTMLElement) {
   caja.querySelector('[data-sticker-share]')!.addEventListener('click', async () => {
     const f = await archivo();
     try {
-      if (navigator.canShare?.({ files: [f] })) await navigator.share({ files: [f], text: `Mi tejedor en BoyaConf 2026 · ${TALK_TITLE}` });
+      if (navigator.canShare?.({ files: [f] })) await navigator.share({ files: [f], text: `Mi tejedor en BoyaConf 2026 · ${TALK_TITLE} @boyaca.dev @vanessamarelycode #BoyaConf2026` });
       else downloadFile(f.name, f);
     } catch {
       /* La persona canceló el menú de compartir. */
