@@ -435,3 +435,52 @@ export function tejedorSilhouette(title = 'Sin tejedor'): string {
   </g>
   <text x="120" y="116" text-anchor="middle" font-family="system-ui, sans-serif" font-size="56" font-weight="700" fill="#8a8d8b">?</text></svg>`;
 }
+
+/** Sticker 1080×1080 con fondo transparente y borde blanco: listo para historias y WhatsApp. */
+export async function tejedorSticker(card: TejedorCard): Promise<Blob> {
+  await document.fonts?.ready;
+  const S = 1080;
+  const svg = tejedorSVG(normalizeTejedor(card.opts), `Tejedor ${card.name}`);
+  const url = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }));
+  const img = await new Promise<HTMLImageElement>((ok, no) => { const i = new Image(); i.onload = () => ok(i); i.onerror = no; i.src = url; });
+  URL.revokeObjectURL(url);
+  const h = 760, w = Math.round((h * 240) / 344), x = (S - w) / 2, y = 40;
+  // Silueta blanca: el borde recortado típico de un sticker
+  const sil = document.createElement('canvas');
+  sil.width = S; sil.height = S;
+  const sc = sil.getContext('2d')!;
+  sc.drawImage(img, x, y, w, h);
+  sc.globalCompositeOperation = 'source-in';
+  sc.fillStyle = '#fff';
+  sc.fillRect(0, 0, S, S);
+  const canvas = document.createElement('canvas');
+  canvas.width = S; canvas.height = S;
+  const ctx = canvas.getContext('2d')!;
+  const borde = document.createElement('canvas');
+  borde.width = S; borde.height = S;
+  const bc = borde.getContext('2d')!;
+  for (let a = 0; a < Math.PI * 2; a += Math.PI / 18) bc.drawImage(sil, Math.cos(a) * 18, Math.sin(a) * 18);
+  ctx.shadowColor = 'rgba(0,0,0,0.25)'; ctx.shadowBlur = 22; ctx.shadowOffsetY = 8;
+  ctx.drawImage(borde, 0, 0);
+  ctx.shadowColor = 'transparent';
+  ctx.drawImage(img, x, y, w, h);
+  // Cinta con el evento y el nombre
+  const sans = "'Manrope', system-ui, sans-serif";
+  const cinta = (texto: string, cy: number, tam: number, fondo: string, color: string, rot: number) => {
+    ctx.save();
+    ctx.translate(S / 2, cy);
+    ctx.rotate(rot);
+    ctx.font = `800 ${tam}px ${sans}`;
+    const tw = ctx.measureText(texto).width + tam * 1.4;
+    ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.roundRect(-tw / 2 - 10, -tam - 10, tw + 20, tam * 2 + 20, tam); ctx.fill();
+    ctx.fillStyle = fondo;
+    ctx.beginPath(); ctx.roundRect(-tw / 2, -tam, tw, tam * 2, tam); ctx.fill();
+    ctx.fillStyle = color; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(texto, 0, 2);
+    ctx.restore();
+  };
+  cinta(card.name, 850, 46, '#1a0e1c', '#ffe08a', -0.04);
+  cinta('BoyaConf 2026 · UI generativa', 970, 34, '#22c68d', '#1a0e1c', 0.03);
+  return new Promise((ok, no) => canvas.toBlob((b) => (b ? ok(b) : no(new Error('toBlob'))), 'image/png'));
+}

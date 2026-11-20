@@ -27,30 +27,34 @@ const espera = (ms: number, signal?: AbortSignal) => new Promise<void>((ok, no) 
   signal?.addEventListener('abort', () => (clearTimeout(t), no(new DOMException('Cancelado', 'AbortError'))), { once: true });
 });
 
-/** Solo para comprobar la seguridad: agrega HTML peligroso dentro del texto del modelo. */
-function conContenidoExterno(trozos: [string, number][]): [string, number][] {
-  if (!params.has('inyectar')) return trozos;
-  const marca = '"texto": "';
+/** Prueba de seguridad: agrega a la respuesta un HTML que ejecuta código si la web lo inserta como HTML. */
+export const prueba = { activa: params.has('inyectar') };
+export const SCRIPT_DE_PRUEBA = "<img src=x onerror='window.__xss=(window.__xss||0)+1'>";
+async function* conPrueba(fuente: AsyncGenerator<string>): AsyncGenerator<string> {
   let acumulado = '';
-  const salida: [string, number][] = [];
-  let hecho = false;
-  for (const [t, dt] of trozos) {
+  let hecho = !prueba.activa;
+  for await (const t of fuente) {
+    if (hecho) { yield t; continue; }
     const antes = acumulado.length;
     acumulado += t;
-    const i = hecho ? -1 : acumulado.lastIndexOf(marca);
-    if (i < 0 || !acumulado.slice(i + marca.length).length) { salida.push([t, dt]); continue; }
-    const corte = i + marca.length - antes;
-    salida.push([t.slice(0, corte), dt], ["<img src=x onerror='window.__xss=(window.__xss||0)+1'>", 0], [t.slice(corte), 0]);
+    const m = /"texto"\s*:\s*"/.exec(acumulado);
+    if (!m) { yield t; continue; }
+    const corte = m.index + m[0].length - antes;
+    yield t.slice(0, corte);
+    yield SCRIPT_DE_PRUEBA;
+    yield t.slice(corte);
     hecho = true;
   }
-  return salida;
 }
 
-export async function* pedirAlModelo(pedido: string, signal?: AbortSignal): AsyncGenerator<string> {
+export function pedirAlModelo(pedido: string, signal?: AbortSignal): AsyncGenerator<string> {
+  return conPrueba(desdeElModelo(pedido, signal));
+}
+async function* desdeElModelo(pedido: string, signal?: AbortSignal): AsyncGenerator<string> {
   if ((await motor()) === 'grabacion') {
     const g = GRABADAS.find((x) => x.pedido === pedido) ?? GRABADAS[0];
     if (!g) throw new Error('No hay respuestas grabadas');
-    for (const [t, dt] of conContenidoExterno(g.trozos)) {
+    for (const [t, dt] of g.trozos) {
       await espera(dt, signal);
       yield t;
     }

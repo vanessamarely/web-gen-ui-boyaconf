@@ -1600,3 +1600,14 @@ section[data-id='agentica'] .pasaba { margin: 0 0 14px; }
 section[data-id='agentica'] .beneficios { margin-top: 0; }
 section[data-id='agentica'] .beneficios li { padding: 20px 22px; gap: 10px; }
 section[data-id='agentica'] .porque { margin-top: 14px; }
+
+/* Textos sin palabras sueltas: líneas equilibradas en títulos y párrafos. */
+deck-stage > section :is(.title, .poll-q, .frase, .sec-title, .cover-title, h3) { text-wrap: balance; }
+deck-stage > section :is(.pasaba, .porque, .medida, .idea, .idea-nota, .lead, .nota-audio, p, li) { text-wrap: pretty; }
+deck-stage > section .card-frame > :is(.pasaba, .porque, .medida) { max-width: 1040px; margin-inline: auto; }
+.ganas { list-style: none; margin: 12px auto 0; padding: 0; display: grid; gap: 6px; max-width: 1040px; }
+.ganas li { font-size: 22px; line-height: 1.25; color: var(--ink); } .ganas li::before { content: '✓ '; color: var(--green); font-weight: 800; }
+:root[data-ratio='4-3'] .ganas li { font-size: 17px; }
+section[data-id='agentica'] .medida { margin-top: 6px; }
+@media (max-width: 640px) { deck-stage > section .ganas li { font-size: 16px; } }
+.app-pasos code { font: 600 0.85em var(--mono); color: var(--green); overflow-wrap: anywhere; }

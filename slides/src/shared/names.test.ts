@@ -71,3 +71,21 @@ describe('puntos del podio', () => {
     expect(scoreFor(undefined, {}, { reactions: 3 }, {})).toBe(30);
   });
 });
+
+describe('400 asistentes a la vez', () => {
+  it('nadie queda con el mismo apodo', async () => {
+    const { claimUniqueName, randomName, TOTAL_COMBINATIONS } = await import('./names');
+    const reservados = new Set<string>();
+    const reservar = async (n: string) => {
+      await new Promise((ok) => setTimeout(ok, Math.random() * 5));
+      if (reservados.has(n)) return false;
+      reservados.add(n);
+      return true;
+    };
+    let s = 3;
+    const r = () => (s = (s * 16807) % 2147483647) / 2147483647;
+    const nombres = await Promise.all(Array.from({ length: 400 }, () => claimUniqueName(randomName(r), reservar)));
+    expect(new Set(nombres).size).toBe(400);
+    expect(TOTAL_COMBINATIONS).toBeGreaterThan(400);
+  });
+});

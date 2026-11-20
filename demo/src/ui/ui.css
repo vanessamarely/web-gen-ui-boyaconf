@@ -21,3 +21,18 @@ body { margin: 0 auto; max-width: 860px; padding: 18px 16px 150px; background: v
 .medidas { position: fixed; left: 0; right: 0; bottom: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; padding: 10px 12px; background: #1a0e1c; color: #fff; } .medidas div { text-align: center; } .medidas small { display: block; font-size: 12px; color: #d9cfdb; } .medidas b { font-size: 20px; }
 @media (max-width: 520px) { .fila { grid-template-columns: minmax(0, 1fr) 68px 36px 70px; font-size: 14px; } .medidas b { font-size: 16px; } .medidas small { font-size: 10px; } }
 .explica { margin: 10px 0 0; padding: 10px 14px; border-radius: 10px; background: #e9e5da; font-size: 15px; line-height: 1.35; }
+.prueba { display: flex; gap: 8px; align-items: center; margin-top: 8px; font-size: 14px; color: var(--tenue); }
+.prueba input { width: 18px; height: 18px; }
+.progreso { margin: 8px 0 0; padding: 8px 12px; border-radius: 10px; background: var(--suave); color: #1d5636; font-weight: 600; }
+.progreso[hidden] { display: none; }
+.medidas { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.cwv { position: fixed; left: 0; right: 0; bottom: 64px; z-index: 2; display: flex; justify-content: center; gap: 14px; margin: 0; padding: 6px 10px; background: #2a1c2d; color: #fff; font: 600 13px ui-monospace, monospace; }
+.cwv .ok { color: #7ee2b8; } .cwv .mal { color: #ff8fa3; }
+.agente { margin: 14px 0 6px; padding: 14px 16px; border: 2px solid #8fa9ec; border-radius: 14px; background: #eef2fd; }
+.agente h2 { margin: 0 0 4px; font-size: 17px; } .agente-nota { margin: 0 0 10px; font-size: 14px; color: var(--tenue); } .agente-nota small { display: block; margin-top: 2px; }
+.agente code, .registro code { font: 600 13px ui-monospace, monospace; background: #fff; padding: 1px 5px; border-radius: 6px; overflow-wrap: anywhere; }
+.agente .pedido-fila button { background: #3f5fb5; }
+.registro { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 6px; font-size: 14px; } .registro li { padding: 6px 10px; border-radius: 8px; background: #fff; }
+.registro .ok { border-left: 4px solid var(--marca); } .registro .mal { border-left: 4px solid #e5294f; } .registro .quien { font-weight: 700; margin-right: 4px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.fila.por-agente { animation: por-agente 1.6s ease-out; } @keyframes por-agente { from { background: #dfe7fb; box-shadow: inset 4px 0 0 #3f5fb5; } }

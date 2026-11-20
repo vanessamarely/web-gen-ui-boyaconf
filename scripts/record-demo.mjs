@@ -26,7 +26,7 @@ const ESCENAS = {
 
 const capa = () => {
   const s = document.createElement('style');
-  s.textContent = `.cabeza,.pedido,.medidas,.estado{display:none!important} body{max-width:1120px;padding:92px 24px 90px;zoom:1}
+  s.textContent = `.cabeza,.pedido,.medidas,.estado,.explica,.prueba,.progreso,.cwv{display:none!important} body{max-width:1120px;padding:92px 24px 90px;zoom:1}
   #m-tablero{position:fixed;z-index:9;top:0;left:0;right:0;display:flex;justify-content:center;gap:48px;padding:12px;background:#1a0e1c;color:#fff;font:600 21px system-ui}
   #m-tablero b{margin-left:10px;color:#ffe08a;font-size:30px}
   #m-rotulo{position:fixed;z-index:9;left:50%;bottom:20px;transform:translateX(-50%);padding:12px 26px;border-radius:999px;background:#1a0e1c;color:#fff;font:700 25px system-ui;white-space:nowrap}

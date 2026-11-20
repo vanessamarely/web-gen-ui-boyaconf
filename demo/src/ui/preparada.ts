@@ -112,6 +112,45 @@ export class VistaPreparada {
     if (!this.dePersona.has(l.id) && document.activeElement !== f.input) f.input.value = String(l.cantidad);
     this.actualizarFila(l.id);
   }
+  // ── Acciones que el agente puede usar (las mismas que haría la persona) ──
+  private lista() {
+    return [...this.bloques.entries()].find(([k]) => !k.startsWith('comparador'))?.[1].children[1] as HTMLElement | undefined;
+  }
+  private resaltar(id: string) {
+    const f = this.filas.get(id)?.raiz;
+    f?.classList.remove('por-agente');
+    void f?.offsetWidth;
+    f?.classList.add('por-agente');
+    f?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  }
+  agregar(id: string, cantidad: number) {
+    const c = this.lista();
+    if (!c) return 'Todavía no hay una lista. Primero pídele un mercado a la IA.';
+    if (!this.filas.has(id)) this.pintarFila(c, { id, cantidad });
+    this.cambiar(id, cantidad);
+    return null;
+  }
+  cambiar(id: string, cantidad: number) {
+    const f = this.filas.get(id);
+    if (!f) return 'Ese producto no está en la lista.';
+    this.dePersona.set(id, cantidad);
+    f.input.value = String(cantidad);
+    this.actualizarFila(id);
+    this.resaltar(id);
+    return null;
+  }
+  quitar(id: string) {
+    const f = this.filas.get(id);
+    if (!f) return 'Ese producto no está en la lista.';
+    f.raiz.remove();
+    this.filas.delete(id);
+    this.dePersona.delete(id);
+    return null;
+  }
+  productos() {
+    return [...this.filas.keys()];
+  }
+
   private actualizarFila(id: string) {
     const f = this.filas.get(id)!;
     const p = BY_ID.get(id)!;

@@ -128,7 +128,24 @@
             <li style="--i: 0"><h3>Hoy: el agente adivina</h3><p>Busca el botón «Agregar», adivina dónde va la cantidad y simula clics. Si cambias el diseño, se equivoca.</p></li>
             <li style="--i: 1" class="destacado"><h3>Con WebMCP: tu web le indica</h3><p>Tu web publica la acción y el agente la llama directamente:</p><code class="accion">agregar_producto({ id: "papa", kg: 5 })</code></li>
           </ol>
-          <p class="porque"><b>Para ti:</b> funciona aunque cambies el diseño, tú decides qué puede hacer el agente y puedes pedir confirmación antes de comprar. Aún es experimental.</p>
+          <ul class="ganas reveal"><li style="--i: 2"><b>Si rediseñas tu web,</b> el agente no se rompe: la acción sigue igual.</li><li style="--i: 3"><b>Tú eliges</b> qué acciones publicas: el agente no puede hacer nada más.</li><li style="--i: 4"><b>Antes de comprar,</b> puedes pedirle confirmación a la persona.</li></ul>
+          <p class="medida">WebMCP aún es experimental.</p>
+        </div>
+      </section>
+
+      <section data-id="agente-demo" data-label="Un agente usa la demo">
+        <div class="frame card-frame">
+          <p class="eyebrow">Veámoslo en nuestra demo</p>
+          <h2 class="title">Un agente <span class="hl">usa la página con acciones</span></h2>
+          <div class="app-ej">
+            <video muted loop playsinline preload="none" data-src="/clips/g-agente.webm" poster="/clips/g-agente.jpg" aria-label="Gemini Nano llama acciones de la página para cambiar la lista del mercado"></video>
+            <ol class="app-pasos">
+              <li><b>1</b><span>Le pido: <strong>“Quita las rubas”</strong></span></li>
+              <li><b>2</b><span>Gemini Nano elige la acción <code>quitar_producto</code></span></li>
+              <li><b>3</b><span>La página la ejecuta y queda en el <strong>registro</strong></span></li>
+            </ol>
+          </div>
+          <p class="porque">El agente no hace clics: llama las acciones que la página publica. <b>La UI generativa arma la pantalla; la web agéntica la usa.</b></p>
         </div>
       </section>
 
@@ -170,7 +187,7 @@
               <li><b>3</b><span>Pregunto qué cocinar: arma una <strong>receta</strong></span></li>
             </ol>
           </div>
-          <p class="porque">La IA elige los componentes. <b>Gemini Nano corre aquí, en este computador.</b></p>
+          <p class="porque">Nadie diseñó estas tres pantallas: <b>Gemini Nano eligió la lista, el comparador y la receta.</b> Corre dentro de Chrome, en este computador.</p>
         </div>
       </section>
 
@@ -182,7 +199,7 @@
             <video muted loop playsinline preload="none" data-src="/clips/g-estado-antes.webm" poster="/clips/g-estado-antes.jpg" aria-label="Demo de UI generativa"></video>
             <ol class="app-pasos">
               <li><b>1</b><span>La IA empieza a armar mi mercado</span></li>
-              <li><b>2</b><span>Cambio la papa pastusa a <strong>5 kg</strong></span></li>
+              <li><b>2</b><span>Mientras sigue respondiendo, <strong>yo</strong> cambio la papa pastusa a <strong>5 kg</strong></span></li>
               <li><b>3</b><span>Llega otro pedazo y <strong>vuelve a 2 kg</strong></span></li>
             </ol>
           </div>
@@ -196,10 +213,14 @@
         </div>
       </section>
 
-      <section data-id="reglas-idea" data-label="Comprobar reglas" class="frase-slide">
+      <section data-id="reglas-idea" data-label="Comprobar reglas">
         <div class="frame card-frame">
           <p class="eyebrow">¿Cómo encontramos estos errores?</p>
-          <p class="frase">Si cada respuesta es distinta, <span class="hl">no comparamos pantallas: comprobamos reglas.</span></p>
+          <h2 class="title">Si cada respuesta es distinta, <span class="hl">no comparamos pantallas: comprobamos reglas</span></h2>
+          <ol class="beneficios dos reveal">
+            <li style="--i: 0"><h3>Comparar la pantalla</h3><p>«¿Muestra 2 kg de papa?» Falla en cuanto la IA sugiere 3 kg, aunque la web esté bien.</p></li>
+            <li style="--i: 1" class="destacado"><h3>Comprobar una regla</h3><p>«¿Se conserva lo que cambió la persona?» Sirve con cualquier respuesta de la IA.</p></li>
+          </ol>
         </div>
       </section>
 

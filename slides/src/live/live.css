@@ -321,3 +321,6 @@ main { max-width: 520px; margin: 0 auto; min-height: 60dvh; }
 .ask-res h2, .ask-res h3, .ask-res p, .ask-res ul { margin: 0; }
 .ask-res h3 { font-size: 18px; }
 .ask-res ul { padding-left: 20px; display: grid; gap: 6px; line-height: 1.35; }
+.sticker-cta { display: grid; gap: 10px; margin-top: 12px; padding: 14px; border: 2px dashed #22c68d; border-radius: 16px; background: rgba(34, 198, 141, 0.1); }
+.sticker-cta p { margin: 0; font-size: 15px; line-height: 1.35; }
+.sticker-cta .row { display: flex; flex-wrap: wrap; gap: 8px; }

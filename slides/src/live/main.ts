@@ -9,7 +9,7 @@ import { Brain, Check, Circle, CircleHelp, Diamond, Download, FileText, Flame, G
 import { SLIDES, SLIDE_BY_ID, type SlideContent } from '../shared/content';
 import { EVENT, NS, PUBLIC_DEMO_URL, REPO_URL, SKILL_URL, TALK_TITLE } from "../shared/config";
 import { downloadFile, keepsakeHTML, keepsakeMarkdown, type SavedNote } from '../shared/keepsake';
-import { ACCESORIOS, DEFAULT_TEJEDOR, HILOS, EXPRESIONES, LEYENDA, PATRONES, PIELES, RUANAS, SOMBREROS, tejedorPNG, tejedorSilhouette, tejedorSVG, normalizeTejedor, randomTejedor, type TejedorOptions } from '../shared/tejedor';
+import { ACCESORIOS, DEFAULT_TEJEDOR, HILOS, EXPRESIONES, LEYENDA, PATRONES, PIELES, RUANAS, SOMBREROS, tejedorPNG, tejedorSticker, tejedorSilhouette, tejedorSVG, normalizeTejedor, randomTejedor, type TejedorOptions } from '../shared/tejedor';
 import { claimUniqueName, cleanName, randomName, TOTAL_COMBINATIONS } from '../shared/names';
 import { QUESTIONS, type QuestionId } from '../shared/questions';
 import { REACTIONS, correctCount, getRealtime, podiumKey, winnerCode, type Reaction, type Realtime, type SlideState, type Votes } from '../shared/realtime';
@@ -857,9 +857,34 @@ function renderTejedor(screen: HTMLElement) {
     // Queda marcado aunque falle la red: la app lo reintenta antes del muro y del podio.
     tejedor.saved = true;
     persist();
-    msg.textContent = (await syncTejedor()) ? '¡Listo! Tu tejedor está en el muro, en el podio y en tu memoria.' : 'No se pudo publicar. Lo intentaremos otra vez antes del podio.';
+    const ok = await syncTejedor();
+    msg.textContent = ok ? '¡Listo! Tu tejedor está en el muro, en el podio y en tu memoria.' : 'No se pudo publicar. Lo intentaremos otra vez antes del podio.';
+    if (ok) mostrarSticker(screen);
   });
+  if (tejedor.published) mostrarSticker(screen);
   preview();
+}
+
+/** Después de publicar: reclama tu sticker para redes. */
+function mostrarSticker(screen: HTMLElement) {
+  if (screen.querySelector('[data-sticker]')) return;
+  const caja = document.createElement('div');
+  caja.className = 'sticker-cta';
+  caja.dataset.sticker = '';
+  caja.innerHTML = `<p><b>¡Reclama tu sticker!</b> Compártelo en tus historias y etiqueta a <b>@vanessamarelycode</b>.</p>
+    <div class="row"><button class="btn primary" type="button" data-sticker-share>${icon(Send, 18)} Compartir sticker</button><button class="btn ghost" type="button" data-sticker-dl>${icon(Download, 18)} Descargar</button></div>`;
+  screen.querySelector('[data-msg]')?.after(caja);
+  const archivo = async () => new File([await tejedorSticker(tejedor)], `sticker-${slug()}.png`, { type: 'image/png' });
+  caja.querySelector('[data-sticker-dl]')!.addEventListener('click', async () => downloadFile(`sticker-${slug()}.png`, await tejedorSticker(tejedor)));
+  caja.querySelector('[data-sticker-share]')!.addEventListener('click', async () => {
+    const f = await archivo();
+    try {
+      if (navigator.canShare?.({ files: [f] })) await navigator.share({ files: [f], text: `Mi tejedor en BoyaConf 2026 · ${TALK_TITLE}` });
+      else downloadFile(f.name, f);
+    } catch {
+      /* La persona canceló el menú de compartir. */
+    }
+  });
 }
 
 // ── Menú y reacciones ───────────────────────────────────────────────────
