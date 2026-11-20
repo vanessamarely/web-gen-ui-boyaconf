@@ -19,6 +19,8 @@ export interface Ronda {
   correccion: string;
   /** Una frase bajo el título del slide de implementación */
   idea: string;
+  /** Sus videos traen la voz sintética del lector de pantalla */
+  audio?: boolean;
   /** Fragmento que se muestra como ejemplo de la prueba */
   ejemplo?: string;
   porque?: string;
@@ -130,6 +132,7 @@ export const RONDAS: Ronda[] = [
     problema: 'El lector de pantalla recibía un aviso tras otro',
     yaSabiamos: 'nombrar los campos y anunciar los cambios.',
     ahora: 'el contenido cambia cientos de veces en segundos.',
+    audio: true,
     mide: 'Avisos al lector de pantalla', antes: '204', despues: '2', limite: 'Campos sin nombre: de 8 a 0',
     correccion: "Avisa al empezar y al terminar, no con cada cambio",
     porque: "Además, cada campo necesita un nombre, por ejemplo: aria-label=\"Cantidad de papa\".",

@@ -1586,3 +1586,10 @@ section[data-id='industria'] .medida { margin-top: 10px; font-size: 19px; }
 :root:not([data-theme='dark']) .medida code { color: #8f1d5c; }
 .codigo-slide .pasaba.idea { margin: -6px 0 10px; font-size: 22px; text-align: center; }
 :root[data-ratio='4-3'] .codigo-slide .pasaba.idea { font-size: 17px; }
+
+/* Escuchar al lector de pantalla. */
+.ronda-videos figure { position: relative; }
+.escuchar { position: absolute; right: 12px; bottom: 12px; z-index: 2; min-height: 40px; padding: 0 16px; border: 2px solid #2a211b; border-radius: 999px; background: #ffe08a; color: #2a211b; font: 700 17px var(--sans); cursor: pointer; }
+.nota-audio { margin: 6px 0 0; font-size: 16px; color: var(--ink-dim); text-align: center; }
+.escuchar { top: 64px; bottom: auto; }
+@media (max-width: 640px) { .escuchar { top: 40px; min-height: 36px; font-size: 14px; } }

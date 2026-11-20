@@ -103,9 +103,9 @@ document.querySelectorAll<HTMLElement>('[data-ronda]').forEach((sec) => {
     <h2 class="title">${esc(d.problema)}</h2>
     <p class="pasaba"><b>Ya sabíamos</b> ${esc(d.yaSabiamos)} <b>Ahora</b> ${esc(d.ahora)}</p>
     <div class="ronda-videos">
-      <figure class="rojo"><figcaption><span>Sin preparar</span><b>${esc(d.antes)}</b></figcaption>${video('antes', 'versión sin preparar')}</figure>
-      <figure class="verde"><figcaption><span>Preparada</span><b>${esc(d.despues)}</b></figcaption>${video('despues', 'versión preparada')}</figure>
-    </div>
+      <figure class="rojo"><figcaption><span>Sin preparar</span><b>${esc(d.antes)}</b></figcaption>${video('antes', 'versión sin preparar')}${d.audio ? '<button type="button" class="escuchar" data-escuchar>🔊 Escuchar</button>' : ''}</figure>
+      <figure class="verde"><figcaption><span>Preparada</span><b>${esc(d.despues)}</b></figcaption>${video('despues', 'versión preparada')}${d.audio ? '<button type="button" class="escuchar" data-escuchar>🔊 Escuchar</button>' : ''}</figure>
+    </div>${d.audio ? '<p class="nota-audio">Voz sintética que lee los avisos que la página envía al lector de pantalla.</p>' : ''}
     <p class="medida"><b>${esc(d.mide)}</b> · ${esc(d.limite)}${d.ejemplo ? ` <code>${esc(d.ejemplo)}</code>` : ''}</p>`;
 });
 document.querySelectorAll<HTMLElement>('[data-codigo]').forEach((sec) => {
@@ -295,8 +295,20 @@ menu.addEventListener('click', (e) => {
 });
 
 // ── Clips de la demo: se cargan perezosamente y solo se reproducen en el slide activo ──
+// Escuchar: solo un video suena a la vez y vuelve a empezar para oír los avisos desde el inicio.
+document.addEventListener('click', (e) => {
+  const boton = (e.target as HTMLElement).closest<HTMLElement>('[data-escuchar]');
+  const v = boton?.closest('figure')?.querySelector('video');
+  if (!v) return;
+  document.querySelectorAll('video').forEach((otro) => (otro.muted = true));
+  if (!v.src) v.src = v.dataset.src!;
+  v.muted = false;
+  v.currentTime = 0;
+  void v.play().catch(() => undefined);
+});
 function playClips(slide: HTMLElement) {
   document.querySelectorAll<HTMLVideoElement>('video[data-src]').forEach((v) => {
+    v.muted = true;
     if (slide.contains(v)) {
       if (!v.src) v.src = v.dataset.src!;
       v.currentTime = 0;
