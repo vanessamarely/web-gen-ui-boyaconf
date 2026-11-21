@@ -14,7 +14,7 @@ describe('tejedor', () => {
   });
 
   it('normaliza opciones fuera de rango (datos del muro)', () => {
-    expect(normalizeTejedor({ ruana: 99, sombrero: -1, accesorio: 2.5 } as never)).toEqual({ ruana: 0, patron: 0, sombrero: 0, piel: 2, accesorio: 0, expresion: 0 });
+    expect(normalizeTejedor({ ruana: 99, sombrero: -1, accesorio: 2.5 } as never)).toEqual({ ruana: 0, patron: 0, sombrero: 0, piel: 2, accesorio: 0, expresion: 0, genero: 2 });
   });
 
   it('escapa el título', () => {

@@ -13,9 +13,11 @@ export interface TejedorOptions {
   piel: number;
   accesorio: number;
   expresion: number;
+  /** 0 mujer, 1 hombre, 2 sin especificar (los tejedores anteriores quedan así) */
+  genero?: number;
 }
 
-export const DEFAULT_TEJEDOR: TejedorOptions = { ruana: 0, patron: 0, sombrero: 0, piel: 2, accesorio: 1, expresion: 0 };
+export const DEFAULT_TEJEDOR: TejedorOptions = { ruana: 0, patron: 0, sombrero: 0, piel: 2, accesorio: 1, expresion: 0, genero: 2 };
 
 /** Paletas de la ruana: [base, acento, acento 2, borde] — lana teñida con nombres de Boyacá. */
 export const RUANAS = [
@@ -33,6 +35,7 @@ export const SOMBREROS = ['Sombrero de paja', 'Sombrero de fieltro', 'Gorro teji
 export const PIELES = ['#f6d3b3', '#e8b48a', '#c98b5e', '#9a6440', '#6b4329'] as const;
 export const ACCESORIOS = ['Ninguno', 'Madeja de lana', 'Tiple', 'Tejo', 'Laptop', 'Frailejón', 'Almojábana'] as const;
 export const EXPRESIONES = ['Sonrisa', 'Guiño', 'Sorpresa', 'Concentrado'] as const;
+export const GENEROS = ['Mujer', 'Hombre', 'Prefiero no decir'] as const;
 
 /** El hilo que teje tu tejedor: la práctica que te llevas (lista cerrada: nada de texto libre llega al proyector). */
 export const HILOS = [
@@ -67,12 +70,13 @@ export function normalizeTejedor(o: Partial<TejedorOptions> | null | undefined):
     piel: clampIdx(o?.piel ?? 2, PIELES.length),
     accesorio: clampIdx(o?.accesorio ?? 0, ACCESORIOS.length),
     expresion: clampIdx(o?.expresion ?? 0, EXPRESIONES.length),
+    genero: clampIdx(o?.genero ?? 2, GENEROS.length),
   };
 }
 
 export function randomTejedor(r: () => number = Math.random): TejedorOptions {
   const n = (len: number) => Math.floor(r() * len);
-  return { ruana: n(RUANAS.length), patron: n(PATRONES.length), sombrero: n(SOMBREROS.length), piel: n(PIELES.length), accesorio: n(ACCESORIOS.length), expresion: n(EXPRESIONES.length) };
+  return { ruana: n(RUANAS.length), patron: n(PATRONES.length), sombrero: n(SOMBREROS.length), piel: n(PIELES.length), accesorio: n(ACCESORIOS.length), expresion: n(EXPRESIONES.length), genero: n(GENEROS.length) };
 }
 
 /** Patrón de la ruana como <pattern> con id único por dibujo. */
@@ -156,6 +160,23 @@ function face(expresion: number): string {
     default: // sonrisa
       return `${cejas()}${ojo(102)}${ojo(138)}${nariz}${cheeks}${risa}`;
   }
+}
+
+/** Rasgos según el género elegido: pestañas, labios y aretes; o barba corta y cejas más gruesas. */
+function rasgos(genero: number, a1: string): { atras: string; frente: string } {
+  if (genero === 0)
+    return {
+      atras: `<path d="M70 96 C62 130 64 156 74 176 L90 170 C82 150 80 126 84 104 Z M170 96 C178 130 176 156 166 176 L150 170 C158 150 160 126 156 104 Z" fill="${HAIR}" stroke="${INK}" stroke-width="2" stroke-linejoin="round"/>`,
+      frente: `<path d="M95 95 l-4 -4 M98 93 l-2 -5 M145 95 l4 -4 M142 93 l2 -5" stroke="${INK}" stroke-width="2.2" stroke-linecap="round"/>
+        <g stroke="${INK}" stroke-width="2"><circle cx="69" cy="114" r="4.5" fill="${a1}"/><circle cx="171" cy="114" r="4.5" fill="${a1}"/></g>`,
+    };
+  if (genero === 1)
+    return {
+      atras: '',
+      frente: `<path d="M92 86 Q102 80 111 86 M129 86 Q138 80 148 86" fill="none" stroke="${HAIR}" stroke-width="5" stroke-linecap="round"/>
+        <path d="M82 116 C86 140 100 150 120 150 C140 150 154 140 158 116 C150 130 138 136 120 136 C102 136 90 130 82 116 Z" fill="${HAIR}" opacity=".85"/>`,
+    };
+  return { atras: '', frente: '' };
 }
 
 /** Manos por defecto (a los lados del ruana). */
@@ -250,6 +271,7 @@ export function tejedorSVG(opts: TejedorOptions, title = 'Tejedor'): string {
   <ellipse cx="120" cy="300" rx="78" ry="9" fill="#000" opacity=".13"/>
   ${acc.back}
   ${sombreroBack(o.sombrero, colors)}
+  ${rasgos(o.genero ?? 2, a1).atras}
   <!-- Piernas y ojotas -->
   <g ${S}>
     <rect x="94" y="236" width="20" height="50" rx="6" fill="#3c3c3c"/>
@@ -275,6 +297,7 @@ export function tejedorSVG(opts: TejedorOptions, title = 'Tejedor'): string {
   <circle cx="120" cy="96" r="51" fill="url(#${id}-sk)"/>
   ${sombreroFront(o.sombrero, colors, patron)}
   ${face(o.expresion)}
+  ${rasgos(o.genero ?? 2, a1).frente}
   ${acc.front}
 </svg>`;
 }

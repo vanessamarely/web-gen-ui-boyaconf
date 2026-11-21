@@ -9,7 +9,7 @@ import { Brain, Check, Circle, CircleHelp, Diamond, Download, FileText, Flame, G
 import { SLIDES, SLIDE_BY_ID, type SlideContent } from '../shared/content';
 import { EVENT, NS, PUBLIC_DEMO_URL, REPO_URL, SKILL_URL, TALK_TITLE } from "../shared/config";
 import { downloadFile, keepsakeHTML, keepsakeMarkdown, type SavedNote } from '../shared/keepsake';
-import { ACCESORIOS, DEFAULT_TEJEDOR, HILOS, EXPRESIONES, LEYENDA, PATRONES, PIELES, RUANAS, SOMBREROS, tejedorPNG, tejedorSticker, tejedorSilhouette, tejedorSVG, normalizeTejedor, randomTejedor, type TejedorOptions } from '../shared/tejedor';
+import { ACCESORIOS, DEFAULT_TEJEDOR, GENEROS, HILOS, EXPRESIONES, LEYENDA, PATRONES, PIELES, RUANAS, SOMBREROS, tejedorPNG, tejedorSticker, tejedorSilhouette, tejedorSVG, normalizeTejedor, randomTejedor, type TejedorOptions } from '../shared/tejedor';
 import { claimUniqueName, cleanName, randomName, TOTAL_COMBINATIONS } from '../shared/names';
 import { QUESTIONS, type QuestionId } from '../shared/questions';
 import { REACTIONS, correctCount, getRealtime, podiumKey, winnerCode, type Reaction, type Realtime, type SlideState, type Votes } from '../shared/realtime';
@@ -840,7 +840,7 @@ function renderTejedor(screen: HTMLElement) {
     <p class="mini">Piel</p><div class="swatches" role="radiogroup" aria-label="Piel">${PIELES.map(
       (c, i) => `<button type="button" class="swatch" role="radio" aria-label="Tono de piel ${i + 1}" aria-checked="${tejedor.opts.piel === i}" data-opt="piel" data-v="${i}" style="--swatch:${c}"></button>`,
     ).join('')}</div>
-    ${chips('accesorio', 'Lo que lleva', ACCESORIOS)}${chips('expresion', 'Expresión', EXPRESIONES)}`;
+    ${chips('genero', 'Género', GENEROS)}${chips('accesorio', 'Lo que lleva', ACCESORIOS)}${chips('expresion', 'Expresión', EXPRESIONES)}`;
   const changed = () => {
     persist();
     preview();
