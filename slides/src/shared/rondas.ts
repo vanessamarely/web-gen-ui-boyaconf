@@ -123,7 +123,7 @@ export const RONDAS: Ronda[] = [
       { nombre: "Angular", evita: "computed(() => this.sugerida())", usa: "computed(() => this.dePersona()[id] ?? this.sugerida())" },
       { nombre: "Svelte", evita: "$derived(sugerida)", usa: "$derived(dePersona[id] ?? sugerida)" },
     ],
-    notas: "La pantalla ya es estable. Ahora una situación propia de esta nueva web. Mientras la IA seguía respondiendo, cambié la papa a 5 kilos. Llegó el siguiente pedazo de la respuesta y volvió a 2. Mi cambio sí estaba guardado: el problema es que la IA seguía enviando datos. Esto no es solo de la demo: la documentación de AG-UI, el protocolo que conecta agentes con interfaces, recomienda resolver los conflictos entre lo que cambia el agente y lo que cambia la interfaz.",
+    notas: "La pantalla ya es estable. Ahora una situación propia de esta nueva web. Mientras la IA seguía respondiendo, cambié la papa a 5 kilos. Llegó la siguiente parte del JSON, que todavía decía cantidad 2, y volvió a 2. Mi cambio sí estaba guardado: el problema es que la IA seguía enviando datos. Esto no es solo de la demo: la documentación de AG-UI, el protocolo que conecta agentes con interfaces, recomienda resolver los conflictos entre lo que cambia el agente y lo que cambia la interfaz.",
     notasCodigo: 'La regla cabe en una línea: si la persona cambió el dato, se usa su valor; si no, se usa lo que sugiere la IA. Lo mismo aplica cuando un agente actúa en la página.',
     time: "13:35", timeCodigo: "14:10",
   },
