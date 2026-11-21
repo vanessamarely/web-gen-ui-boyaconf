@@ -34,7 +34,7 @@ function icon(node: IconNode, size = 28, color?: string): SVGElement {
 
 /** Mensajes entre el deck y la consola de la presentadora (misma máquina, sin red). */
 export type PresenterMsg =
-  | { type: 'state'; index: number; total: number; id: string; players: number; tejedores: number; questions: number; votes: number; lostHere: number; live: boolean; online: boolean; mode: string }
+  | { type: 'state'; index: number; total: number; id: string; players: number; tejedores: number; questions: number; votes: number; lostHere: number; live: boolean; online: boolean; mode: string; podio: { modo: string; nombres: string[] } }
   | { type: 'goto'; index: number }
   | { type: 'next' }
   | { type: 'prev' }
@@ -161,7 +161,7 @@ export async function initLive(stage: DeckStage, sections: HTMLElement[]) {
   // ── Consola de la presentadora (BroadcastChannel) ─────────────────────
   function tellConsole() {
     const id = sections[lastIndex]?.dataset.id ?? '';
-    const msg: PresenterMsg = { type: 'state', index: lastIndex, total: sections.length, id, players: players.length, tejedores: tejedores.filter((c) => !c.hidden).length, questions: questions.length, votes: votes.length, lostHere: feedback.filter((f) => f.lost.includes(id)).length, live: presenter, online, mode: rt.mode };
+    const msg: PresenterMsg = { type: 'state', index: lastIndex, total: sections.length, id, players: players.length, tejedores: tejedores.filter((c) => !c.hidden).length, questions: questions.length, votes: votes.length, lostHere: feedback.filter((f) => f.lost.includes(id)).length, live: presenter, online, mode: rt.mode, podio: { modo: Object.keys(slide?.openedAt ?? {}).length ? 'preguntas' : 'participación', nombres: ranking().slice(0, 3).map((r) => r.name) } };
     bc.postMessage(msg);
   }
   bc.onmessage = (e: MessageEvent<PresenterMsg>) => {

@@ -5,9 +5,11 @@ const ON_TOPIC =
 const OFF_TOPIC = /(put[ao]|mierd|pend[ae]j|verga|coñ|carajo|fuck|shit|sex|nazi|cojud|huev[oó]n)/i;
 
 /** ¿La pregunta es sobre la charla? (mínimo 8 caracteres, sin groserías, con algún término del tema) */
-export const isOnTopic = (text: string) => text.trim().length >= 8 && !OFF_TOPIC.test(text) && ON_TOPIC.test(text);
+// Se acepta cualquier pregunta respetuosa: el filtro de tema dejaba por fuera dudas válidas.
+export const isOnTopic = (text: string) => text.trim().length >= 8 && !OFF_TOPIC.test(text);
+void ON_TOPIC;
 
-const VACIAS = new Set('para como cual cuales donde cuando porque pero esta este esto esa ese eso estas estos las los una uno unos unas del que qué por con sin sobre entre mas más muy hay ser son fue era tiene tienen hace hacen puede pueden sirve sirven significa explica explicas entendi entendí entiendo parte charla web'.split(' '));
+const VACIAS = new Set('para como cual cuales donde cuando porque pero esta este esto esa ese eso estas estos las los una uno unos unas del que qué por con sin sobre entre mas más muy hay ser son fue era tiene tienen hace hacen puede pueden sirve sirven significa explica explicas entendi entendí entiendo parte charla web regla reglas version preparar preparada sin'.split(' '));
 const normalizar = (t: string) => t.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 const palabras = (t: string) => normalizar(t).split(/[^a-z0-9]+/).filter((p) => p.length >= 3 && !VACIAS.has(p));
 

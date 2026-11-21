@@ -1127,7 +1127,7 @@ function openAsk(inicial = '') {
     try {
       await sendWithHint(rt.ask({ name: name ?? 'Anónimo', text: `[${topic}] ${text}`.slice(0, 280), slide: (live?.label ?? '').slice(0, 80) }), () => (estado.textContent = QUEUED));
       void rt.react('ask').catch(() => undefined);
-      estado.textContent = 'Tu pregunta le llegó a Vanessa. Gemini Nano te enviará una respuesta en unos segundos.';
+      estado.textContent = 'Tu pregunta le llegó a Vanessa. Si tiene su consola abierta, Gemini Nano te responde aquí en unos segundos.';
     } catch (err) {
       console.error('[live] pregunta', err);
       estado.textContent = `No se pudo enviar a Vanessa. (${(err as { code?: string }).code ?? 'error'})`;

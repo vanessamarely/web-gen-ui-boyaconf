@@ -44,6 +44,12 @@ function render(m: Extract<PresenterMsg, { type: 'state' }>) {
   const lost = $('[data-stat="lost"]');
   lost.textContent = `${m.lostHere} perdidos aquí`;
   lost.classList.toggle('alert', m.lostHere > 0);
+  const podio = $('[data-stat="podio"]');
+  const n = m.podio?.nombres.length ?? 0;
+  podio.textContent = n >= 3 ? `podio por ${m.podio.modo}: listo` : `podio por ${m.podio?.modo ?? 'participación'}: ${n} de 3`;
+  podio.title = m.podio?.nombres.join(' · ') ?? '';
+  podio.className = n >= 3 ? 'listo' : 'alert';
+  $('[data-podio-top]').textContent = n ? `Top ${n}: ${m.podio.nombres.join(' · ')}` : 'Aún nadie suma puntos para el podio.';
   const live = $('[data-stat="live"]');
   live.textContent = !m.online ? 'sin señal' : m.live ? '● transmitiendo' : 'sin transmitir';
   live.className = !m.online ? 'alert' : m.live ? 'on' : 'off';
