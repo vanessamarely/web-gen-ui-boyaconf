@@ -162,19 +162,22 @@ function face(expresion: number): string {
   }
 }
 
-/** Rasgos según el género elegido: pestañas, labios y aretes; o barba corta y cejas más gruesas. */
-function rasgos(genero: number, a1: string): { atras: string; frente: string } {
-  if (genero === 0)
+/** Rasgos según el género elegido: pelo largo, pestañas y aretes; o cejas gruesas y patillas. */
+function rasgos(genero: number, sombrero: number, a1: string): { atras: string; frente: string } {
+  if (genero === 0) {
+    // Con trenzas o pañoleta el pelo ya está dibujado: no se repite.
+    const pelo = sombrero === 3 || sombrero === 4 ? '' : `<path d="M68 100 C60 132 62 156 72 176 C78 178 84 176 88 172 C82 150 80 126 84 104 Z M172 100 C180 132 178 156 168 176 C162 178 156 176 152 172 C158 150 160 126 156 104 Z" fill="${HAIR}" stroke="${INK}" stroke-width="2" stroke-linejoin="round"/>`;
     return {
-      atras: `<path d="M70 96 C62 130 64 156 74 176 L90 170 C82 150 80 126 84 104 Z M170 96 C178 130 176 156 166 176 L150 170 C158 150 160 126 156 104 Z" fill="${HAIR}" stroke="${INK}" stroke-width="2" stroke-linejoin="round"/>`,
-      frente: `<path d="M95 95 l-4 -4 M98 93 l-2 -5 M145 95 l4 -4 M142 93 l2 -5" stroke="${INK}" stroke-width="2.2" stroke-linecap="round"/>
-        <g stroke="${INK}" stroke-width="2"><circle cx="69" cy="114" r="4.5" fill="${a1}"/><circle cx="171" cy="114" r="4.5" fill="${a1}"/></g>`,
+      atras: pelo,
+      frente: `<path d="M95 96 l-4 -3 M146 96 l4 -3" stroke="${INK}" stroke-width="2.2" stroke-linecap="round"/>
+        <g stroke="${INK}" stroke-width="1.6"><path d="M66 110 v6 M174 110 v6"/><circle cx="66" cy="119" r="3.6" fill="${a1}"/><circle cx="174" cy="119" r="3.6" fill="${a1}"/></g>`,
     };
+  }
   if (genero === 1)
     return {
       atras: '',
-      frente: `<path d="M92 86 Q102 80 111 86 M129 86 Q138 80 148 86" fill="none" stroke="${HAIR}" stroke-width="5" stroke-linecap="round"/>
-        <path d="M82 116 C86 140 100 150 120 150 C140 150 154 140 158 116 C150 130 138 136 120 136 C102 136 90 130 82 116 Z" fill="${HAIR}" opacity=".85"/>`,
+      frente: `<path d="M92 87 Q102 81 111 87 M129 87 Q138 81 148 87" fill="none" stroke="${HAIR}" stroke-width="5.5" stroke-linecap="round"/>
+        ${sombrero === 3 || sombrero === 4 ? '' : `<path d="M72 92 C72 104 74 112 78 118 L82 116 C80 108 80 100 80 92 Z M168 92 C168 104 166 112 162 118 L158 116 C160 108 160 100 160 92 Z" fill="${HAIR}"/>`}`,
     };
   return { atras: '', frente: '' };
 }
@@ -271,7 +274,7 @@ export function tejedorSVG(opts: TejedorOptions, title = 'Tejedor'): string {
   <ellipse cx="120" cy="300" rx="78" ry="9" fill="#000" opacity=".13"/>
   ${acc.back}
   ${sombreroBack(o.sombrero, colors)}
-  ${rasgos(o.genero ?? 2, a1).atras}
+  ${rasgos(o.genero ?? 2, o.sombrero, a1).atras}
   <!-- Piernas y ojotas -->
   <g ${S}>
     <rect x="94" y="236" width="20" height="50" rx="6" fill="#3c3c3c"/>
@@ -297,7 +300,7 @@ export function tejedorSVG(opts: TejedorOptions, title = 'Tejedor'): string {
   <circle cx="120" cy="96" r="51" fill="url(#${id}-sk)"/>
   ${sombreroFront(o.sombrero, colors, patron)}
   ${face(o.expresion)}
-  ${rasgos(o.genero ?? 2, a1).frente}
+  ${rasgos(o.genero ?? 2, o.sombrero, a1).frente}
   ${acc.front}
 </svg>`;
 }
