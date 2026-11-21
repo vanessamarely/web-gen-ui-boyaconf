@@ -51,11 +51,11 @@ export const RONDAS: Ronda[] = [
     ahora: "la IA puede traer contenido copiado de una reseña o de otra página.",
     mide: "Prueba de seguridad", antes: "lo ejecutó", despues: "solo lo mostró", limite: "Agregamos a propósito este HTML al consejo de la IA:",
     correccion: "Muestra la respuesta de la IA como texto",
-    porque: "Si de verdad necesitas HTML, límpialo con DOMPurify, como recomiendan OWASP y Chrome. Angular limpia [innerHTML] por defecto, pero para texto usa {{ }}.",
+    porque: "¿Necesitas HTML? Límpialo con DOMPurify, como recomiendan OWASP y Chrome.",
     evitaTitulo: "Insertarla como HTML: se ejecuta",
     usaTitulo: "Mostrarla como texto: no se ejecuta",
     ejemplo: "<img src=\"x\" onerror=\"robarDatos()\">",
-    idea: "La IA sí puede pedir componentes visuales, como en A2UI o AG-UI, pero la web los dibuja con los suyos: nunca ejecuta el HTML que traiga la respuesta.",
+    idea: "La IA puede pedir componentes visuales, pero la web los dibuja con los suyos. Nunca ejecuta el HTML de la respuesta.",
     frameworks: [
       { nombre: "React", evita: "<p dangerouslySetInnerHTML={{ __html: consejo }} />", usa: "<p>{consejo}</p>" },
       { nombre: "Vue", evita: "<p v-html=\"consejo\"></p>", usa: "<p>{{ consejo }}</p>" },
@@ -73,10 +73,9 @@ export const RONDAS: Ronda[] = [
     ahora: "la IA envía su respuesta en cientos de pedacitos.",
     mide: "Veces que se redibujó la pantalla", antes: '204', despues: '51', limite: "En esta demo no se congeló, pero es trabajo de más: en un celular sencillo sí se nota",
     correccion: "Junta los pedacitos y redibuja cada 100 ms",
-    porque: "Para la persona se ve igual de fluido. Para el navegador es 4 veces menos trabajo. throttle viene en lodash o es-toolkit.",
     evitaTitulo: "Redibujar con cada pedacito",
     usaTitulo: "Redibujar cada 100 ms (throttle)",
-    idea: "Igual que en un buscador: no reaccionas a cada tecla. Aquí no redibujas con cada pedacito, sino una vez cada 100 ms con todo lo que llegó.",
+    idea: "Como en un buscador: no reaccionas a cada tecla. Redibujas cada 100 ms con todo lo que llegó.",
     diagrama: true,
     frameworks: [
       { nombre: "React", evita: "onTrozo = (t) => setTexto(t);", usa: "onTrozo = throttle((t) => setTexto(t), 100);" },
@@ -98,7 +97,6 @@ export const RONDAS: Ronda[] = [
     evitaTitulo: "Clave por posición",
     usaTitulo: "Clave por id",
     idea: "La IA puede cambiar el orden. Con el id, el framework reconoce cada producto y lo reutiliza.",
-    porque: "La clave debe salir del dato, no del orden en que la IA lo envió.",
     frameworks: [
       { nombre: "React", evita: "<Fila key={i} item={p} />", usa: "<Fila key={p.id} item={p} />" },
       { nombre: "Vue", evita: "<Fila v-for=\"(p, i) in items\" :key=\"i\" />", usa: "<Fila v-for=\"p in items\" :key=\"p.id\" />" },
@@ -119,7 +117,6 @@ export const RONDAS: Ronda[] = [
     evitaTitulo: "Siempre gana la IA",
     usaTitulo: "Primero lo de la persona",
     idea: "Si la persona cambió la cantidad, se usa su valor. Si no, se usa lo que sugiere la IA.",
-    porque: "Lo mismo aplica cuando un agente cambia datos en la página.",
     frameworks: [
       { nombre: "React", evita: "const cantidad = sugerida;", usa: "const cantidad = dePersona[id] ?? sugerida;" },
       { nombre: "Vue", evita: "computed(() => sugerida.value)", usa: "computed(() => dePersona.value[id] ?? sugerida.value)" },
@@ -137,10 +134,9 @@ export const RONDAS: Ronda[] = [
     ahora: 'el contenido cambia cientos de veces en segundos.',
     mide: 'Avisos al lector de pantalla', antes: '204', despues: '2', limite: 'Campos sin nombre: de 8 a 0',
     correccion: "Avisa al empezar y al terminar, no con cada cambio",
-    porque: "Además, cada campo necesita un nombre, por ejemplo: aria-label=\"Cantidad de papa\".",
     evitaTitulo: "Anuncia cada pedazo",
     usaTitulo: "Anuncia solo el estado",
-    idea: "aria-busy indica que se está generando, y un solo mensaje avisa cuando termina.",
+    idea: "aria-busy avisa que se está generando y un solo mensaje avisa cuando termina. Cada campo lleva su aria-label.",
     frameworks: [
       { nombre: "React", evita: "<main aria-live=\"polite\">", usa: "<main aria-busy={generando}>\n<p role=\"status\">{mensaje}</p>" },
       { nombre: "Vue", evita: "<main aria-live=\"polite\">", usa: "<main :aria-busy=\"generando\">\n<p role=\"status\">{{ mensaje }}</p>" },

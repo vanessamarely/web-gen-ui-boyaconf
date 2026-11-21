@@ -1648,3 +1648,4 @@ deck-stage > section > .frame { z-index: 1; }
 @keyframes racha-tiembla { to { transform: rotate(3deg); } }
 @media (prefers-reduced-motion: reduce) { .racha { display: none; } }
 :root[data-sin-preguntas] .aviso-pregunta { display: none; }
+.nota-exp { color: var(--ink-dim); font-weight: 500; }
