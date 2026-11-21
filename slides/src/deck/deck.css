@@ -1630,7 +1630,7 @@ section .diagrama .dg span:first-child { text-align: left; }
 :root[data-theme='dark'] .deco { opacity: 0.45; filter: brightness(1.15); }
 :root[data-theme='dark'] .deco-condor path, :root[data-theme='dark'] .deco-condor ellipse { fill: #d9cfdb; }
 section[data-deck-active] .deco-condor .lm-condor { animation: glide 9s ease-in-out infinite; }
-deck-stage > section > .frame { position: relative; z-index: 1; }
+deck-stage > section > .frame { z-index: 1; }
 :root[data-ratio='4-3'] .deco-paramo { width: 64px; } :root[data-ratio='4-3'] .deco-condor { width: 100px; left: 20px; }
 @media (max-width: 640px) { .deco { display: none; } }
 @media (prefers-reduced-motion: reduce) { .deco-condor .lm-condor { animation: none !important; } }
