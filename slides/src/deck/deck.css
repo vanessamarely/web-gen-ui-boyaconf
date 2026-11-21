@@ -1621,3 +1621,17 @@ section .diagrama .marcas { display: block; width: 100%; min-width: 120px; heigh
 section .diagrama .dg span:first-child { text-align: left; }
 .aviso-pregunta { width: max-content; max-width: calc(100% - 40px); white-space: nowrap; font-size: 18px; padding: 6px 18px; }
 @media (max-width: 640px) { .aviso-pregunta { width: auto; white-space: normal; } }
+.qa-nano { margin: 6px 0; padding: 8px 10px; border-left: 3px solid #3f5fb5; border-radius: 6px; background: rgba(143, 169, 236, 0.15); font-size: 14px; }
+
+/* Decoración: frailejones al costado izquierdo y cóndor arriba a la izquierda, detrás del contenido. */
+.deco { position: absolute; z-index: 0; pointer-events: none; opacity: 0.55; }
+.deco-paramo { left: 6px; bottom: 74px; width: 92px; height: auto; }
+.deco-condor { left: 40px; top: 28px; width: 150px; height: auto; }
+:root[data-theme='dark'] .deco { opacity: 0.45; filter: brightness(1.15); }
+:root[data-theme='dark'] .deco-condor path, :root[data-theme='dark'] .deco-condor ellipse { fill: #d9cfdb; }
+section[data-deck-active] .deco-condor .lm-condor { animation: glide 9s ease-in-out infinite; }
+deck-stage > section > .frame { position: relative; z-index: 1; }
+:root[data-ratio='4-3'] .deco-paramo { width: 64px; } :root[data-ratio='4-3'] .deco-condor { width: 100px; left: 20px; }
+@media (max-width: 640px) { .deco { display: none; } }
+@media (prefers-reduced-motion: reduce) { .deco-condor .lm-condor { animation: none !important; } }
+.deco-condor { overflow: visible; width: 170px; top: 14px; }

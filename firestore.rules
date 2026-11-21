@@ -109,6 +109,13 @@ service cloud.firestore {
           && request.resource.data.slide is string && request.resource.data.slide.size() <= 80;
       }
 
+      // Respuestas a las preguntas: las escribe la presentadora (Gemini Nano en su computador)
+      // y solo las lee quien preguntó.
+      match /respuestas/{id} {
+        allow read: if isPresenter() || (request.auth != null && resource.data.uid == request.auth.uid);
+        allow write: if isPresenter();
+      }
+
       match /feedback/{uid} {
         allow read, delete: if isPresenter();
         allow create, update: if isOwner(uid) && onlyKeys(['lost', 'clara', 'util', 'at'])

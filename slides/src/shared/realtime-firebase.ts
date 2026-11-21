@@ -1,10 +1,10 @@
 import { GithubAuthProvider, getAuth, linkWithPopup, signInAnonymously, signInWithCredential } from 'firebase/auth';
-import { Timestamp, addDoc, arrayUnion, collection, deleteDoc, doc, getDoc, getDocs, initializeFirestore, limit, onSnapshot, orderBy, query, serverTimestamp, setDoc, updateDoc, writeBatch } from 'firebase/firestore';
+import { Timestamp, addDoc, arrayUnion, collection, deleteDoc, doc, getDoc, getDocs, initializeFirestore, limit, onSnapshot, orderBy, query, serverTimestamp, setDoc, updateDoc, where, writeBatch } from 'firebase/firestore';
 import { PRESENTER_GITHUB_ID, SESSION_ID } from './config';
 import { getFirebaseApp } from './firebase';
 import { nameKey } from './names';
 import { QUESTION_IDS, type AnswerKey } from './questions';
-import { emptySlide, type AudienceQuestion, type Feedback, type TejedorData, type Player, type Reaction, type Realtime, type SlideState, type VoteRecord, type Votes } from './realtime';
+import { emptySlide, type AudienceQuestion, type Feedback, type TejedorData, type Player, type Reaction, type Realtime, type Respuesta, type SlideState, type VoteRecord, type Votes } from './realtime';
 
 /** Con señal inestable, una lectura puede fallar una vez: se reintenta antes de avisarle a la persona. */
 async function conReintentos<T>(tarea: () => Promise<T>, intentos = 3): Promise<T> {
@@ -207,12 +207,20 @@ export async function createFirebaseRealtime(): Promise<Realtime> {
     async removeQuestion(id) {
       await deleteDoc(doc(sub('questions'), id));
     },
+    async responder(q, texto) {
+      await setDoc(doc(sub('respuestas'), q.id), { uid: q.uid, texto: texto.slice(0, 600), at: serverTimestamp() });
+    },
+    onMisRespuestas(cb) {
+      return onSnapshot(query(sub('respuestas'), where('uid', '==', uid())), (snap) =>
+        cb(snap.docs.map((d): Respuesta => { const x = d.data({ serverTimestamps: 'estimate' }); return { id: d.id, uid: x.uid, texto: x.texto, at: ms(x.at) ?? Date.now() }; })),
+      () => undefined);
+    },
     async setTejedorHidden(id, hidden) {
       await updateDoc(doc(sub('tejedores'), id), { hidden });
     },
     async resetSession() {
       let n = 0;
-      for (const name of ['players', 'names', 'votes', 'reactions', 'questions', 'tejedores', 'feedback']) {
+      for (const name of ['players', 'names', 'votes', 'reactions', 'questions', 'tejedores', 'feedback', 'respuestas']) {
         const snap = await getDocs(sub(name));
         for (let i = 0; i < snap.docs.length; i += 400) {
           const batch = writeBatch(db);

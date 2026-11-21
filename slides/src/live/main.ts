@@ -191,6 +191,7 @@ async function boot() {
     });
   }
   rt = await getRealtime();
+  escucharRespuestas();
   const forcedLocal = new URLSearchParams(location.search).has('local');
   if (rt.mode === 'local' && !forcedLocal && import.meta.env.VITE_FIREBASE_API_KEY) {
     netOnline = false;
@@ -642,9 +643,29 @@ function renderLost() {
   b.disabled = done || !live?.id;
   b.querySelector('span')!.textContent = done ? 'Avisado' : 'Me perdí';
 }
+/** Me perdí: primero ayuda inmediata con lo principal del slide, luego puede preguntarle a la IA. */
+function ayudaMePerdi(id: string) {
+  const c = SLIDE_BY_ID.get(id);
+  const dlg = document.createElement('dialog');
+  dlg.className = 'ask-sheet';
+  dlg.innerHTML = `<div class="ask-res">
+    <h2>${icon(CircleHelp, 22)} Tranquilo, te ayudamos</h2>
+    ${c ? `<h3>${esc(c.title)}</h3><ul>${c.summary.map((p) => `<li>${esc(p)}</li>`).join('')}</ul>` : ''}
+    <p class="fine">Vanessa ya sabe que este slide no quedó claro. Si sigues con dudas, pregúntale a la IA.</p>
+    <div class="row"><button class="btn ghost" type="button" data-cerrar>Ya entendí</button><button class="btn primary" type="button" data-preguntar>${icon(MessageCircleQuestion, 18)} Preguntarle a la IA</button></div>
+  </div>`;
+  document.body.append(dlg);
+  const cerrar = () => (dlg.close(), dlg.remove());
+  dlg.addEventListener('cancel', () => dlg.remove());
+  $('[data-cerrar]', dlg).addEventListener('click', cerrar);
+  $('[data-preguntar]', dlg).addEventListener('click', () => { cerrar(); openAsk(c ? `No entendí: ${c.title}` : ''); });
+  dlg.showModal();
+}
 async function sendLost(b: HTMLButtonElement) {
   const id = live?.id;
-  if (!id || lostSlides.includes(id)) return;
+  if (!id) return;
+  ayudaMePerdi(id);
+  if (lostSlides.includes(id)) return;
   b.disabled = true;
   navigator.vibrate?.(15);
   try {
@@ -931,6 +952,7 @@ function setupReactions() {
     .map((r) => `<button type="button" data-r="${r}" title="${REACTIONS[r].label}" style="--c:${REACTIONS[r].color}">${icon(REACTION_ICONS[r], 24)}<span>${REACTION_SHORT[r]}</span></button>`)
     .join('') + `<button type="button" data-lost title="Avisarle a Vanessa que no entendiste este slide" style="--c:#f2a33a" disabled>${icon(CircleHelp, 24)}<span>Me perdí</span></button>`;
   let last = 0;
+  const veces: Partial<Record<Reaction, number>> = {};
   bar.addEventListener('click', async (e) => {
     const lostBtn = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-lost]');
     if (lostBtn && rt) return void sendLost(lostBtn);
@@ -944,7 +966,110 @@ function setupReactions() {
     void b.offsetWidth;
     b.classList.add('pop');
     navigator.vibrate?.(15);
+    veces[r] = (veces[r] ?? 0) + 1;
+    lluvia(REACTION_EMOJI[r] ?? '✨');
+    // Cada 3 toques sube un nivel: 1) mensaje, 2) lluvia grande y mensaje, 3) escena con tu tejedor.
+    if (veces[r]! % 3 === 0) {
+      const nivel = (veces[r]! / 3 - 1) % 3;
+      if (nivel === 2) escena(r);
+      else {
+        if (nivel === 1) for (let i = 0; i < 3; i++) setTimeout(() => lluvia(REACTION_EMOJI[r] ?? '✨'), i * 250);
+        celebrar(MENSAJES[r] ?? MENSAJES.fire, veces[r]! / 3 - 1);
+      }
+    }
     await rt.react(r).catch(() => undefined);
+  });
+}
+
+// ── Tocar varias veces una reacción: lluvia de emojis y un mensaje distinto cada vez ──
+const REACTION_EMOJI: Partial<Record<Reaction, string>> = { fire: '🔥', heart: '💜', mind: '🤯' };
+const MENSAJES: Record<string, string[]> = {
+  fire: ['¡Qué energía, sumercé! 🔥', 'Tu entusiasmo se nota en la pantalla', 'Con esa energía, el podio es tuyo', '¡Gracias por participar!'],
+  heart: ['Gracias por el cariño, sumercé 💜', 'Aprovecha: saluda a quien tienes al lado', 'Haz networking: comparte tu tejedor', 'Así se teje una comunidad'],
+  mind: ['¡Aprender también es divertido! 🤯', 'Ese dato te voló la cabeza', 'Anótalo en tu memoria de la charla', '¡Felicitaciones por aprender algo nuevo!'],
+};
+function lluvia(emoji: string) {
+  for (let i = 0; i < 6; i++) {
+    const e = document.createElement('span');
+    e.className = 'lluvia';
+    e.textContent = emoji;
+    e.style.left = `${10 + Math.random() * 80}%`;
+    e.style.animationDelay = `${i * 70}ms`;
+    e.addEventListener('animationend', () => e.remove(), { once: true });
+    document.body.append(e);
+  }
+}
+/** Tercer nivel: una escena con el tejedor de la persona. */
+function escena(r: Reaction) {
+  const avatar = tejedorSVG(tejedor.saved ? tejedor.opts : DEFAULT_TEJEDOR, 'Tu tejedor');
+  // La posición va en el <g>; la animación solo mueve la llama dentro de él.
+  const forma = 'M0 0 C-22 -18 -16 -46 -4 -62 C-2 -46 8 -44 10 -58 C24 -40 30 -16 16 0 Z';
+  const llama = (x: number, y: number, s: number, d: number) => `<g transform="translate(${x} ${y}) scale(${s})"><path class="llama" style="animation-delay:${d}ms" d="${forma}" fill="#ff9d1a" stroke="#2a211b" stroke-width="2.5"/><g transform="translate(2 0) scale(.55)"><path class="llama" style="animation-delay:${d + 120}ms" d="${forma}" fill="#ffe14d"/></g></g>`;
+  const fondos: Partial<Record<Reaction, { fondo: string; frente: string; texto: string }>> = {
+    fire: {
+      // Oficina en llamas: escena original, inspirada en el meme "This is fine".
+      fondo: `<rect width="320" height="320" fill="#c9b23f"/><rect y="230" width="320" height="90" fill="#8a5a2b"/>
+        <path d="M0 0 H320 V40 C280 60 240 30 200 48 C160 64 120 34 80 52 C50 64 20 46 0 56 Z" fill="#3a2a1f" opacity=".85"/>
+        <rect x="24" y="96" width="46" height="134" fill="#6b4a35" stroke="#2a211b" stroke-width="3"/><circle cx="60" cy="166" r="3" fill="#f3c94f"/>
+        <rect x="214" y="80" width="56" height="44" fill="#fffdf8" stroke="#2a211b" stroke-width="3"/><path d="M222 116 l14 -16 10 10 8 -8 10 14 Z" fill="#2f7a4a"/>
+        <ellipse cx="250" cy="236" rx="40" ry="8" fill="#6b4a35" stroke="#2a211b" stroke-width="3"/><path d="M246 236 V286 M254 236 V286" stroke="#2a211b" stroke-width="4"/>
+        <path d="M240 224 h16 v12 h-16 Z M256 226 a5 5 0 0 1 0 8" fill="#f3e6cf" stroke="#2a211b" stroke-width="2.5"/>`,
+      frente: `${llama(18, 320, 1.6, 0)}${llama(60, 322, 1.1, 200)}${llama(286, 320, 1.7, 100)}${llama(250, 318, 1, 300)}${llama(14, 230, 1.2, 150)}${llama(300, 210, 1.3, 50)}
+        <g transform="translate(176 70)"><path d="M0 0 h120 a12 12 0 0 1 12 12 v34 a12 12 0 0 1 -12 12 h-84 l-22 18 4 -18 h-18 a12 12 0 0 1 -12 -12 v-34 a12 12 0 0 1 12 -12 z" transform="translate(-12 0)" fill="#fff" stroke="#2a211b" stroke-width="3"/><text x="54" y="36" text-anchor="middle" font-family="Manrope, system-ui" font-weight="800" font-size="19" fill="#2a211b">This is fine.</text></g>`,
+      texto: 'Todo bajo control… o eso creemos 🔥',
+    },
+    heart: {
+      fondo: `<rect width="320" height="320" fill="#ffd6e7"/>${Array.from({ length: 14 }, (_, i) => `<text class="flota" style="animation-delay:${i * 140}ms" x="${(i * 53) % 300 + 10}" y="${(i * 97) % 280 + 30}" font-size="${18 + (i % 3) * 8}">💜</text>`).join('')}`,
+      frente: '',
+      texto: 'Gracias por el cariño. ¡Comparte tu tejedor con alguien nuevo!',
+    },
+    mind: {
+      fondo: `<rect width="320" height="320" fill="#1a0e1c"/>${Array.from({ length: 18 }, (_, i) => `<circle class="chispa" style="animation-delay:${i * 90}ms" cx="${(i * 71) % 300 + 10}" cy="${(i * 43) % 300 + 10}" r="${2 + (i % 3)}" fill="${['#f3c94f', '#22c68d', '#8fa9ec', '#ff6b85'][i % 4]}"/>`).join('')}<text x="160" y="56" text-anchor="middle" font-size="44">💡</text>`,
+      frente: '',
+      texto: '¡Felicitaciones por aprender algo nuevo hoy!',
+    },
+  };
+  const f = fondos[r];
+  if (!f) return;
+  document.querySelector('.escena')?.remove();
+  const capa = document.createElement('div');
+  capa.className = `escena escena-${r}`;
+  capa.setAttribute('role', 'status');
+  capa.innerHTML = `<figure><svg viewBox="0 0 320 320" aria-hidden="true">${f.fondo}<g transform="translate(${r === 'fire' ? 70 : 90} ${r === 'fire' ? 96 : 70}) scale(${r === 'fire' ? 0.62 : 0.68})">${avatar.replace(/^<svg[^>]*>/, '').replace(/<\/svg>$/, '')}</g>${f.frente}</svg><figcaption>${esc(f.texto)}</figcaption></figure>`;
+  const cerrar = () => capa.remove();
+  capa.addEventListener('click', cerrar);
+  setTimeout(cerrar, 4200);
+  document.body.append(capa);
+  navigator.vibrate?.([30, 50, 30]);
+}
+function celebrar(lista: string[], n: number) {
+  const t = document.createElement('p');
+  t.className = 'celebra';
+  t.setAttribute('role', 'status');
+  t.textContent = lista[n % lista.length];
+  t.addEventListener('animationend', () => t.remove(), { once: true });
+  document.querySelectorAll('.celebra').forEach((x) => x.remove());
+  document.body.append(t);
+}
+
+// ── Respuestas de Gemini Nano (desde el computador de la presentadora) ──
+function escucharRespuestas() {
+  const vistas = new Set<string>(store.get<string[]>('respuestasVistas', []));
+  rt.onMisRespuestas((rs) => {
+    for (const r of rs) {
+      if (vistas.has(r.id)) continue;
+      vistas.add(r.id);
+      store.set('respuestasVistas', [...vistas]);
+      const dlg = document.createElement('dialog');
+      dlg.className = 'ask-sheet';
+      dlg.innerHTML = `<div class="ask-res"><h2>${icon(MessageCircleQuestion, 22)} Respuesta a tu pregunta</h2><p>${esc(r.texto)}</p><p class="fine">Respondida por Gemini Nano en el computador de Vanessa, con el contenido de la charla.</p><button class="btn primary wide" type="button" data-cerrar>Gracias</button></div>`;
+      document.body.append(dlg);
+      $('[data-cerrar]', dlg).addEventListener('click', () => (dlg.close(), dlg.remove()));
+      dlg.addEventListener('cancel', () => dlg.remove());
+      document.querySelectorAll('dialog[open]').forEach((d) => d !== dlg && (d as HTMLDialogElement).close());
+      dlg.showModal();
+      navigator.vibrate?.([20, 40, 20]);
+    }
   });
 }
 
@@ -952,12 +1077,12 @@ function setupReactions() {
 // Solo sobre el tema de la charla: se elige el tema y el texto debe mencionar algo relacionado.
 const ASK_TOPICS = ['Harness', 'Rendimiento', 'DOM y estado', 'Accesibilidad', 'Agentes de IA', 'La demo'] as const;
 let lastAsk = 0;
-function openAsk() {
+function openAsk(inicial = '') {
   const dlg = document.createElement('dialog');
   dlg.className = 'ask-sheet';
   dlg.innerHTML = `<form>
     <h2>${icon(MessageCircleQuestion, 22)} ¿Tienes una pregunta sobre la charla?</h2>
-    <p class="fine">Cuéntale a Vanessa <b>qué parte no entendiste</b> o qué quieres saber. Le llega con tu apodo${name ? ` <b>${esc(name)}</b>` : ''} y no se proyecta. Si el tema ya se vio, aquí mismo te mostramos lo principal.</p>
+    <p class="fine">Cuéntale a Vanessa <b>qué parte no entendiste</b> o qué quieres saber. Le llega con tu apodo${name ? ` <b>${esc(name)}</b>` : ''} y no se proyecta. Te mostramos lo principal al instante y <b>Gemini Nano</b>, en el computador de Vanessa, te envía una respuesta.</p>
     <fieldset class="field"><legend>Tema</legend><div class="chips" role="radiogroup" aria-label="Tema">${ASK_TOPICS.map((tp, i) => `<button type="button" role="radio" aria-checked="${i === 0}" data-topic="${esc(tp)}">${esc(tp)}</button>`).join('')}</div></fieldset>
     <textarea name="q" rows="4" maxlength="280" required placeholder="Ej.: No entendí qué hace un harness"></textarea>
     <p class="fine" data-ask-msg role="status"></p>
@@ -998,14 +1123,15 @@ function openAsk() {
     try {
       await sendWithHint(rt.ask({ name: name ?? 'Anónimo', text: `[${topic}] ${text}`.slice(0, 280), slide: (live?.label ?? '').slice(0, 80) }), () => (estado.textContent = QUEUED));
       void rt.react('ask').catch(() => undefined);
-      estado.textContent = 'Tu pregunta le llegó a Vanessa.';
+      estado.textContent = 'Tu pregunta le llegó a Vanessa. Gemini Nano te enviará una respuesta en unos segundos.';
     } catch (err) {
       console.error('[live] pregunta', err);
       estado.textContent = `No se pudo enviar a Vanessa. (${(err as { code?: string }).code ?? 'error'})`;
     }
   });
   dlg.showModal();
-  dlg.querySelector('textarea')!.focus();
+  const area = dlg.querySelector('textarea');
+  if (area) { area.value = inicial; area.focus(); }
 }
 
 void boot();

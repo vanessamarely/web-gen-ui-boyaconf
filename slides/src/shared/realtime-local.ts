@@ -1,7 +1,7 @@
 import { NS } from './config';
 import { nameKey } from './names';
 import type { AnswerKey, QuestionId } from './questions';
-import { emptySlide, type AudienceQuestion, type Feedback, type TejedorData, type Player, type Reaction, type Realtime, type SlideState, type VoteRecord, type Votes } from './realtime';
+import { emptySlide, type AudienceQuestion, type Feedback, type TejedorData, type Player, type Reaction, type Realtime, type Respuesta, type SlideState, type VoteRecord, type Votes } from './realtime';
 
 interface LocalDb {
   slide: SlideState;
@@ -13,12 +13,13 @@ interface LocalDb {
   votes: Record<string, VoteRecord>;
   tejedores: Record<string, TejedorData>;
   questions: Record<string, AudienceQuestion>;
+  respuestas: Record<string, Respuesta>;
   feedback: Record<string, Feedback>;
   answers: AnswerKey | null;
 }
 
 const KEY = `${NS}.local.db`;
-const empty = (): LocalDb => ({ slide: emptySlide(), players: {}, joinedAt: {}, names: {}, votes: {}, tejedores: {}, questions: {}, feedback: {}, answers: null });
+const empty = (): LocalDb => ({ slide: emptySlide(), players: {}, joinedAt: {}, names: {}, votes: {}, tejedores: {}, questions: {}, respuestas: {}, feedback: {}, answers: null });
 
 function read(): LocalDb {
   try {
@@ -170,6 +171,10 @@ export function createLocalRealtime(): Realtime {
     async removeQuestion(id) {
       write((db) => delete db.questions[id]);
     },
+    async responder(q, texto) {
+      write((db) => ((db.respuestas ??= {})[q.id] = { id: q.id, uid: q.uid, texto: texto.slice(0, 600), at: Date.now() }));
+    },
+    onMisRespuestas: (cb) => sub((db) => cb(Object.values(db.respuestas ?? {}).filter((r) => r.uid === me))),
     async setTejedorHidden(id, hidden) {
       write((db) => {
         if (db.tejedores[id]) db.tejedores[id].hidden = hidden;

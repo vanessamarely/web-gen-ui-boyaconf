@@ -104,6 +104,13 @@ export interface VoteRecord {
 
 export type Unsub = () => void;
 
+export interface Respuesta {
+  id: string;
+  uid: string;
+  texto: string;
+  at: number;
+}
+
 export interface Realtime {
   readonly mode: 'firebase' | 'local';
   uid(): string;
@@ -143,6 +150,10 @@ export interface Realtime {
   /** Solo presentadora (las reglas no dejan leerlas a nadie más). */
   onQuestions(cb: (qs: AudienceQuestion[]) => void, onError?: (msg: string) => void): Unsub;
   removeQuestion(id: string): Promise<void>;
+  /** Solo presentadora: respuesta (Gemini Nano de su computador) que le llega a quien preguntó. */
+  responder(q: { id: string; uid: string }, texto: string): Promise<void>;
+  /** Las respuestas a mis preguntas. */
+  onMisRespuestas(cb: (rs: Respuesta[]) => void): Unsub;
   /** Solo presentadora. */
   onFeedback(cb: (all: Feedback[]) => void, onError?: (msg: string) => void): Unsub;
   setTejedorHidden(id: string, hidden: boolean): Promise<void>;

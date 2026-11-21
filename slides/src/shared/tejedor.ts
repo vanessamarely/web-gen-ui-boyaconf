@@ -92,7 +92,7 @@ function patronDef(id: string, kind: number, [base, a1, a2]: readonly string[]):
 }
 
 const S = `stroke="${INK}" stroke-width="2" stroke-linejoin="round"`;
-const CAP = `<path d="M68 96 C66 52 94 38 120 38 C146 38 174 52 172 96 C160 72 140 64 120 66 C100 64 80 72 68 96 Z" fill="${HAIR}" ${S}/>`;
+const CAP = `<path d="M68 96 C66 52 94 38 120 38 C146 38 174 52 172 96 C160 72 140 64 120 66 C100 64 80 72 68 96 Z" fill="${HAIR}" ${S}/><path d="M86 62 C96 50 112 45 128 45" fill="none" stroke="#fff" stroke-opacity=".22" stroke-width="4" stroke-linecap="round"/>`;
 
 function sombreroBack(t: number, [, a1, a2]: readonly string[]): string {
   if (t === 4)
@@ -140,17 +140,21 @@ function sombreroFront(t: number, [base, a1, a2, borde]: readonly string[], pid:
 }
 
 function face(expresion: number): string {
-  const cheeks = `<circle cx="94" cy="116" r="7" fill="#ff7daf" opacity=".55"/><circle cx="146" cy="116" r="7" fill="#ff7daf" opacity=".55"/>`;
+  const cheeks = `<ellipse cx="92" cy="118" rx="8" ry="5" fill="#ff7daf" opacity=".5"/><ellipse cx="148" cy="118" rx="8" ry="5" fill="#ff7daf" opacity=".5"/>`;
   const line = `fill="none" stroke="${INK}" stroke-width="3" stroke-linecap="round"`;
+  const ojo = (x: number, r = 5.5) => `<circle cx="${x}" cy="101" r="${r}" fill="${INK}"/><circle cx="${x + 1.8}" cy="99" r="1.7" fill="#fff"/>`;
+  const cejas = (dy = 0) => `<path d="M93 ${88 + dy} Q102 ${83 + dy} 110 ${88 + dy} M130 ${88 + dy} Q138 ${83 + dy} 147 ${88 + dy}" fill="none" stroke="${HAIR}" stroke-width="3.4" stroke-linecap="round"/>`;
+  const nariz = `<path d="M120 106 Q116 113 122 114" fill="none" stroke="${INK}" stroke-opacity=".5" stroke-width="2.2" stroke-linecap="round"/>`;
+  const risa = `<path d="M106 120 Q120 138 134 120 Z" fill="#7a2730" stroke="${INK}" stroke-width="2.4" stroke-linejoin="round"/><path d="M112 127 Q120 132 128 127" fill="none" stroke="#ff8a8a" stroke-width="3" stroke-linecap="round"/>`;
   switch (expresion) {
     case 1: // guiño
-      return `<circle cx="102" cy="100" r="5" fill="${INK}"/><path d="M132 100 Q138 95 144 100" ${line}/>${cheeks}<path d="M108 120 Q120 132 134 119" ${line}/>`;
+      return `${cejas()}${ojo(102)}<path d="M131 101 Q138 95 145 101" ${line}/>${nariz}${cheeks}${risa}`;
     case 2: // sorpresa
-      return `<circle cx="102" cy="100" r="6" fill="${INK}"/><circle cx="138" cy="100" r="6" fill="${INK}"/>${cheeks}<ellipse cx="120" cy="124" rx="7" ry="9" fill="${INK}"/>`;
-    case 3: // concentrado (leyendo el JSON Schema)
-      return `<path d="M94 88 Q102 85 110 89 M146 88 Q138 85 130 89" ${line}/><circle cx="102" cy="102" r="4.5" fill="${INK}"/><circle cx="138" cy="102" r="4.5" fill="${INK}"/>${cheeks}<path d="M110 122 Q120 127 130 122" ${line}/>`;
+      return `${cejas(-4)}${ojo(102, 6.5)}${ojo(138, 6.5)}${nariz}${cheeks}<ellipse cx="120" cy="127" rx="7" ry="9" fill="#7a2730" stroke="${INK}" stroke-width="2.4"/>`;
+    case 3: // concentrado
+      return `<path d="M93 90 Q102 86 110 91 M147 90 Q138 86 130 91" fill="none" stroke="${HAIR}" stroke-width="3.4" stroke-linecap="round"/>${ojo(102, 4.8)}${ojo(138, 4.8)}${nariz}${cheeks}<path d="M110 124 Q120 129 130 124" ${line}/>`;
     default: // sonrisa
-      return `<circle cx="102" cy="100" r="5" fill="${INK}"/><circle cx="138" cy="100" r="5" fill="${INK}"/>${cheeks}<path d="M106 118 Q120 134 134 118" ${line}/>`;
+      return `${cejas()}${ojo(102)}${ojo(138)}${nariz}${cheeks}${risa}`;
   }
 }
 
@@ -239,8 +243,11 @@ export function tejedorSVG(opts: TejedorOptions, title = 'Tejedor'): string {
   <title>${escapeXml(title)}</title>
   <defs>
     ${patronDef(patron, o.patron, colors)}
+ <radialGradient id="${id}-sk" cx=".4" cy=".35" r=".75"><stop offset="0" stop-color="#fff" stop-opacity=".22"/><stop offset=".7" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".12"/></radialGradient>
+    <linearGradient id="${id}-sh" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#000" stop-opacity="0"/><stop offset=".65" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".2"/></linearGradient>
     <pattern id="${band}" width="12" height="12" patternUnits="userSpaceOnUse"><rect width="12" height="12" fill="${borde}"/><path d="M0 6 L6 0 L12 6 L6 12 Z" fill="${a1}"/></pattern>
   </defs>
+  <ellipse cx="120" cy="300" rx="78" ry="9" fill="#000" opacity=".13"/>
   ${acc.back}
   ${sombreroBack(o.sombrero, colors)}
   <!-- Piernas y ojotas -->
@@ -248,7 +255,9 @@ export function tejedorSVG(opts: TejedorOptions, title = 'Tejedor'): string {
     <rect x="94" y="236" width="20" height="50" rx="6" fill="#3c3c3c"/>
     <rect x="126" y="236" width="20" height="50" rx="6" fill="#3c3c3c"/>
     <rect x="94" y="270" width="20" height="12" fill="${skin}"/><rect x="126" y="270" width="20" height="12" fill="${skin}"/>
-    <ellipse cx="102" cy="292" rx="15" ry="7" fill="#8b5a2b"/><ellipse cx="138" cy="292" rx="15" ry="7" fill="#8b5a2b"/>
+    <path d="M86 286 h30 a7 7 0 0 1 0 14 h-30 a7 7 0 0 1 0 -14 z M124 286 h30 a7 7 0 0 1 0 14 h-30 a7 7 0 0 1 0 -14 z" fill="#fffdf8"/>
+    <path d="M90 288 Q102 280 114 288 M128 288 Q140 280 152 288" fill="none" stroke="${a1}" stroke-width="4" stroke-linecap="round"/>
+    <path d="M88 297 h28 M126 297 h28" stroke="#c9bfb2" stroke-width="2"/>
   </g>
   <!-- Ruana con patron y borde tejido -->
   <g ${S}>
@@ -258,9 +267,12 @@ export function tejedorSVG(opts: TejedorOptions, title = 'Tejedor'): string {
     <path d="M60 248 v8 M72 250 v8 M84 252 v8 M96 253 v8 M108 254 v8 M120 254 v8 M132 254 v8 M144 253 v8 M156 252 v8 M168 250 v8 M180 248 v8" stroke="${borde}" stroke-width="2.4" stroke-linecap="round"/>
     <path d="M106 142 Q120 154 134 142" fill="none"/>
   </g>
+  <path d="M80 146 C100 136 140 136 160 146 L186 236 C150 248 90 248 54 236 Z" fill="url(#${id}-sh)"/>
   <!-- Cabeza -->
   <rect x="110" y="132" width="20" height="14" fill="${skin}" ${S}/>
+  <circle cx="69" cy="102" r="9" fill="${skin}" ${S}/><circle cx="171" cy="102" r="9" fill="${skin}" ${S}/>
   <circle cx="120" cy="96" r="52" fill="${skin}" ${S}/>
+  <circle cx="120" cy="96" r="51" fill="url(#${id}-sk)"/>
   ${sombreroFront(o.sombrero, colors, patron)}
   ${face(o.expresion)}
   ${acc.front}

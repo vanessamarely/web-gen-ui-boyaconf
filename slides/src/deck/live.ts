@@ -10,6 +10,7 @@
 import QRCode from 'qrcode';
 import { Brain, Check, Circle, Diamond, Flame, Heart, MessageCircleQuestion, Square, Triangle, createElement, type IconNode } from 'lucide';
 import { SLIDE_BY_ID } from '../shared/content';
+import { nanoListo, responderConNano } from './nano-respuestas';
 import { NS, PUBLIC_DEMO_URL, PUBLIC_SLIDES_URL, REPO_URL, SESSION_ID, prettyUrl, publicLiveUrl, isPublicView } from '../shared/config';
 import { HILOS, tejedorSilhouette, tejedorSVG, type TejedorOptions } from '../shared/tejedor';
 import { QUESTIONS, QUESTION_IDS, parseAnswerKey, type AnswerKey, type QuestionId } from '../shared/questions';
@@ -557,13 +558,44 @@ export async function initLive(stage: DeckStage, sections: HTMLElement[]) {
   function renderQuestions() {
     renderPulse();
     const list = panel.querySelector('.qa-list')!;
-    list.innerHTML = questions.map((q) => `<li><p>${esc(q.text)}</p><small>${esc(q.name)} · ${esc(q.slide)}</small><button type="button" data-del="${esc(q.id)}">Respondida · quitar</button></li>`).join('');
+    list.innerHTML = questions.map((q) => { const r = respuestasNano.get(q.id); return `<li><p>${esc(q.text)}</p><small>${esc(q.name)} · ${esc(q.slide)}</small>${r ? `<p class="qa-nano"><b>${r === '…' ? 'Gemini Nano está respondiendo…' : 'Gemini Nano respondió:'}</b> ${r === '…' ? '' : esc(r)}</p>` : ''}<button type="button" data-del="${esc(q.id)}">Respondida · quitar</button></li>`; }).join('');
     list.querySelectorAll<HTMLButtonElement>('[data-del]').forEach((b) => b.addEventListener('click', () => void rt.removeQuestion(b.dataset.del!)));
     const empty = panel.querySelector<HTMLElement>('.qa-empty')!;
     empty.hidden = questions.length > 0 && !qaError;
     empty.textContent = qaError || 'Aún no hay preguntas.';
     empty.classList.toggle('error', Boolean(qaError));
     panel.querySelector('[data-q-total]')!.textContent = String(questions.length);
+  }
+  // Gemini Nano de este computador responde cada pregunta una sola vez, en orden.
+  const respuestasNano = new Map<string, string>();
+  const respondidas = new Set<string>(JSON.parse(localStorage.getItem(`${NS}.nano.${SESSION_ID}`) || '[]'));
+  let respondiendo = false;
+  let conNano: boolean | null = null;
+  async function responderPendientes() {
+    if (respondiendo || !presenter) return;
+    conNano ??= await nanoListo();
+    if (!conNano) return;
+    respondiendo = true;
+    try {
+      for (const q of questions) {
+        if (respondidas.has(q.id) || !q.uid) continue;
+        respuestasNano.set(q.id, '…');
+        renderQuestions();
+        try {
+          const texto = await responderConNano(q.text);
+          await rt.responder({ id: q.id, uid: q.uid }, texto);
+          respuestasNano.set(q.id, texto);
+          respondidas.add(q.id);
+          localStorage.setItem(`${NS}.nano.${SESSION_ID}`, JSON.stringify([...respondidas]));
+        } catch (err) {
+          console.warn('[nano] no se pudo responder', err);
+          respuestasNano.delete(q.id);
+        }
+        renderQuestions();
+      }
+    } finally {
+      respondiendo = false;
+    }
   }
   function listenQuestions() {
     if (!presenter || unsubQuestions) return;
@@ -579,6 +611,7 @@ export async function initLive(stage: DeckStage, sections: HTMLElement[]) {
         for (const q of qs) if (q.uid && !askedSet.has(q.uid)) (askedSet.add(q.uid), (added = true));
         if (added) savePart();
         qaError = '';
+        void responderPendientes();
         renderQuestions();
         syncPresenterUi();
         tellConsole();

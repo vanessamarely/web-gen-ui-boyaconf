@@ -32,7 +32,7 @@ const sol = (x: number, y: number, r: number, face = false) => {
 };
 
 /** Cóndor andino planeando (alas largas, collar blanco). */
-const condor = (x: number, y: number, s = 1) =>
+export const condor = (x: number, y: number, s = 1) =>
   `<g class="lm-condor" transform="translate(${x} ${y}) scale(${s})">
     <path d="M0 0 C-30 -14 -62 -12 -96 4 C-70 2 -52 8 -36 14 L-12 8 Z" fill="${INK}"/>
     <path d="M0 0 C30 -14 62 -12 96 4 C70 2 52 8 36 14 L12 8 Z" fill="${INK}"/>
@@ -60,7 +60,7 @@ function colcha(seedStart: number, top: number, bottom = 600): string {
 }
 
 /** Frailejón: tronco de hojas secas y roseta plateada con flor amarilla. */
-const frailejon = (x: number, y: number, s = 1) =>
+export const frailejon = (x: number, y: number, s = 1) =>
   `<g transform="translate(${x} ${y}) scale(${s})">
     <path d="M-9 0 C-11 -40 -10 -80 -6 -110 L6 -110 C10 -80 11 -40 9 0 Z" fill="#8b6a46" ${S}/>
     <path d="M-9 -20 h18 M-10 -45 h20 M-9 -70 h18 M-7 -95 h14" stroke="#6b4f33" stroke-width="2"/>

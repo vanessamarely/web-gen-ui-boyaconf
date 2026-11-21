@@ -29,7 +29,7 @@ import { initLive } from './live';
 import { MODES, RATIOS, initRatio, type RatioMode } from './ratio';
 import { initCodeFocus } from './code-focus';
 import { highlight } from './highlight';
-import { LANDMARKS } from './landmarks';
+import { LANDMARKS , condor, frailejon } from './landmarks';
 
 type DeckStage = HTMLElement & { goTo(i: number): void; next(): void; prev(): void };
 
@@ -92,6 +92,13 @@ const toggleJoinQr = () => {
   else delete document.documentElement.dataset.joinqr;
   save('joinqr', off ? '0' : '1');
 };
+
+// ── Decoración de Boyacá: frailejones al costado y un cóndor planeando, sin tapar el texto ──
+const DECORADOS = new Set(['reto', 'por-que', 'reglas-idea', 'harness', 'flujo', 'empezar', 'cierre', 'industria']);
+sections.forEach((s) => {
+  if (!DECORADOS.has(s.dataset.id ?? '')) return;
+  s.insertAdjacentHTML('afterbegin', `<svg class="deco deco-paramo" viewBox="-30 -180 140 200" aria-hidden="true">${frailejon(10, 0, 1)}${frailejon(70, 10, 0.65)}</svg><svg class="deco deco-condor" viewBox="-140 -60 280 120" aria-hidden="true">${condor(0, 0, 1)}</svg>`);
+});
 
 // ── Reglas: una sola fuente para deck, celular y memoria ──
 document.querySelectorAll<HTMLElement>('[data-ronda]').forEach((sec) => {
