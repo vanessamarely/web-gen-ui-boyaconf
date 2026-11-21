@@ -338,3 +338,6 @@ main { max-width: 520px; margin: 0 auto; min-height: 60dvh; }
 @keyframes llama { to { transform: scaleY(1.18) scaleX(0.92); } } @keyframes flota { to { transform: translateY(-14px); } } @keyframes chispa { to { opacity: .2; } }
 @keyframes escena-in { from { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .escena .llama, .escena .flota, .escena .chispa { animation: none; } }
+.creator .grupo { margin: 14px 0 0; padding: 10px 12px 12px; border: 1px solid var(--line); border-radius: 16px; }
+.creator .grupo legend { padding: 0 6px; font: 800 15px var(--sans); color: var(--ink); }
+.creator .grupo .mini:first-of-type { margin-top: 2px; }

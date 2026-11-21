@@ -9,7 +9,7 @@ import { Brain, Check, Circle, CircleHelp, Diamond, Download, FileText, Flame, G
 import { SLIDES, SLIDE_BY_ID, type SlideContent } from '../shared/content';
 import { EVENT, NS, PUBLIC_DEMO_URL, REPO_URL, SKILL_URL, TALK_TITLE } from "../shared/config";
 import { downloadFile, keepsakeHTML, keepsakeMarkdown, type SavedNote } from '../shared/keepsake';
-import { ACCESORIOS, DEFAULT_TEJEDOR, GENEROS, HILOS, EXPRESIONES, LEYENDA, PATRONES, PIELES, RUANAS, SOMBREROS, tejedorPNG, tejedorSticker, tejedorSilhouette, tejedorSVG, normalizeTejedor, randomTejedor, type TejedorOptions } from '../shared/tejedor';
+import { ACCESORIOS, CABELLOS, COLORES_PELO, DEFAULT_TEJEDOR, GENEROS, HILOS, EXPRESIONES, LEYENDA, PATRONES, PIELES, RUANAS, SOMBREROS, tejedorPNG, tejedorSticker, tejedorSilhouette, tejedorSVG, normalizeTejedor, randomTejedor, type TejedorOptions } from '../shared/tejedor';
 import { claimUniqueName, cleanName, randomName, TOTAL_COMBINATIONS } from '../shared/names';
 import { QUESTIONS, type QuestionId } from '../shared/questions';
 import { REACTIONS, correctCount, getRealtime, podiumKey, winnerCode, type Reaction, type Realtime, type SlideState, type Votes } from '../shared/realtime';
@@ -814,13 +814,10 @@ function renderTejedor(screen: HTMLElement) {
     <div class="doll-preview" data-preview></div>
     <p class="legend">${esc(LEYENDA)}</p>
     <label class="field"><span>Nombre de tu tejedor</span><input data-f="name" maxlength="18" value="${esc(tejedor.name)}" autocomplete="off" /></label>
-    <fieldset class="field"><legend>El hilo que teje tu tejedor</legend><div class="chips penas" role="radiogroup">${HILOS.map(
+    <div data-opts></div>
+    <fieldset class="field grupo-hilo"><legend>El hilo que teje tu tejedor</legend><div class="chips penas" role="radiogroup">${HILOS.map(
       (p, i) => `<button type="button" role="radio" aria-checked="${tejedor.hilo === i}" data-hilo="${i}">${esc(p)}</button>`,
     ).join('')}</div></fieldset>
-    <fieldset class="field"><legend>Ruana</legend><div class="palettes" role="radiogroup">${RUANAS.map(
-      (t, i) => `<button type="button" role="radio" aria-checked="${tejedor.opts.ruana === i}" data-opt="ruana" data-v="${i}"><i>${t.c.map((c) => `<b style="background:${c}"></b>`).join('')}</i>${esc(t.label)}</button>`,
-    ).join('')}</div></fieldset>
-    <div data-opts></div>
     <button class="btn ghost" type="button" data-random>${icon(Shuffle, 16)} Sorpréndeme</button>
     <p class="fine">Se dibuja <b>en tu celular</b> (SVG). Si lo publicas, al muro solo viajan tus elecciones.</p>
     <button class="btn wide primary" type="button" data-publish>${icon(Send, 18)} ${tejedor.published ? 'Actualizar en el muro y el podio' : 'Publicar en el muro y el podio (+100)'}</button>
@@ -836,11 +833,16 @@ function renderTejedor(screen: HTMLElement) {
     `<p class="mini">${label}</p><div class="chips" role="radiogroup" aria-label="${label}">${labels
       .map((l, i) => `<button type="button" role="radio" aria-checked="${tejedor.opts[key] === i}" data-opt="${key}" data-v="${i}">${esc(l)}</button>`)
       .join('')}</div>`;
-  $('[data-opts]', screen).innerHTML = `${chips('patron', 'Patron (diseño tejido)', PATRONES)}${chips('sombrero', 'Sombrero', SOMBREROS)}
-    <p class="mini">Piel</p><div class="swatches" role="radiogroup" aria-label="Piel">${PIELES.map(
-      (c, i) => `<button type="button" class="swatch" role="radio" aria-label="Tono de piel ${i + 1}" aria-checked="${tejedor.opts.piel === i}" data-opt="piel" data-v="${i}" style="--swatch:${c}"></button>`,
-    ).join('')}</div>
-    ${chips('genero', 'Género', GENEROS)}${chips('accesorio', 'Lo que lleva', ACCESORIOS)}${chips('expresion', 'Expresión', EXPRESIONES)}`;
+  const grupo = (titulo: string, cuerpo: string) => `<fieldset class="grupo"><legend>${titulo}</legend>${cuerpo}</fieldset>`;
+  const muestras = (key: 'piel' | 'colorPelo', etiqueta: string, colores: readonly string[], nombres?: readonly string[]) =>
+    `<p class="mini">${etiqueta}</p><div class="swatches" role="radiogroup" aria-label="${etiqueta}">${colores.map((c, i) => `<button type="button" class="swatch" role="radio" aria-label="${nombres?.[i] ?? `${etiqueta} ${i + 1}`}" title="${nombres?.[i] ?? ''}" aria-checked="${normalizeTejedor(tejedor.opts)[key] === i}" data-opt="${key}" data-v="${i}" style="--swatch:${c}"></button>`).join('')}</div>`;
+  const o = normalizeTejedor(tejedor.opts);
+  tejedor.opts = o;
+  $('[data-opts]', screen).innerHTML =
+    grupo('Cuerpo', `${chips('genero', 'Género', GENEROS)}${muestras('piel', 'Piel', PIELES)}${chips('expresion', 'Expresión', EXPRESIONES)}`) +
+    grupo('Cabello', `${chips('cabello', 'Tipo', CABELLOS)}${muestras('colorPelo', 'Color', COLORES_PELO.map((x) => x.c), COLORES_PELO.map((x) => x.label))}`) +
+    grupo('Ropa', `<p class="mini">Ruana</p><div class="palettes" role="radiogroup" aria-label="Ruana">${RUANAS.map((t, i) => `<button type="button" role="radio" aria-checked="${o.ruana === i}" data-opt="ruana" data-v="${i}"><i>${t.c.map((c) => `<b style="background:${c}"></b>`).join('')}</i>${esc(t.label)}</button>`).join('')}</div>${chips('patron', 'Patrón de la ruana', PATRONES)}${chips('sombrero', 'Sombrero', SOMBREROS)}`) +
+    grupo('Lo que lleva', chips('accesorio', 'Accesorio', ACCESORIOS));
   const changed = () => {
     persist();
     preview();

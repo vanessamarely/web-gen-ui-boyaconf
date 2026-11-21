@@ -15,9 +15,11 @@ export interface TejedorOptions {
   expresion: number;
   /** 0 mujer, 1 hombre, 2 sin especificar (los tejedores anteriores quedan así) */
   genero?: number;
+  cabello?: number;
+  colorPelo?: number;
 }
 
-export const DEFAULT_TEJEDOR: TejedorOptions = { ruana: 0, patron: 0, sombrero: 0, piel: 2, accesorio: 1, expresion: 0, genero: 2 };
+export const DEFAULT_TEJEDOR: TejedorOptions = { ruana: 0, patron: 0, sombrero: 0, piel: 2, accesorio: 1, expresion: 0, genero: 2, cabello: 0, colorPelo: 0 };
 
 /** Paletas de la ruana: [base, acento, acento 2, borde] — lana teñida con nombres de Boyacá. */
 export const RUANAS = [
@@ -31,7 +33,15 @@ export const RUANAS = [
 
 /** Patrones tejidos en la ruana. */
 export const PATRONES = ['Listas', 'Rombos', 'Cuadros', 'Grecas', 'Lisa'] as const;
-export const SOMBREROS = ['Sombrero de paja', 'Sombrero de fieltro', 'Gorro tejido', 'Pañoleta', 'Trenzas', 'Corto'] as const;
+export const SOMBREROS = ['Sombrero de paja', 'Sombrero de fieltro', 'Gorro tejido', 'Pañoleta', 'Sin sombrero'] as const;
+export const CABELLOS = ['Corto', 'Largo', 'Trenzas', 'Moño', 'Crespo'] as const;
+export const COLORES_PELO = [
+  { label: 'Negro', c: '#2b2118' },
+  { label: 'Castaño', c: '#6b4226' },
+  { label: 'Rubio', c: '#d9a944' },
+  { label: 'Rojizo', c: '#a8432a' },
+  { label: 'Canoso', c: '#b9b4ad' },
+] as const;
 export const PIELES = ['#f6d3b3', '#e8b48a', '#c98b5e', '#9a6440', '#6b4329'] as const;
 export const ACCESORIOS = ['Ninguno', 'Madeja de lana', 'Tiple', 'Tejo', 'Laptop', 'Frailejón', 'Almojábana'] as const;
 export const EXPRESIONES = ['Sonrisa', 'Guiño', 'Sorpresa', 'Concentrado'] as const;
@@ -63,20 +73,29 @@ let seq = 0;
 const clampIdx = (n: number, len: number) => (Number.isInteger(n) && n >= 0 && n < len ? n : 0);
 
 export function normalizeTejedor(o: Partial<TejedorOptions> | null | undefined): TejedorOptions {
+  // Tejedores anteriores: "Trenzas" (4) y "Corto" (5) eran opciones de sombrero.
+  let sombrero = o?.sombrero ?? 0;
+  let cabello = o?.cabello;
+  if (cabello === undefined) {
+    cabello = sombrero === 4 ? 2 : sombrero === 5 ? 0 : o?.genero === 0 ? 1 : 0;
+    if (sombrero === 5) sombrero = 4;
+  }
   return {
     ruana: clampIdx(o?.ruana ?? 0, RUANAS.length),
     patron: clampIdx(o?.patron ?? 0, PATRONES.length),
-    sombrero: clampIdx(o?.sombrero ?? 0, SOMBREROS.length),
+    sombrero: clampIdx(sombrero, SOMBREROS.length),
     piel: clampIdx(o?.piel ?? 2, PIELES.length),
     accesorio: clampIdx(o?.accesorio ?? 0, ACCESORIOS.length),
     expresion: clampIdx(o?.expresion ?? 0, EXPRESIONES.length),
     genero: clampIdx(o?.genero ?? 2, GENEROS.length),
+    cabello: clampIdx(cabello, CABELLOS.length),
+    colorPelo: clampIdx(o?.colorPelo ?? 0, COLORES_PELO.length),
   };
 }
 
 export function randomTejedor(r: () => number = Math.random): TejedorOptions {
   const n = (len: number) => Math.floor(r() * len);
-  return { ruana: n(RUANAS.length), patron: n(PATRONES.length), sombrero: n(SOMBREROS.length), piel: n(PIELES.length), accesorio: n(ACCESORIOS.length), expresion: n(EXPRESIONES.length), genero: n(GENEROS.length) };
+  return { ruana: n(RUANAS.length), patron: n(PATRONES.length), sombrero: n(SOMBREROS.length), piel: n(PIELES.length), accesorio: n(ACCESORIOS.length), expresion: n(EXPRESIONES.length), genero: n(GENEROS.length), cabello: n(CABELLOS.length), colorPelo: n(COLORES_PELO.length) };
 }
 
 /** Patrón de la ruana como <pattern> con id único por dibujo. */
@@ -98,17 +117,40 @@ function patronDef(id: string, kind: number, [base, a1, a2]: readonly string[]):
 const S = `stroke="${INK}" stroke-width="2" stroke-linejoin="round"`;
 const CAP = `<path d="M68 96 C66 52 94 38 120 38 C146 38 174 52 172 96 C160 72 140 64 120 66 C100 64 80 72 68 96 Z" fill="${HAIR}" ${S}/><path d="M86 62 C96 50 112 45 128 45" fill="none" stroke="#fff" stroke-opacity=".22" stroke-width="4" stroke-linecap="round"/>`;
 
-function sombreroBack(t: number, [, a1, a2]: readonly string[]): string {
-  if (t === 4)
-    // Trenzas largas con cintas de colores
-    return `<g stroke="${INK}" stroke-width="2">
-      <path d="M72 96 C60 140 64 170 70 200" fill="none" stroke="${HAIR}" stroke-width="16" stroke-linecap="round"/>
-      <path d="M168 96 C180 140 176 170 170 200" fill="none" stroke="${HAIR}" stroke-width="16" stroke-linecap="round"/>
-      <rect x="62" y="198" width="16" height="8" rx="3" fill="${a1}"/><rect x="162" y="198" width="16" height="8" rx="3" fill="${a2}"/></g>`;
+function sombreroBack(t: number, [, a1]: readonly string[]): string {
   if (t === 3)
     // Pañoleta: la tela cae detrás de la cabeza
     return `<path d="M64 100 C60 140 70 168 92 178 L148 178 C170 168 180 140 176 100 Z" fill="${a1}" stroke="${INK}" stroke-width="2" stroke-linejoin="round"/>`;
   return '';
+}
+
+/** Cabello detrás de la cabeza (largo, trenzas, moño, crespo). */
+function peloAtras(cabello: number, sombrero: number, [, a1, a2]: readonly string[]): string {
+  switch (cabello) {
+    case 1: // largo
+      return `<path d="M66 100 C56 140 58 172 70 196 C80 200 92 196 96 190 C86 166 84 132 88 104 Z M174 100 C184 140 182 172 170 196 C160 200 148 196 144 190 C154 166 156 132 152 104 Z" fill="${HAIR}" ${S}/>`;
+    case 2: // trenzas con cintas
+      return `<g stroke="${INK}" stroke-width="2">
+      <path d="M72 96 C60 140 64 170 70 200" fill="none" stroke="${HAIR}" stroke-width="16" stroke-linecap="round"/>
+      <path d="M168 96 C180 140 176 170 170 200" fill="none" stroke="${HAIR}" stroke-width="16" stroke-linecap="round"/>
+      <path d="M64 130 l12 6 M62 150 l12 6 M64 170 l12 6 M176 130 l-12 6 M178 150 l-12 6 M176 170 l-12 6" stroke="${INK}" stroke-opacity=".35" stroke-width="2"/>
+      <rect x="62" y="198" width="16" height="8" rx="3" fill="${a1}"/><rect x="162" y="198" width="16" height="8" rx="3" fill="${a2}"/></g>`;
+    case 3: // moño
+      return sombrero === 4 ? `<circle cx="120" cy="36" r="20" fill="${HAIR}" ${S}/><path d="M108 30 Q120 22 132 30" fill="none" stroke="#fff" stroke-opacity=".25" stroke-width="3"/>` : `<circle cx="150" cy="70" r="18" fill="${HAIR}" ${S}/>`;
+    case 4: // crespo
+      return [[68, 96], [64, 120], [72, 142], [172, 96], [176, 120], [168, 142]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="16" fill="${HAIR}" ${S}/>`).join('');
+    default:
+      return '';
+  }
+}
+
+/** Cabello sobre la frente cuando no hay sombrero. */
+function peloArriba(cabello: number): string {
+  if (cabello === 0)
+    return `<path d="M68 94 C64 50 94 36 120 36 C150 36 176 50 172 94 C168 78 160 70 150 66 C142 76 124 80 104 76 C92 74 80 80 68 94 Z" fill="${HAIR}" ${S}/>`;
+  if (cabello === 4)
+    return `<g fill="${HAIR}" ${S}>${[[78, 66], [96, 50], [120, 44], [144, 50], [162, 66], [70, 86], [170, 86]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="18"/>`).join('')}</g><path d="M70 92 C80 74 160 74 170 92 C160 80 80 80 70 92 Z" fill="${HAIR}"/>`;
+  return `${CAP}<path d="M120 40 L120 64" stroke="#4a3a2c" stroke-width="2"/>`;
 }
 
 function sombreroFront(t: number, [base, a1, a2, borde]: readonly string[], pid: string): string {
@@ -129,10 +171,8 @@ function sombreroFront(t: number, [base, a1, a2, borde]: readonly string[], pid:
       return `${CAP}<g ${S}>
         <path d="M64 92 C66 52 96 38 120 38 C144 38 174 52 176 92 C160 76 140 70 120 70 C100 70 80 76 64 92 Z" fill="${a1}"/>
         <path d="M70 84 C90 72 150 72 170 84" fill="none" stroke="${a2}" stroke-width="3" stroke-dasharray="2 6"/></g>`;
-    case 4: // Trenzas: raya al medio
-      return `${CAP}<path d="M120 40 L120 64" stroke="#4a3a2c" stroke-width="2"/>`;
-    case 5: // Corto
-      return `<path d="M68 94 C64 50 94 36 120 36 C150 36 176 50 172 94 C168 78 160 70 150 66 C142 76 124 80 104 76 C92 74 80 80 68 94 Z" fill="${HAIR}" ${S}/>`;
+    case 4: // Sin sombrero: se ve el cabello
+      return '';
     default: // Sombrero de paja (jipa) con cinta tejida
       return `${CAP}<g ${S}>
         <ellipse cx="120" cy="62" rx="90" ry="18" fill="#e8c983"/>
@@ -163,23 +203,15 @@ function face(expresion: number): string {
 }
 
 /** Rasgos según el género elegido: pelo largo, pestañas y aretes; o cejas gruesas y patillas. */
-function rasgos(genero: number, sombrero: number, a1: string): { atras: string; frente: string } {
-  if (genero === 0) {
-    // Con trenzas o pañoleta el pelo ya está dibujado: no se repite.
-    const pelo = sombrero === 3 || sombrero === 4 ? '' : `<path d="M68 100 C60 132 62 156 72 176 C78 178 84 176 88 172 C82 150 80 126 84 104 Z M172 100 C180 132 178 156 168 176 C162 178 156 176 152 172 C158 150 160 126 156 104 Z" fill="${HAIR}" stroke="${INK}" stroke-width="2" stroke-linejoin="round"/>`;
-    return {
-      atras: pelo,
-      frente: `<path d="M95 96 l-4 -3 M146 96 l4 -3" stroke="${INK}" stroke-width="2.2" stroke-linecap="round"/>
-        <g stroke="${INK}" stroke-width="1.6"><path d="M66 110 v6 M174 110 v6"/><circle cx="66" cy="119" r="3.6" fill="${a1}"/><circle cx="174" cy="119" r="3.6" fill="${a1}"/></g>`,
-    };
-  }
+/** Rasgos según el género elegido: pestañas y aretes; o cejas gruesas y patillas. */
+function rasgos(genero: number, cabello: number, a1: string): string {
+  if (genero === 0)
+    return `<path d="M95 96 l-4 -3 M146 96 l4 -3" stroke="${INK}" stroke-width="2.2" stroke-linecap="round"/>
+        <g stroke="${INK}" stroke-width="1.6"><path d="M66 110 v6 M174 110 v6"/><circle cx="66" cy="119" r="3.6" fill="${a1}"/><circle cx="174" cy="119" r="3.6" fill="${a1}"/></g>`;
   if (genero === 1)
-    return {
-      atras: '',
-      frente: `<path d="M92 87 Q102 81 111 87 M129 87 Q138 81 148 87" fill="none" stroke="${HAIR}" stroke-width="5.5" stroke-linecap="round"/>
-        ${sombrero === 3 || sombrero === 4 ? '' : `<path d="M72 92 C72 104 74 112 78 118 L82 116 C80 108 80 100 80 92 Z M168 92 C168 104 166 112 162 118 L158 116 C160 108 160 100 160 92 Z" fill="${HAIR}"/>`}`,
-    };
-  return { atras: '', frente: '' };
+    return `<path d="M92 87 Q102 81 111 87 M129 87 Q138 81 148 87" fill="none" stroke="${HAIR}" stroke-width="5.5" stroke-linecap="round"/>
+        ${cabello === 0 ? `<path d="M72 92 C72 104 74 112 78 118 L82 116 C80 108 80 100 80 92 Z M168 92 C168 104 166 112 162 118 L158 116 C160 108 160 100 160 92 Z" fill="${HAIR}"/>` : ''}`;
+  return '';
 }
 
 /** Manos por defecto (a los lados del ruana). */
@@ -263,7 +295,8 @@ export function tejedorSVG(opts: TejedorOptions, title = 'Tejedor'): string {
   const patron = `${id}-p`;
   const band = `${id}-b`;
   const acc = accessory(o.accesorio, skin, colors);
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -24 240 344" role="img" aria-label="${escapeXml(title)}">
+  const pelo = COLORES_PELO[o.colorPelo ?? 0].c;
+  return (`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -24 240 344" role="img" aria-label="${escapeXml(title)}">
   <title>${escapeXml(title)}</title>
   <defs>
     ${patronDef(patron, o.patron, colors)}
@@ -274,7 +307,7 @@ export function tejedorSVG(opts: TejedorOptions, title = 'Tejedor'): string {
   <ellipse cx="120" cy="300" rx="78" ry="9" fill="#000" opacity=".13"/>
   ${acc.back}
   ${sombreroBack(o.sombrero, colors)}
-  ${rasgos(o.genero ?? 2, o.sombrero, a1).atras}
+  ${peloAtras(o.cabello ?? 0, o.sombrero, colors)}
   <!-- Piernas y ojotas -->
   <g ${S}>
     <rect x="94" y="236" width="20" height="50" rx="6" fill="#3c3c3c"/>
@@ -298,11 +331,11 @@ export function tejedorSVG(opts: TejedorOptions, title = 'Tejedor'): string {
   <circle cx="69" cy="102" r="9" fill="${skin}" ${S}/><circle cx="171" cy="102" r="9" fill="${skin}" ${S}/>
   <circle cx="120" cy="96" r="52" fill="${skin}" ${S}/>
   <circle cx="120" cy="96" r="51" fill="url(#${id}-sk)"/>
-  ${sombreroFront(o.sombrero, colors, patron)}
+  ${o.sombrero === 4 ? peloArriba(o.cabello ?? 0) : sombreroFront(o.sombrero, colors, patron)}
   ${face(o.expresion)}
-  ${rasgos(o.genero ?? 2, o.sombrero, a1).frente}
+  ${rasgos(o.genero ?? 2, o.cabello ?? 0, a1)}
   ${acc.front}
-</svg>`;
+</svg>`).replaceAll(HAIR, pelo);
 }
 
 export function svgDataUrl(svg: string): string {

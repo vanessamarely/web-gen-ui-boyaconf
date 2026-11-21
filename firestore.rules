@@ -140,10 +140,12 @@ service cloud.firestore {
           && d.name is string && d.name.size() > 0 && d.name.size() <= 24
           && smallInt(d.hilo, 20)
           && o is map
-          && o.keys().hasOnly(['ruana', 'patron', 'sombrero', 'piel', 'accesorio', 'expresion', 'genero'])
+          && o.keys().hasOnly(['ruana', 'patron', 'sombrero', 'piel', 'accesorio', 'expresion', 'genero', 'cabello', 'colorPelo'])
           && smallInt(o.ruana, 9) && smallInt(o.patron, 9) && smallInt(o.sombrero, 9)
           && smallInt(o.piel, 9) && smallInt(o.accesorio, 9) && smallInt(o.expresion, 9)
-          && (!('genero' in o) || smallInt(o.genero, 9));
+          && (!('genero' in o) || smallInt(o.genero, 9))
+          && (!('cabello' in o) || smallInt(o.cabello, 9))
+          && (!('colorPelo' in o) || smallInt(o.colorPelo, 9));
       }
     }
 
