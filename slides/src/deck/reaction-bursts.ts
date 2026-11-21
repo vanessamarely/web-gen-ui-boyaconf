@@ -24,7 +24,7 @@ export function createBursts(getPlayers: () => number) {
     el.className = `burst burst-${kind}`;
     el.setAttribute('role', 'status');
     if (kind === 'fire')
-      el.innerHTML = `<div class="burst-runner">${tejedorSVG({ ruana: 3, patron: 0, sombrero: 0, piel: 2, accesorio: 1, expresion: 2 }, 'Tejedor')}</div><p class="burst-sign">¡Boyacá está que arde! 🔥</p>`;
+      el.innerHTML = `<div class="burst-runner">${tejedorSVG({ ruana: 3, patron: 0, sombrero: 0, piel: 2, accesorio: 1, expresion: 2 }, 'Tejedor')}</div><p class="burst-sign">¡Qué energía, Boyacá! 🔥</p>`;
     if (kind === 'mind') el.innerHTML = `<div class="burst-tejo">${tejoSVG()}</div><p class="burst-sign">¡Mecha! Mente volada 🤯</p>`;
     if (kind === 'heart') el.innerHTML = `<div class="burst-sol">${solSVG()}</div><p class="burst-sign">¡Gracias, sumercé! ❤️</p>`;
     document.body.append(el);

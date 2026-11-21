@@ -507,8 +507,37 @@ export async function initLive(stage: DeckStage, sections: HTMLElement[]) {
   // Oleadas de reacciones → efectos en pantalla (tejedor, tejo, sol).
   const bursts = createBursts(() => players.length);
   Object.assign(window, { deckBurst: (k: Reaction) => bursts.show(k) });
+  // En pantalla: cada 3 reacciones seguidas de una persona aparece su tejedor desde abajo.
+  const rachas = new Map<string, number>();
+  let enEscena = 0;
+  // Carriles fijos para que los tejedores no se monten uno sobre otro.
+  const CARRILES = [10, 26, 42, 58, 74];
+  const ocupados = new Set<number>();
+  const textoRacha: Record<string, string> = { fire: '¡Con toda la energía!', heart: '¡Gracias por el cariño!', mind: '¡Aprendiendo!' };
+  function avatarEnPantalla(r: Reaction, uid: string) {
+    if (enEscena >= 5 || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const t = tejedores.find((x) => x.id === uid && !x.hidden);
+    const nombre = players.find((p) => p.id === uid)?.name ?? t?.name;
+    if (!nombre) return;
+    const el = document.createElement('div');
+    el.className = `racha racha-${r}`;
+    const libre = CARRILES.findIndex((_, i) => !ocupados.has(i));
+    if (libre < 0) return;
+    ocupados.add(libre);
+    el.style.left = `${CARRILES[libre]}%`;
+    const fx = r === 'fire' ? '<span class="racha-fx">🔥🔥🔥</span>' : r === 'heart' ? '<span class="racha-fx">💜💜💜</span>' : '<span class="racha-fx">💡✨</span>';
+    el.innerHTML = `${fx}<div class="racha-art">${avatar(t?.opts, nombre)}</div><p><b>${esc(nombre)}</b><span>${textoRacha[r] ?? ''}</span></p>`;
+    enEscena++;
+    el.addEventListener('animationend', (e) => { if (e.target === el) { el.remove(); enEscena--; ocupados.delete(libre); } });
+    document.body.append(el);
+  }
   rt.onReaction((r, uid) => {
     bursts.add(r);
+    if (uid && r !== 'ask') {
+      const n = (rachas.get(`${uid}:${r}`) ?? 0) + 1;
+      rachas.set(`${uid}:${r}`, n);
+      if (n % 3 === 0) avatarEnPantalla(r, uid);
+    }
     if (uid && r !== 'ask' && (part.reactions[uid] ?? 0) < 10) {
       part.reactions[uid] = (part.reactions[uid] ?? 0) + 1;
       savePart();

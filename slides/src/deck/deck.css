@@ -1637,3 +1637,13 @@ deck-stage > section > .frame { z-index: 1; }
 .deco-condor { overflow: visible; width: 170px; top: 14px; }
 :root[data-sin-dinamica] .aviso-pregunta { display: none; }
 .deck-menu-panel .slides-list button.saltado { text-decoration: line-through; opacity: .45; }
+.racha { position: fixed; z-index: 65; bottom: 6%; width: 150px; display: grid; justify-items: center; pointer-events: none; animation: racha 4.2s cubic-bezier(.2,1.2,.4,1) both; }
+.racha-art { width: 110px; } .racha-art svg { display: block; width: 100%; height: auto; }
+.racha-fire .racha-art { animation: racha-tiembla .25s ease-in-out infinite alternate; filter: drop-shadow(0 0 14px #ff9d1a); }
+.racha-heart .racha-art { filter: drop-shadow(0 0 14px #c56cf0); } .racha-mind .racha-art { filter: drop-shadow(0 0 14px #f3c94f); }
+.racha-fx { font-size: 34px; line-height: 1; margin-bottom: -6px; }
+.racha p { margin: 2px 0 0; padding: 4px 12px; border: 2px solid #2a211b; border-radius: 999px; background: #ffe08a; color: #2a211b; text-align: center; font: 700 14px/1.2 var(--sans); }
+.racha p b { display: block; font-size: 15px; } .racha p span { font-size: 12px; }
+@keyframes racha { 0% { transform: translateY(120%); opacity: 0; } 15% { transform: translateY(0); opacity: 1; } 80% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-30%); opacity: 0; } }
+@keyframes racha-tiembla { to { transform: rotate(3deg); } }
+@media (prefers-reduced-motion: reduce) { .racha { display: none; } }
