@@ -59,7 +59,7 @@ export const RONDAS: Ronda[] = [
     frameworks: [
       { nombre: "React", evita: "<p dangerouslySetInnerHTML={{ __html: consejo }} />", usa: "<p>{consejo}</p>" },
       { nombre: "Vue", evita: "<p v-html=\"consejo\"></p>", usa: "<p>{{ consejo }}</p>" },
-      { nombre: "Angular", evita: "<p [innerHTML]=\"consejo()\"></p>", usa: "<p>{{ consejo() }}</p>" },
+      { nombre: "Angular", evita: "<p [innerHTML]=\"consejo\"></p>", usa: "<p>{{ consejo }}</p>" },
       { nombre: "Svelte", evita: "<p>{@html consejo}</p>", usa: "<p>{consejo}</p>" },
     ],
     notas: "Empecemos por lo primero que ve la persona. Siempre supimos que no se debe confiar en lo que escriben los usuarios. Pues la respuesta de la IA es igual: puede traer contenido que copió de una reseña o de otra página. Para probarlo, agregamos a propósito al consejo de la IA una imagen con un onerror que ejecuta JavaScript. La versión sin preparar lo ejecutó. La preparada lo mostró como texto.",

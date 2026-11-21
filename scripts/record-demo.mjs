@@ -16,24 +16,58 @@ const PEDIDO = 'Arma un mercado para 4 personas con 120 mil';
 const TIPOS = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml' };
 const srv = createServer((q, r) => { let u = normalize(q.url.split('?')[0]); if (u.endsWith('/')) u += 'index.html'; try { const b = readFileSync(join(DIST, u)); r.writeHead(200, { 'content-type': TIPOS[extname(u)] ?? 'application/octet-stream' }); r.end(b); } catch { r.writeHead(404); r.end(); } }).listen(5383);
 
+// Cada escena es una lista de pasos: el rótulo cambia en el momento en que pasa cada cosa.
 const ESCENAS = {
-  renderizado: { marcador: (m) => [['Script en la respuesta', m.xss ? 'se ejecutó' : 'no se ejecutó']], antes: 'La web ejecuta el script que traía la respuesta', despues: 'La web lo muestra como texto y no se ejecuta' },
-  streaming: { marcador: (m) => [['Actualizaciones de pantalla', m.pintadas]], antes: 'Actualiza la pantalla con cada pedazo', despues: 'Actualiza la pantalla cada 100 ms' },
-  dom: { marcador: (m) => [['Elementos creados', m.nodos.toLocaleString('es-CO')]], antes: 'Reconstruye toda la interfaz', despues: 'Reutiliza lo que ya está en pantalla', resaltar: true },
-  estado: { marcador: (_, v) => [['Papa pastusa', `${v} kg`]], antes: 'Cambié la papa a 5 kg y la IA la devolvió a 2 kg', despues: 'Cambié la papa a 5 kg y mi cambio se queda', editar: true },
-  accesibilidad: { marcador: (m, _, s) => [['Avisos al lector de pantalla', m.anuncios], ['Campos sin nombre', s]], antes: 'El lector de pantalla recibe un aviso tras otro', despues: 'Avisa al empezar y al terminar' },
+  renderizado: {
+    marcador: (m) => [['Script en la respuesta', m.xss ? 'se ejecutó' : 'no se ejecutó']],
+    pasos: { inicio: '1. La IA responde por partes, en JSON', resaltarTicker: /<img[^>]*>/, medio: '2. Dentro del consejo llega este HTML: <img onerror=…>', antes: '3. La web lo inserta como HTML: el script se ejecuta', despues: '3. La web lo muestra como texto: no se ejecuta' },
+  },
+  streaming: {
+    marcador: (m) => [['Veces que se redibujó la pantalla', m.pintadas]],
+    pasos: { inicio: '1. La IA responde en cientos de pedacitos', medio: '2. Mira el contador mientras llegan', antes: '3. Redibujó la pantalla con cada pedacito', despues: '3. Redibujó solo cada 100 ms' },
+  },
+  dom: {
+    marcador: (m) => [['Elementos creados', m.nodos.toLocaleString('es-CO')]],
+    resaltar: true,
+    pasos: { inicio: '1. La IA responde por partes', medio: '2. Lo que se pinta de rojo se crea de nuevo', antes: '3. Reconstruyó toda la lista una y otra vez', despues: '3. Solo creó lo que faltaba' },
+  },
+  estado: {
+    marcador: (_, v) => [['Papa pastusa', `${v} kg`]],
+    editar: true,
+    pasos: { inicio: '1. La IA envía la lista por partes, en JSON', editar: '2. Mientras responde, cambio la papa a 5 kg', llega: '3. Llega la siguiente parte: "cantidad": 2', antes: '4. La web la devolvió a 2 kg', despues: '4. La web respetó mi cambio: 5 kg' },
+  },
+  accesibilidad: {
+    marcador: (m, _, s) => [['Avisos al lector de pantalla', m.anuncios], ['Campos sin nombre', s]],
+    pasos: { inicio: '1. La IA responde por partes', medio: '2. Mira los avisos que recibe el lector de pantalla', antes: '3. Un aviso con cada pedacito', despues: '3. Un aviso al empezar y otro al terminar' },
+  },
 };
 
 const capa = () => {
   const s = document.createElement('style');
-  s.textContent = `.cabeza,.pedido,.medidas,.estado,.explica,.prueba,.progreso,.cwv{display:none!important} body{max-width:1120px;padding:92px 24px 90px;zoom:1}
-  #m-tablero{position:fixed;z-index:9;top:0;left:0;right:0;display:flex;justify-content:center;gap:48px;padding:12px;background:#1a0e1c;color:#fff;font:600 21px system-ui}
+  s.textContent = `.cabeza,.pedido,.medidas,.estado,.explica,.prueba,.progreso,.cwv,.agente,.ui-titulo{display:none!important}
+  body{max-width:none;margin:0;padding:78px 420px 70px 28px;zoom:1}
+  .superficie{zoom:1.32;transform-origin:top left}
+  #m-tablero{position:fixed;z-index:9;top:0;left:0;right:0;display:flex;justify-content:center;gap:48px;padding:10px;background:#1a0e1c;color:#fff;font:600 21px system-ui}
   #m-tablero b{margin-left:10px;color:#ffe08a;font-size:30px}
-  #m-rotulo{position:fixed;z-index:9;left:50%;bottom:20px;transform:translateX(-50%);padding:12px 26px;border-radius:999px;background:#1a0e1c;color:#fff;font:700 25px system-ui;white-space:nowrap}
+  #m-json{position:fixed;z-index:8;top:72px;right:16px;bottom:84px;width:384px;margin:0;padding:12px 14px;border-radius:14px;background:#1a0e1c;color:#cfe8d8;font:600 21px/1.4 ui-monospace,monospace;white-space:pre-wrap;word-break:break-all;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end}
+  #m-json b{display:block;margin-bottom:8px;color:#ffe08a;font:800 18px system-ui;letter-spacing:.04em;text-transform:uppercase}
+  #m-json mark{background:#e5294f;color:#fff;border-radius:4px;padding:0 2px}
+  #m-rotulo{position:fixed;z-index:9;left:28px;right:420px;bottom:16px;padding:12px 22px;border-radius:999px;background:#1a0e1c;color:#fff;font:700 24px system-ui;text-align:center}
   .m-nuevo{animation:m-flash .55s ease-out} @keyframes m-flash{from{box-shadow:0 0 0 3px #e5294f;background:#ffd9df}to{box-shadow:0 0 0 3px transparent}}
-  .m-foco{outline:5px solid #e5294f!important;outline-offset:2px}`;
+  .m-foco{outline:5px solid #e5294f!important;outline-offset:2px;border-radius:6px}
+  .m-ok{outline:5px solid #12a673!important;outline-offset:2px;border-radius:6px}`;
   document.head.append(s);
-  document.body.insertAdjacentHTML('beforeend', '<div id="m-tablero"></div><div id="m-rotulo"></div>');
+  document.body.insertAdjacentHTML('beforeend', '<div id="m-tablero"></div><pre id="m-json"><b>Lo que llega de la IA</b><span></span></pre><div id="m-rotulo"></div>');
+  let todo = '';
+  window.__resaltar = null;
+  window.__trozo = (t) => {
+    todo += t;
+    const cola = todo.slice(-230);
+    const esc = (x) => x.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c]);
+    let html = esc(cola);
+    if (window.__resaltar) html = html.replace(new RegExp(esc(window.__resaltar).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), (m) => `<mark>${m}</mark>`);
+    document.querySelector('#m-json span').innerHTML = html;
+  };
 };
 
 mkdirSync(OUT, { recursive: true });
@@ -58,10 +92,13 @@ async function grabar(nombre, url, escena) {
 }
 
 const resultados = {};
+const rotulo = (page, t) => page.evaluate((x) => { document.querySelector('#m-rotulo').textContent = x; }, t);
 for (const [id, e] of Object.entries(ESCENAS).filter(([k]) => !process.env.SOLO || process.env.SOLO === k)) for (const [version, modo] of [['antes', 'directo'], ['despues', 'preparada']]) {
   await grabar(`g-${id}-${version}`, `http://localhost:5383/ui/?modo=${modo}&motor=grabacion${id === 'renderizado' ? '&inyectar=1' : ''}`, async (page) => {
-    await page.evaluate((t) => { document.querySelector('#m-rotulo').textContent = t; }, e[version]);
+    const P = e.pasos;
+    await rotulo(page, P.inicio);
     if (e.resaltar) await page.evaluate(() => new MutationObserver((l) => { for (const r of l) for (const n of r.addedNodes) if (n.classList?.contains('fila') || n.classList?.contains('bloque')) n.classList.add('m-nuevo'); }).observe(document.querySelector('[data-superficie]'), { childList: true, subtree: true }));
+    if (id === 'renderizado') await page.evaluate(() => { window.__resaltar = "<img src=x onerror='window.__xss=(window.__xss||0)+1'>"; });
     const tablero = async () => page.evaluate((f) => {
       const m = window.uiDemo.medidas();
       const v = document.querySelector('[data-cantidad="papa-pastusa"]')?.value ?? '–';
@@ -70,17 +107,33 @@ for (const [id, e] of Object.entries(ESCENAS).filter(([k]) => !process.env.SOLO 
     }, e.marcador.toString());
     let vivo = true;
     const ciclo = (async () => { while (vivo) { await tablero().catch(() => {}); await page.waitForTimeout(120); } })();
+    await page.waitForTimeout(900);
     const fin = page.evaluate((p) => window.uiDemo.pedir(p), PEDIDO);
     if (e.editar) {
-      await page.waitForSelector('[data-cantidad="papa-pastusa"]');
-      await page.waitForTimeout(900);
+      // Se detiene la respuesta para que se vea cada paso.
+      await page.waitForSelector('[data-cantidad="cubio"]');
+      await page.evaluate(() => window.uiDemo.pausar(true));
+      await page.waitForTimeout(700);
+      await rotulo(page, P.editar);
+      await page.evaluate(() => document.querySelector('[data-cantidad="papa-pastusa"]').closest('.fila').classList.add('m-foco'));
+      await page.waitForTimeout(600);
       await page.evaluate(() => { const i = document.querySelector('[data-cantidad="papa-pastusa"]'); i.value = '5'; i.dispatchEvent(new Event('input', { bubbles: true })); });
+      await page.waitForTimeout(1800);
+      await rotulo(page, P.llega);
+      await page.evaluate(() => { window.__resaltar = '"id": "papa-pastusa", "cantidad": 2'; });
+      await page.evaluate(() => window.uiDemo.pausar(false));
+      await page.waitForTimeout(1600);
+      await rotulo(page, P[version]);
+      await page.evaluate((ok) => { const f = document.querySelector('[data-cantidad="papa-pastusa"]').closest('.fila'); f.classList.remove('m-foco'); f.classList.add(ok ? 'm-ok' : 'm-foco'); }, version === 'despues');
+    } else {
+      await page.waitForTimeout(2600);
+      await rotulo(page, P.medio);
     }
     await fin;
     vivo = false; await ciclo; await tablero();
-    if (e.editar) await page.evaluate(() => document.querySelector('[data-cantidad="papa-pastusa"]').closest('.fila').classList.add('m-foco'));
-    resultados[`${id}-${version}`] = await page.evaluate(() => ({ ...window.uiDemo.medidas(), papa: document.querySelector('[data-cantidad="papa-pastusa"]').value }));
-    await page.waitForTimeout(2600);
+    if (!e.editar) await rotulo(page, P[version]);
+    resultados[`${id}-${version}`] = await page.evaluate(() => ({ ...window.uiDemo.medidas(), papa: document.querySelector('[data-cantidad="papa-pastusa"]')?.value }));
+    await page.waitForTimeout(3000);
   });
   console.log(id, version, JSON.stringify(resultados[`${id}-${version}`]));
 }

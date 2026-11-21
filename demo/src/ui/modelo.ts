@@ -12,6 +12,8 @@ export interface Grabacion { pedido: string; trozos: [string, number][] }
 const GRABADAS = grabaciones as Grabacion[];
 export const PEDIDOS = ['Arma un mercado para 4 personas con 120 mil', '¿Dónde está más barata la papa?', '¿Qué cocino con papa, habas y cubios?'];
 export let ultima: Grabacion | null = null;
+/** Solo para grabar los videos: pausa la respuesta grabada en un punto. */
+export const pausa = { activa: false };
 
 export async function motor(): Promise<'nano' | 'grabacion'> {
   if (params.get('motor') === 'grabacion' || !LM()) return 'grabacion';
@@ -76,6 +78,7 @@ async function* desdeGrabacion(pedido: string, signal?: AbortSignal): AsyncGener
     if (!g) throw new Error('No hay respuestas grabadas');
     for (const [t, dt] of g.trozos) {
       await espera(dt, signal);
+      while (pausa.activa) await espera(80, signal);
       yield t;
     }
   }

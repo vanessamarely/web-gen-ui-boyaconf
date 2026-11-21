@@ -1,5 +1,5 @@
 // Mercado generativo: la misma web muestra una interfaz distinta según cada pedido.
-import { estadoMotor, motor, pedirAlModelo, PEDIDOS, prueba, ultima } from './modelo';
+import { estadoMotor, motor, pausa, pedirAlModelo, PEDIDOS, prueba, ultima } from './modelo';
 import { VistaDirecta } from './directo';
 import { VistaPreparada } from './preparada';
 import { conteo } from './conteo';
@@ -65,7 +65,10 @@ async function pedir(texto: string) {
   vista.empezar();
   const t0 = performance.now();
   try {
-    for await (const trozo of pedirAlModelo(texto, mio.signal)) vista.recibir(trozo);
+    for await (const trozo of pedirAlModelo(texto, mio.signal)) {
+      vista.recibir(trozo);
+      (window as unknown as { __trozo?: (t: string) => void }).__trozo?.(trozo);
+    }
     vista.terminar();
   } catch (e) {
     if ((e as DOMException).name !== 'AbortError') { console.error(e); estado.textContent = 'La IA no pudo responder. Intenta de nuevo.'; }
@@ -148,4 +151,4 @@ void registrar({ agregar: (i, c) => (vista instanceof VistaPreparada ? vista.agr
   $('.agente-nota').insertAdjacentHTML('beforeend', ` <small>${via === 'nativo' ? 'WebMCP nativo de Chrome.' : 'Tu navegador aún no trae WebMCP: las acciones se registran en la página.'}</small>`);
 });
 
-Object.assign(window, { uiDemo: { usarAgente, pedir, medidas: () => ({ ...m, pintadas: conteo.pintadas, xss: (window as unknown as { __xss?: number }).__xss ?? 0 }), grabacion: () => ultima } });
+Object.assign(window, { uiDemo: { pausar: (v: boolean) => (pausa.activa = v), usarAgente, pedir, medidas: () => ({ ...m, pintadas: conteo.pintadas, xss: (window as unknown as { __xss?: number }).__xss ?? 0 }), grabacion: () => ultima } });
