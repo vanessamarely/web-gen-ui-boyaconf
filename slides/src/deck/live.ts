@@ -134,7 +134,9 @@ export async function initLive(stage: DeckStage, sections: HTMLElement[]) {
   function publish(index: number) {
     const s = sections[index];
     // Si la presentadora saltó la dinámica, los celulares no ven esas preguntas ni el podio.
-    if (document.documentElement.hasAttribute('data-sin-dinamica') && ['q1', 'q2', 'q3', 'podio'].includes(s?.dataset.id ?? '')) return;
+    const idS = s?.dataset.id ?? '';
+    const root = document.documentElement;
+    if ((root.hasAttribute('data-sin-dinamica') && ['q1', 'q2', 'q3', 'podio'].includes(idS)) || (root.hasAttribute('data-sin-preguntas') && ['q1', 'q2', 'q3'].includes(idS))) return;
     lastIndex = index;
     const c = SLIDE_BY_ID.get(s.dataset.id ?? '');
     const qid = (s.dataset.q as QuestionId | undefined) ?? null;
@@ -431,8 +433,8 @@ export async function initLive(stage: DeckStage, sections: HTMLElement[]) {
         const extras = { tejedor: withTejedor.has(uid), early, asked: askedSet.has(uid), reactions: part.reactions[uid] ?? 0 };
         return { uid, name: names.get(uid) ?? own?.name ?? 'Tejedor anónimo', score: scoreFor(v, slide?.openedAt ?? {}, extras, answers), speed, code: winnerCode(uid), opts: own?.opts ?? null };
       })
-      // Para entrar al podio hay que acertar al menos una pregunta: los bonos solo suben posiciones.
-      .filter((r) => r.score > 0 && correctCount(byVote.get(r.uid)?.votes ?? {}, answers) > 0)
+      // Con preguntas, hay que acertar al menos una. Si se saltaron, el podio es por participación.
+      .filter((r) => r.score > 0 && (!Object.keys(slide?.openedAt ?? {}).length || correctCount(byVote.get(r.uid)?.votes ?? {}, answers) > 0))
       .sort((a, b) => b.score - a.score || a.speed - b.speed); // empate: quien respondió antes
   }
   const avatar = (opts: TejedorOptions | null | undefined, name: string) => (opts ? tejedorSVG(opts, `Tejedor de ${name}`) : tejedorSilhouette(`${name} no publicó su tejedor`));

@@ -589,7 +589,9 @@ function renderPodium(screen: HTMLElement) {
            <p>Acércate al escenario y muestra este código:</p><p class="code">${myCode}</p>`
         : pos >= 3
           ? `<h1>¡Quedaste en el puesto ${pos + 1}!</h1><p class="muted">Estás en el top 10 con ${me!.score.toLocaleString('es-CO')} puntos. ¡Gran carrera, tejedor!</p>`
-          : `<h1>¡Gracias por jugar!</h1><p class="muted">Acertaste ${correctCount(myVotes, live?.answers ?? {})} de 3. Para entrar al podio hay que acertar al menos una; los bonos suben posiciones. El podio está en la pantalla.</p>`
+          : !Object.keys(live?.openedAt ?? {}).length
+            ? `<h1>¡Gracias por participar!</h1><p class="muted">Hoy el podio se decidió por participación: llegar a tiempo, publicar tu tejedor, preguntar y reaccionar. El podio está en la pantalla.</p>`
+            : `<h1>¡Gracias por jugar!</h1><p class="muted">Acertaste ${correctCount(myVotes, live?.answers ?? {})} de 3. Para entrar al podio hay que acertar al menos una; los bonos suben posiciones. El podio está en la pantalla.</p>`
     }
     ${podium.length ? `<ol class="podium-list">${podium.slice(0, 5).map((p, i) => `<li ${i === pos ? 'data-me' : ''}><span class="pl-avatar">${p.opts ? tejedorSVG(p.opts, p.name) : tejedorSilhouette()}</span><span class="pl-name">${i + 1}. ${esc(p.name)}</span><b>${p.score.toLocaleString('es-CO')}</b></li>`).join('')}</ol>` : '<p class="muted">Esperando el podio…</p>'}
     <p class="fine">Tu código: <b>${myCode}</b></p>

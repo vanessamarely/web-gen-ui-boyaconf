@@ -201,8 +201,11 @@ const toggleRail = () => {
 const menuBtn = document.querySelector<HTMLButtonElement>('.deck-menu-btn')!;
 const menu = document.querySelector<HTMLElement>('.deck-menu-panel')!;
 // Sin tiempo para la dinámica: la presentadora puede saltar las preguntas y el podio.
-const DINAMICA = new Set(['q1', 'q2', 'q3', 'podio']);
+const PREGUNTAS = new Set(['q1', 'q2', 'q3']);
 const sinDinamica = () => document.documentElement.hasAttribute('data-sin-dinamica');
+const sinPreguntas = () => document.documentElement.hasAttribute('data-sin-preguntas');
+/** Slides que se saltan: solo preguntas (el podio queda por participación) o preguntas y podio. */
+const saltado = (id: string) => (sinDinamica() && (PREGUNTAS.has(id) || id === 'podio')) || (sinPreguntas() && PREGUNTAS.has(id));
 
 let current = Math.max(0, sections.findIndex((s) => s.hasAttribute('data-deck-active')));
 
@@ -231,6 +234,7 @@ menu.innerHTML = publico ? `
   <button type="button" data-act="fs">Pantalla completa <kbd>F</kbd></button>
   <button type="button" data-act="rail">Panel de miniaturas <kbd>S</kbd></button>
   <button type="button" data-act="joinqr">QR para unirse en cada slide <kbd>J</kbd></button>
+  <button type="button" data-act="preguntas-off">${(() => { try { return localStorage.getItem(`${NS}.deck.sinPreguntas`) === '1'; } catch { return false; } })() ? 'Mostrar las preguntas' : 'Saltar solo las preguntas (podio por participación)'}</button>
   <button type="button" data-act="dinamica">${(() => { try { return localStorage.getItem(`${NS}.deck.sinDinamica`) === '1'; } catch { return false; } })() ? 'Mostrar preguntas y podio' : 'Saltar preguntas y podio (sin tiempo)'}</button>
   <button type="button" data-act="present" data-presenter-only>Presentar en vivo (GitHub)</button>
   <button type="button" data-act="answers" data-presenter-ui hidden>Cargar respuestas del podio… <kbd data-answers-status></kbd></button>
@@ -256,7 +260,7 @@ function renderMenuList() {
   [...list.children].forEach((b, i) => {
     if (i === current) b.setAttribute('aria-current', 'true');
     else b.removeAttribute('aria-current');
-    b.classList.toggle('saltado', sinDinamica() && DINAMICA.has(sections[i].dataset.id ?? ''));
+    b.classList.toggle('saltado', saltado(sections[i].dataset.id ?? ''));
   });
 }
 
@@ -300,6 +304,7 @@ menu.addEventListener('click', (e) => {
   if (act === 'rail') toggleRail();
   if (act === 'joinqr') toggleJoinQr();
   if (act === 'dinamica') toggleDinamica();
+  if (act === 'preguntas-off') togglePreguntas();
   if (act === 'present') document.dispatchEvent(new CustomEvent('deck:present'));
   if (act === 'answers') document.dispatchEvent(new CustomEvent('deck:answers'));
   if (act === 'wipe') {
@@ -365,6 +370,7 @@ function iniciarTiempo(slide: HTMLElement) {
 // Sin tiempo para la dinámica: la presentadora puede saltar las preguntas y el podio.
 try {
   if (!publico && localStorage.getItem(`${NS}.deck.sinDinamica`) === '1') document.documentElement.setAttribute('data-sin-dinamica', '');
+  if (!publico && localStorage.getItem(`${NS}.deck.sinPreguntas`) === '1') document.documentElement.setAttribute('data-sin-preguntas', '');
 } catch {
   /* noop */
 }
@@ -376,13 +382,21 @@ const toggleDinamica = () => {
   const b = menu.querySelector('[data-act="dinamica"]');
   if (b) b.textContent = on ? 'Mostrar preguntas y podio' : 'Saltar preguntas y podio (sin tiempo)';
 };
+const togglePreguntas = () => {
+  const on = !sinPreguntas();
+  document.documentElement.toggleAttribute('data-sin-preguntas', on);
+  save('sinPreguntas', on ? '1' : '0');
+  renderMenuList();
+  const b = menu.querySelector('[data-act="preguntas-off"]');
+  if (b) b.textContent = on ? 'Mostrar las preguntas' : 'Saltar solo las preguntas (podio por participación)';
+};
 stage.addEventListener('slidechange', (e) => {
   const { index, slide } = (e as CustomEvent).detail as { index: number; slide: HTMLElement };
-  if (sinDinamica() && DINAMICA.has(slide.dataset.id ?? '')) {
+  if (saltado(slide.dataset.id ?? '')) {
     // Se salta en la dirección en la que iba la presentadora.
     const dir = index >= current ? 1 : -1;
     let j = index;
-    while (sections[j] && DINAMICA.has(sections[j].dataset.id ?? '')) j += dir;
+    while (sections[j] && saltado(sections[j].dataset.id ?? '')) j += dir;
     if (sections[j]) return void stage.goTo(j);
   }
   iniciarTiempo(slide);
