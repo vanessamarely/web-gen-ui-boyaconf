@@ -200,6 +200,10 @@ const toggleRail = () => {
 // ── Menú hamburguesa (siempre arriba a la derecha) ───────────────────
 const menuBtn = document.querySelector<HTMLButtonElement>('.deck-menu-btn')!;
 const menu = document.querySelector<HTMLElement>('.deck-menu-panel')!;
+// Sin tiempo para la dinámica: la presentadora puede saltar las preguntas y el podio.
+const DINAMICA = new Set(['q1', 'q2', 'q3', 'podio']);
+const sinDinamica = () => document.documentElement.hasAttribute('data-sin-dinamica');
+
 let current = Math.max(0, sections.findIndex((s) => s.hasAttribute('data-deck-active')));
 
 const ratioLabel = (m: RatioMode) => (m === 'auto' ? ['Auto', 'según la ventana'] : m === 'event' ? ['Extendida', '1680×672 · bandas'] : [RATIOS[m].label, RATIOS[m].hint]);
@@ -227,6 +231,7 @@ menu.innerHTML = publico ? `
   <button type="button" data-act="fs">Pantalla completa <kbd>F</kbd></button>
   <button type="button" data-act="rail">Panel de miniaturas <kbd>S</kbd></button>
   <button type="button" data-act="joinqr">QR para unirse en cada slide <kbd>J</kbd></button>
+  <button type="button" data-act="dinamica">${(() => { try { return localStorage.getItem(`${NS}.deck.sinDinamica`) === '1'; } catch { return false; } })() ? 'Mostrar preguntas y podio' : 'Saltar preguntas y podio (sin tiempo)'}</button>
   <button type="button" data-act="present" data-presenter-only>Presentar en vivo (GitHub)</button>
   <button type="button" data-act="answers" data-presenter-ui hidden>Cargar respuestas del podio… <kbd data-answers-status></kbd></button>
   <button type="button" data-act="questions" data-presenter-ui hidden>Preguntas del público <kbd><span data-q-count>0</span> · Q</kbd></button>
@@ -248,7 +253,11 @@ function renderMenuList() {
       list.append(b);
     });
   }
-  [...list.children].forEach((b, i) => (i === current ? b.setAttribute('aria-current', 'true') : b.removeAttribute('aria-current')));
+  [...list.children].forEach((b, i) => {
+    if (i === current) b.setAttribute('aria-current', 'true');
+    else b.removeAttribute('aria-current');
+    b.classList.toggle('saltado', sinDinamica() && DINAMICA.has(sections[i].dataset.id ?? ''));
+  });
 }
 
 const openMenu = () => {
@@ -290,6 +299,7 @@ menu.addEventListener('click', (e) => {
   if (act === 'fs') toggleFullscreen();
   if (act === 'rail') toggleRail();
   if (act === 'joinqr') toggleJoinQr();
+  if (act === 'dinamica') toggleDinamica();
   if (act === 'present') document.dispatchEvent(new CustomEvent('deck:present'));
   if (act === 'answers') document.dispatchEvent(new CustomEvent('deck:answers'));
   if (act === 'wipe') {
@@ -352,8 +362,29 @@ function iniciarTiempo(slide: HTMLElement) {
   }, 1000);
 }
 
+// Sin tiempo para la dinámica: la presentadora puede saltar las preguntas y el podio.
+try {
+  if (!publico && localStorage.getItem(`${NS}.deck.sinDinamica`) === '1') document.documentElement.setAttribute('data-sin-dinamica', '');
+} catch {
+  /* noop */
+}
+const toggleDinamica = () => {
+  const on = !sinDinamica();
+  document.documentElement.toggleAttribute('data-sin-dinamica', on);
+  save('sinDinamica', on ? '1' : '0');
+  renderMenuList();
+  const b = menu.querySelector('[data-act="dinamica"]');
+  if (b) b.textContent = on ? 'Mostrar preguntas y podio' : 'Saltar preguntas y podio (sin tiempo)';
+};
 stage.addEventListener('slidechange', (e) => {
   const { index, slide } = (e as CustomEvent).detail as { index: number; slide: HTMLElement };
+  if (sinDinamica() && DINAMICA.has(slide.dataset.id ?? '')) {
+    // Se salta en la dirección en la que iba la presentadora.
+    const dir = index >= current ? 1 : -1;
+    let j = index;
+    while (sections[j] && DINAMICA.has(sections[j].dataset.id ?? '')) j += dir;
+    if (sections[j]) return void stage.goTo(j);
+  }
   iniciarTiempo(slide);
   current = index;
   renderMenuList();

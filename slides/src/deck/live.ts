@@ -132,8 +132,10 @@ export async function initLive(stage: DeckStage, sections: HTMLElement[]) {
     if (lastIndex >= 0) tellConsole();
   });
   function publish(index: number) {
-    lastIndex = index;
     const s = sections[index];
+    // Si la presentadora saltó la dinámica, los celulares no ven esas preguntas ni el podio.
+    if (document.documentElement.hasAttribute('data-sin-dinamica') && ['q1', 'q2', 'q3', 'podio'].includes(s?.dataset.id ?? '')) return;
+    lastIndex = index;
     const c = SLIDE_BY_ID.get(s.dataset.id ?? '');
     const qid = (s.dataset.q as QuestionId | undefined) ?? null;
     tellConsole();

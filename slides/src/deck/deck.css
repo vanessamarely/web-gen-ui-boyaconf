@@ -1635,3 +1635,5 @@ deck-stage > section > .frame { z-index: 1; }
 @media (max-width: 640px) { .deco { display: none; } }
 @media (prefers-reduced-motion: reduce) { .deco-condor .lm-condor { animation: none !important; } }
 .deco-condor { overflow: visible; width: 170px; top: 14px; }
+:root[data-sin-dinamica] .aviso-pregunta { display: none; }
+.deck-menu-panel .slides-list button.saltado { text-decoration: line-through; opacity: .45; }
