@@ -60,21 +60,33 @@ if (ESCENA === 'tres') {
     await page.waitForTimeout(3200);
   }
 } else {
-  // Primero la IA arma la lista (sin grabar). Luego el agente la usa con acciones.
+  // Primero la IA arma la lista (sin grabar). Luego el agente la usa con una acción, paso a paso.
   await page.evaluate(() => window.uiDemo.pedir('Arma un mercado para 4 personas con 120 mil'));
-  await page.evaluate(() => { document.querySelector('[data-progreso]').hidden = true; scrollTo(0, 0); });
-  // Todo a la vista en un solo cuadro: el registro del agente y la lista.
-  await page.addStyleTag({ content: 'body{zoom:.74} .ui-titulo,.b-consejo,[data-estado]{display:none!important}' });
-  await page.evaluate(() => { Element.prototype.scrollIntoView = () => {}; });
+  await page.addStyleTag({ content: `.cabeza,.pedido,.medidas,.explica,.prueba,.modo,.cwv,.progreso,.ui-titulo,.b-consejo,[data-estado],.agente .chips,.agente-nota small,.aviso-agente{display:none!important}
+    body{max-width:none;margin:0;padding:22px 24px 90px;display:grid;grid-template-columns:540px 1fr;gap:24px;align-items:start}
+    .agente{margin:0;font-size:18px} .agente h2{font-size:20px} .agente .pedido-fila input{font-size:20px}
+    .registro{font-size:19px} .registro code{font-size:17px}
+    .superficie{zoom:1.12}
+    .m-foco{outline:5px solid #e5294f!important;outline-offset:2px;border-radius:6px}
+    .registro li.m-foco{outline-offset:0}
+    #m-rotulo{position:fixed;z-index:9;left:50%;bottom:18px;transform:translateX(-50%);padding:12px 28px;border-radius:999px;background:#1a0e1c;color:#fff;font:700 24px system-ui;white-space:nowrap}` });
+  await page.evaluate(() => { Element.prototype.scrollIntoView = () => {}; scrollTo(0, 0); document.body.insertAdjacentHTML('beforeend', '<div id="m-rotulo"></div>'); });
+  const rotulo = (t) => page.evaluate((x) => { document.querySelector('#m-rotulo').textContent = x; }, t);
   grabando = true;
-  for (const p of ['Agrega 2 kg de papa criolla', 'Cambia la arracacha a 3 kg', 'Quita las habas']) {
-    await page.evaluate(() => scrollTo(0, 0));
-    await page.fill('#qa', '');
-    await page.type('#qa', p, { delay: 45 });
-    await page.waitForTimeout(400);
-    await page.evaluate((x) => window.uiDemo.usarAgente(x), p);
-    await page.waitForTimeout(2800);
-  }
+  await rotulo('1. Le pido al agente: “Quita las habas”');
+  await page.waitForTimeout(700);
+  await page.type('#qa', 'Quita las habas', { delay: 70 });
+  await page.waitForTimeout(700);
+  await rotulo('2. Gemini Nano elige una acción de la página…');
+  const hecho = page.evaluate(() => window.uiDemo.usarAgente('Quita las habas'));
+  // Se resalta la fila apenas Nano decide, antes de que salga de la lista.
+  await page.waitForFunction(() => /quitar_producto/.test(document.querySelector('[data-registro] li')?.textContent ?? ''), null, { timeout: 60000 });
+  await page.evaluate(() => document.querySelector('[data-registro] li')?.classList.add('m-foco'));
+  await rotulo('2. Gemini Nano eligió quitar_producto({ id: "habas" })');
+  await hecho;
+  await page.waitForTimeout(1800);
+  await rotulo('3. La página la ejecuta: las habas salen de la lista');
+  await page.waitForTimeout(3200);
   console.log(await page.locator('[data-registro]').innerText());
 }
 grabando = false;
